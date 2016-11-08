@@ -87,6 +87,66 @@ as.data.frame.tracks <- function(x, row.names = NULL, optional = FALSE,
 	return(r)
 }
 
+#' Convert from Data Frame to Tracks
+#'
+#' Get cell tracks from a data.frame. Data are expected to be organized as
+#' follows.
+#' One column contains a track identifier, which can be numeric or a string, and
+#' determines which points belong to the same track.
+#' Another column is expected to contain a time index or a time period (e.g. number of
+#' seconds elapsed since the beginning of the track, or since the beginning of the
+#' experiment). Input of dates is not (yet) supported, as absolute time information is
+#' frequently not available.
+#' One to three further columns contain the spatial coordinates
+#' (depending on whether the tracks are 1D, 2D or 3D).
+#' The names or indices of these columns in the data.frame are given using the
+#' corresponding parameters (see below). Names and indices can be mixed, e.g. you can
+#' specify \code{id.column="Parent"} and \code{pos.columns=1:3}
+#'
+#' @inheritParams read.tracks.csv
+#' @param x the data frame to be coerced to a \code{tracks} object.
+as.tracks.data.frame <- function(x, id.column=1, time.column=2,
+                                 pos.columns=c(3,4,5), scale.t=1,
+                                 scale.pos=1, ...) {
+	if( ncol(x) < length(pos.columns) + 1) {
+		stop("Data frame does not contain enough columns! (Perhaps you need to specify 'sep')")
+	}
+	if( length(pos.columns) < 1 ){
+		stop("At least one position column needs to be specified!")
+	}
+	if( length(pos.columns) == 2 && !is.finite(pos.columns[2]) ){
+		cx <- match( pos.columns[1], colnames(x) )
+		if( is.na(cx) && is.numeric(pos.columns[1]) ){
+			cx <- pos.columns[1]
+		}
+		pos.columns <- seq( cx, length(x) )
+	}
+	cx <- as.character(c(id.column,time.column,pos.columns))
+	cxc <- match( cx, colnames(x) )
+	cxi <- match( cx, seq_len(ncol(x)) )
+
+	cxi[is.na(cxi)] <- cxc[is.na(cxi)]
+
+	if( any(is.na(cxi)) ){
+		stop("Column(s) not found: ",
+			paste(cx[is.na(cxi)],collapse=","))
+	}
+	r <- x[,as.integer(cxi)]
+	if( ncol(r) <= 5 ){
+		colnames(r) <- c("id","t",c("x","y","z")[seq_along(pos.columns)])
+	} else {
+		colnames(r) <- c("id","t",paste0("x",seq_along(pos.columns)))
+	}
+	if( scale.t != 1 ){
+		r[,"t"] <- scale.t*r[,"t"]
+	}
+	if( any( scale.pos != 1 ) ){
+		r[,-c(1,2)] <- scale.t*r[,-c(1,2)]
+	}
+	sort.tracks(as.tracks.list(split.data.frame(as.matrix(r[,-1]), r[,1])))
+}
+
+
 `[.tracks` <- function(x,y) as.tracks(as.list(x)[y])
 
 #' @rdname tracks
@@ -228,52 +288,13 @@ read.tracks.csv <- function(file, id.column=1, time.column=2,
 			blank.lines.skip = FALSE, ...)
 		is.blank <- apply( data.raw, 1, function(x) all( is.na(x) ) )
 		ids <- cumsum( is.blank )
-	} else {
-		data.raw <- read.table(file, header=header, sep=sep, ...)
-	}
-	if( ncol(data.raw) < length(pos.columns)+1+as.integer(!track.sep.blankline) ){
-		stop("CSV file does not contain enough columns! (Perhaps you need to specify 'sep')")
-	}
-	if( length(pos.columns) < 1 ){
-		stop("At least one position column needs to be specified!")
-	}
-	if( length(pos.columns) == 2 && !is.finite(pos.columns[2]) ){
-		cx <- match( pos.columns[1], colnames( data.raw ) )
-		if( is.na(cx) && is.numeric(pos.columns[1]) ){
-			cx <- pos.columns[1]
-		}
-		pos.columns <- seq( cx, length(data.raw) )
-	}
-	if( track.sep.blankline ){
 		data.raw <- cbind( data.raw, ids )
 		data.raw <- data.raw[!is.blank,]
 		id.column <- ncol( data.raw )
-	}
-	cx <- as.character(c(id.column,time.column,pos.columns))
-	cxc <- match( cx, colnames(data.raw) )
-	cxi <- match( cx, seq_len(ncol(data.raw)) )
-
-	cxi[is.na(cxi)] <- cxc[is.na(cxi)]
-
-	if( any(is.na(cxi)) ){
-		stop("Column(s) not found: ",
-			paste(cx[is.na(cxi)],collapse=","))
-	}
-	r <- data.raw[,as.integer(cxi)]
-	if( ncol(r) <= 5 ){
-		colnames(r) <- c("id","t",c("x","y","z")[seq_along(pos.columns)])
 	} else {
-		colnames(r) <- c("id","t",paste0("x",seq_along(pos.columns)))
+		data.raw <- read.table(file, header=header, sep=sep, ...)
 	}
-	if( scale.t != 1 ){
-		r[,"t"] <- scale.t*r[,"t"]
-	}
-	if( any( scale.pos != 1 ) ){
-		r[,-c(1,2)] <- scale.t*r[,-c(1,2)]
-	}
-	sort.tracks(structure( 
-		split.data.frame( as.matrix(r[,2:ncol(r)]), r[,1] ),
-		class="tracks"))
+  as.tracks.data.frame(data.raw, id.column, time.column, pos.columns, scale.t, scale.pos)
 }
 
 #' Split Track into Multiple Tracks
