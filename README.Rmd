@@ -1,0 +1,106 @@
+---
+title: MotilityLab README
+author: Johannes Textor
+output:
+  md_document:
+    variant: markdown_github
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+# MotilityLab
+
+MotilityLab is designed to help with describing, visualizing, and quantifying tracks 
+of moving objects. Many common measures used in physics and biology are implemented, such
+as mean square displacement and autocorrelation. The package also provides a flexible 
+function to import tracks from text files.
+
+The MotilityLab package has been developed as part of the project of the same name.
+On the project website (motilitylab.net), a simple GUI frontend to many functions in the 
+package is implemented, and public datasets are available to download and analyze.
+
+# Installation
+
+The latest development version of MotilityLab can be installed from R-forge:
+
+```{r,eval=FALSE}
+   install.packages("MotilityLab",repos="http://R-Forge.R-project.org")
+```
+
+Then the package can be loaded as usual:
+
+```{r}
+	library(MotilityLab)
+```
+
+# Examples
+
+Tracks are organized as lists of matrices, and have S3 class `tracks`. Three example
+datasets are provided with the package. A `plot` method is implemented and can be used
+to visualize these datasets: 
+
+```{r}
+	plot( TCells, col=1 )
+	plot( BCells, col=2 )
+```
+
+To generate a simple mean square displacement plot for the example dataset
+`TCells', use:
+
+```{r}
+	msqd <- aggregate( TCells, squareDisplacement )
+	plot( msqd, type='l' )
+```
+
+This computes the squared displacement (MSD) for over all subtracks of the dataset, and 
+computes the average stratified by subtrack length. To compute the MSD for non-overlapping
+subtracks only, use:
+
+```{r}
+	msqd <- aggregate( TCells, squareDisplacement, max.overlap=0 )
+	plot( msqd, type='l' )
+```
+
+MSD estimates can be biased in applications with a finite field of view (such as
+microscopy), because slower objects remain in the field of view for longer times. This
+can complicate comparisons between different populations. We may thus wish to restrict
+our comparison to subtracks of a certain (short) length. This can be done as 
+follows:
+
+```{r}
+	msqd.t <- aggregate( TCells, squareDisplacement, subtrack.length=1:5, max.overlap=0 )
+	msqd.b <- aggregate( TCells, squareDisplacement, subtrack.length=1:5, max.overlap=0 )
+
+	plot( msqd.t, type='l' )
+	lines( msqd.b, col=2 )
+```
+
+Another common measure to analyze tracks is the autocovariance function; geometrically
+speaking, 
+this is the dot product between pairs of pairs of positions a fixed distance apart. 
+For random walks, the autocovariance decreases to 0 as the subtrack length increases.
+The speed of convergence gives an indication of persistence of 
+orientation, a feature of many realistic objects. To compare persistence of the 
+T cells and B cells datasets, we can use:
+
+```{r}
+	angle.t <- aggregate( TCells, overallDot )
+	angle.b <- aggregate( BCells, overallDot )
+	plot( angle.t, type='l' )
+	lines( angle.b, col=2 )
+```
+
+Many other ways to quantify tracks are implemented in the package and described in the
+PDF documentation. For an overview of the available commands, use the function
+
+```{r,eval=FALSE}
+	help( package="MotilityLab" )
+```

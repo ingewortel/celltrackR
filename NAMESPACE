@@ -1,0 +1,18 @@
+exportPattern("^[^\\.][[:alpha:]]+")
+S3method(plot,tracks)
+S3method(aggregate,tracks)
+S3method(as.data.frame,tracks)
+S3method(as.list,tracks)
+S3method(sort,tracks)
+S3method(c,tracks)
+S3method('[',tracks)
+S3method(as.tracks,list)
+importFrom("grDevices", "col2rgb", "rainbow", "rgb")
+importFrom("graphics", "abline", "plot", "points", "polygon",
+		 "segments", "stripchart")
+importFrom("stats", "aggregate", "approx", "ave", "cov", "diffinv", "dist",
+		 "hclust", "median", "qf", "quantile", "rnorm", "runif",
+		 "sd", "spline", "t.test", "weighted.mean")
+importFrom("utils", "head", "read.table", "tail")
+importFrom("ellipse", "ellipse")
+importFrom("stats", "pf")
