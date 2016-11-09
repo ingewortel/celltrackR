@@ -70,7 +70,7 @@ NULL
 #' colMeans( as.data.frame( TCells )[-c(1,2)] )
 as.data.frame.tracks <- function(x, row.names = NULL, optional = FALSE, 
 	include.timepoint.column=FALSE, ...) {
-	ids <- rep(names(x), lapply(x,nrow))
+	ids <- rep(names(x), sapply(x,nrow))
 	if( include.timepoint.column ){
 		timepoint <- ave( ids, ids, FUN=seq_along )
 		r <- data.frame(id=ids, timepoint=timepoint, do.call( 
@@ -337,7 +337,7 @@ plot.tracks <- function(x, dims=c('x','y'), add=F,
 
 	ids <- names(x)
 	lcol <- rep_len(col, length(ids))
-	pcol <- rep(lcol, lapply(x,nrow))
+	pcol <- rep(lcol, sapply(x,nrow))
 	dim1 <- unlist( lapply(x,'[', , dims[1]) )
 	dim2 <- unlist( lapply(x,'[', , dims[2]) )
 
@@ -371,7 +371,7 @@ plot.tracks <- function(x, dims=c('x','y'), add=F,
 	x1 <- .ulapply(x,lseg(tail,1))
 	y1 <- .ulapply(x,lseg(tail,2))
 
-	lcol <- rep(lcol, lapply(x, function(d) {
+	lcol <- rep(lcol, sapply(x, function(d) {
 		nrow(d) - 1
 	}))
 	segments(x0, y0, x1, y1, col=lcol)
