@@ -1,0 +1,8 @@
+# Unix line ending
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+# Tab indentation (no size specified)
+[*.R]
+indent_style = tab
