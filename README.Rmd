@@ -1,9 +1,7 @@
 ---
 title: MotilityLab README
 author: Johannes Textor
-output:
-  md_document:
-    variant: markdown_github
+output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -12,7 +10,7 @@ output:
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "README-"
+  fig.path = ".README/README-"
 )
 ```
 

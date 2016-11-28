@@ -1,5 +1,5 @@
 ^.editorconfig$
 ^README\.Rmd$
 ^README.md$
-^README-.*\.png$
+^\.README/README-.*\.png$
 ^cran-comments.md$
