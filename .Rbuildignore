@@ -1,3 +1,4 @@
+^.editorconfig$
 ^README\.Rmd$
 ^README.md$
 ^README-.*\.png$
