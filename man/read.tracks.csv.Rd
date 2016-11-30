@@ -60,8 +60,10 @@ Another column is expected to contain a time index or a time period (e.g. number
 seconds elapsed since the beginning of the track, or since the beginning of the 
 experiment). Input of dates is not (yet) supported, as absolute time information is
 frequently not available. 
-One to three further columns contain the spatial coordinates 
-(depending on whether the tracks are 1D, 2D or 3D). 
+Further columns contain the spatial coordinates. If there are three or less spatial
+coordinates, their names will by "x", "y", and "z" 
+(depending on whether the tracks are 1D, 2D or 3D). If there are four or more spatial
+coordinates, their names will be "x1", "x2", and so on.
 The names or indices of these columns in the CSV files are given using the 
 corresponding parameters (see below). Names and indices can be mixed, e.g. you can
 specify \code{id.column="Parent"} and \code{pos.columns=1:3}

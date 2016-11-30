@@ -16,7 +16,7 @@
 
 \item{pos.columns}{vector containing indices or names of the columns that contain
 the spatial coordinates. If this vector has two entries and the second entry is NA,
-e.g. \code{c('x',NA)} or \code{c(5,NA)} then all columns from the indicated column
+e.g. \code{c('x',NA)} or \code{c(5,NA)} then all columns from the indicated column 
 to the last column are used. This is useful when reading files where the exact number
 of spatial dimensions is not known beforehand.}
 
@@ -24,10 +24,10 @@ of spatial dimensions is not known beforehand.}
 or for specifying the time between positions if this is not contained in the file
 itself.}
 
-\item{scale.pos}{a value, or a vector of values, by which to multiply each spatial
+\item{scale.pos}{a value, or a vector of values, by which to multiply each spatial 
 position. Useful for changing units.}
 
-\item{...}{further arguments to be passed to \code{read.csv}, for instance
+\item{...}{further arguments to be passed to \code{read.csv}, for instance 
 \code{sep="\t"} can be useful for tab-separated files.}
 }
 \description{
@@ -39,8 +39,10 @@ Another column is expected to contain a time index or a time period (e.g. number
 seconds elapsed since the beginning of the track, or since the beginning of the
 experiment). Input of dates is not (yet) supported, as absolute time information is
 frequently not available.
-One to three further columns contain the spatial coordinates
-(depending on whether the tracks are 1D, 2D or 3D).
+Further columns contain the spatial coordinates. If there are three or less spatial
+coordinates, their names will by "x", "y", and "z" 
+(depending on whether the tracks are 1D, 2D or 3D). If there are four or more spatial
+coordinates, their names will be "x1", "x2", and so on.
 The names or indices of these columns in the data.frame are given using the
 corresponding parameters (see below). Names and indices can be mixed, e.g. you can
 specify \code{id.column="Parent"} and \code{pos.columns=1:3}
