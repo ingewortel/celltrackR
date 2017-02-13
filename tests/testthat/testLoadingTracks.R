@@ -16,3 +16,8 @@ test_that("Tracks are loaded correctly", {
 test_that("Tracks have correct structure", {
   expect_equal(class(tracks.from.df[[1]]), "matrix")
 })
+
+test_that("Can choose strings or factors when converting to data frame", {
+	expect_equal(class(as.data.frame.tracks(TCells,idsAsFactors=TRUE)[,"id"]),"factor")
+	expect_equal(class(as.data.frame.tracks(TCells,idsAsFactors=FALSE)[,"id"]),"character")
+})

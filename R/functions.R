@@ -60,6 +60,8 @@ NULL
 #'  dataframe will contain a column that consecutively numbers the positions according
 #'  to their time. Note that this information is anyway implicitly present in the time 
 #'  information.
+#' @param idsAsFactors logical. If \code{TRUE}, then the id column of the resulting
+#'  dataframe will be a factor column, otherwise a characeter column.
 #' @param ... further arguments to be passed from or to other methods.
 #'
 #' @return A single data frame containing all individual tracks from the input with a 
@@ -69,15 +71,15 @@ NULL
 #' ## Display overall average position of the T cell data
 #' colMeans( as.data.frame( TCells )[-c(1,2)] )
 as.data.frame.tracks <- function(x, row.names = NULL, optional = FALSE, 
-	include.timepoint.column=FALSE, ...) {
+	include.timepoint.column=FALSE, idsAsFactors = TRUE, ...) {
 	ids <- rep(names(x), sapply(x,nrow))
 	if( include.timepoint.column ){
 		timepoint <- ave( ids, ids, FUN=seq_along )
 		r <- data.frame(id=ids, timepoint=timepoint, do.call( 
-			rbind.data.frame, x ) )
+			rbind.data.frame, x ), stringsAsFactors=idsAsFactors )
 	} else {
 		r <- data.frame(id=ids, do.call( 
-			rbind.data.frame, x ) )
+			rbind.data.frame, x ), stringsAsFactors=idsAsFactors )
 	}
 	if( !is.null(row.names) && length(row.names)==nrow(r) ){
 		rownames(r) <- row.names
@@ -107,6 +109,7 @@ as.data.frame.tracks <- function(x, row.names = NULL, optional = FALSE,
 #'
 #' @inheritParams read.tracks.csv
 #' @param x the data frame to be coerced to a \code{tracks} object.
+#' 
 as.tracks.data.frame <- function(x, id.column=1, time.column=2,
                                  pos.columns=c(3,4,5), scale.t=1,
                                  scale.pos=1, ...) {
@@ -143,7 +146,7 @@ as.tracks.data.frame <- function(x, id.column=1, time.column=2,
 		r[,"t"] <- scale.t*r[,"t"]
 	}
 	if( any( scale.pos != 1 ) ){
-		r[,-c(1,2)] <- scale.t*r[,-c(1,2)]
+		r[,-c(1,2)] <- scale.pos*r[,-c(1,2)]
 	}
 	sort.tracks(as.tracks.list(split.data.frame(as.matrix(r[,-1]), r[,1])))
 }
