@@ -119,12 +119,15 @@ as.tracks.data.frame <- function(x, id.column=1, time.column=2,
 	if( length(pos.columns) < 1 ){
 		stop("At least one position column needs to be specified!")
 	}
-	if( length(pos.columns) == 2 && !is.finite(pos.columns[2]) ){
+
+	# Special case: if columns are in form e.g. c("x",NA) then we
+	# read all columns from the beginning to the end.
+	if( length(pos.columns) == 2 && is.na(pos.columns[2]) ){
 		cx <- match( pos.columns[1], colnames(x) )
 		if( is.na(cx) && is.numeric(pos.columns[1]) ){
 			cx <- pos.columns[1]
 		}
-		pos.columns <- seq( cx, length(x) )
+		pos.columns <- seq( cx, ncol(x) )
 	}
 	cx <- as.character(c(id.column,time.column,pos.columns))
 	cxc <- match( cx, colnames(x) )
