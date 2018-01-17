@@ -24,5 +24,6 @@ Suggests:
     pracma,
     scatterplot3d,
     fractaldim,
-    testthat
+    testthat,
+    wordspace
 RoxygenNote: 6.0.1

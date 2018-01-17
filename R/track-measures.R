@@ -73,6 +73,11 @@
 #' segment of the given track. This function is useful to generate autocovariance plots
 #' (together with \code{\link{aggregate.tracks}}).
 #'
+#' \code{overallNormDot} computes the dot product between the unit vectors along
+#' the first and the last segment of the given track. This function is useful to
+#' generate autocorrelation plots (together with
+#' \code{\link{aggregate.tracks}}).
+#'
 #' \code{hurstExponent} computes the corrected empirical Hurst exponent of the track.
 #' This uses the function \code{\link[pracma]{hurstexp}} from the `pracma` package.
 #' If the track has less than two positions, NA is returned.
@@ -234,6 +239,38 @@ overallDot <- function(x, from=1, to=nrow(x), xdiff=diff(x)) {
 		r[ft] <- .rowSums(a * b, nrow(a), ncol(a))
 	}
 	r
+}
+
+#' @rdname TrackMeasures
+overallNormDot <- function (x, from = 1, to = nrow(x), xdiff = diff(x))
+{
+  # Check for tracks of length one
+  if(length(xdiff) == 0) { return(NaN) }
+
+  # Drop index column before normalizing
+  xdiff <- xdiff[, -1, drop = F]
+
+  # Normalize
+  if (requireNamespace("wordspace", quietly = TRUE)) {
+    # If wordspace is installed, use faster CPP code
+    xdiff_norm <- wordspace::normalize.rows(xdiff)
+  } else {
+    xdiff_norm <- xdiff / sqrt(rowSums(xdiff^2))
+  }
+
+  # In case we're checking for subtracks.length = 1 we know it should be 1
+  if(all(from + 1 == to)) {
+    return(rep(1, length(from)))
+  }
+
+  r <- rep(NaN, length(from))
+  ft <- from < to
+  if (sum(ft) > 0) {
+    a <- xdiff_norm[from[ft], , drop = F]
+    b <- xdiff_norm[to[ft] - 1, , drop = F]
+    r[ft] <- .rowSums(a * b, nrow(a), ncol(a))
+  }
+  r
 }
 
 #' @rdname TrackMeasures

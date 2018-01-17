@@ -18,6 +18,7 @@ test_that("all track measures work", {
 	expect_equal(overallAngle(d[[1]]), pi)
 	expect_equal(meanTurningAngle(d[[1]]), pi/2)
 	expect_equal(overallDot(d[[1]]), -1)
+	expect_equal(overallNormDot(d[[1]]), -1)
 	expect_equal(asphericity(d[[1]]), NaN)
 	expect_equal(hurstExponent(d[[1]]), 0)
 	expect_equal(fractalDimension(d[[1]]), 1.415037499278843480255)
