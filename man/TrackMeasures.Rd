@@ -15,6 +15,7 @@
 \alias{overallAngle}
 \alias{meanTurningAngle}
 \alias{overallDot}
+\alias{overallNormDot}
 \alias{asphericity}
 \alias{hurstExponent}
 \alias{fractalDimension}
@@ -45,6 +46,8 @@ overallAngle(x, from = 1, to = nrow(x), xdiff = diff(x))
 meanTurningAngle(x)
 
 overallDot(x, from = 1, to = nrow(x), xdiff = diff(x))
+
+overallNormDot(x, from = 1, to = nrow(x), xdiff = diff(x))
 
 asphericity(x)
 
@@ -129,6 +132,11 @@ in which two subsequent positions are identical.
 \code{overallDot} computes the dot product between the first and the last 
 segment of the given track. This function is useful to generate autocovariance plots
 (together with \code{\link{aggregate.tracks}}).
+
+\code{overallNormDot} computes the dot product between the unit vectors along
+the first and the last segment of the given track. This function is useful to
+generate autocorrelation plots (together with
+\code{\link{aggregate.tracks}}).
 
 \code{hurstExponent} computes the corrected empirical Hurst exponent of the track.
 This uses the function \code{\link[pracma]{hurstexp}} from the `pracma` package.
