@@ -223,7 +223,7 @@ overallAngle <- function(x, from=1, to=nrow(x), xdiff=diff(x)) {
 
 #' @rdname TrackMeasures
 meanTurningAngle <- function(x) {
-	if(nrow(x)<2){
+	if(nrow(x)<3){
 		return(NaN)
 	}
 	mean(sapply(subtracks(x, 2), overallAngle),na.rm=TRUE)
