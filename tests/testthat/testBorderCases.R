@@ -42,8 +42,11 @@ test_that("all track measures work on tracks of length one", {
 	expect_equal(hurstExponent(d[[2]]), NA)
 })
 
+test_that("mean turning angle works on tracks of length two", {
+	expect_equal(meanTurningAngle(d[[1]][1:2,]), NaN)
+})
+
 
 test_that("aggregation of track measures works", {
 	expect_equal(aggregate(d,trackLength)[,2], c(1,2,8/3,4,5))
 	expect_equal(aggregate(d,duration)[,2], 10*c(1,2,3,4,5))
-})
