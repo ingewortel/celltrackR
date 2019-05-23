@@ -676,82 +676,113 @@ clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method
 # SIMULATION
 # ===============================================
 
-rotationMatrix <- function( theta, u, ndim )
-{
-
-  if (ndim == 3 ){
-    
-    ux <- u[1]
-    uy <- u[2]
-    uz <- u[3]
-    
-    R <- matrix( 0, nrow = 3, ncol = 3 )
-    R[1,1] <- cos(theta) + ux^2*( 1-cos(theta) )
-    R[2,1] <- uy*ux*(1-cos(theta))+uz*sin(theta)
-    R[3,1] <- uz*ux*(1-cos(theta))-uy*sin(theta)
-    R[1,2] <- ux*uy*(1-cos(theta)) - uz*sin(theta)
-    R[2,2] <- cos(theta) + uy^2*(1-cos(theta))
-    R[3,2] <- uz*uy*(1-cos(theta)) + ux*sin(theta)
-    R[1,3] <- ux*uz*(1-cos(theta)) + uy*sin(theta)
-    R[2,3] <- uy*uz*(1-cos(theta)) - ux*sin(theta)
-    R[3,3] <- cos(theta) + uz^2*(1-cos(theta))
-    return(R)
-    
-  } else {
-    stop( "rotationMatrix is only defined in 3D")
+# Given a direction dir and an angle theta,
+# return a random new direction (unit length)
+# at angle theta to dir.
+turnByAngle2D <- function( dir, theta, degrees = TRUE ){
+  
+  if( degrees ){
+    alpha <- pracma::deg2rad(alpha)
   }
+  
+  # Normalize direction of previous step
+  u <- dir / sqrt( sum( dir^2) )
+  
+  # compute angle with x axis.
+  alpha <- acos( u[1] )
+  
+  # New direction is theta degrees to the left or right
+  if( runif(1) < 0.5 ){
+    phi <- alpha + theta
+  } else {
+    phi <- alpha - theta
+  }
+  v <- c( cos(phi), sin(phi) )
+  v
   
 }
 
-reflectionMatrix <- function( u, ndim )
-{
+# Returns a rotation matrix for 3D rotation around axis u by an angle of theta.
+rotationMatrix3D <- function( u, theta ){
   
-  if( ndim != 2 ){
-    stop( "reflectionMatrix is only defined in 2D" )
+  if( length(u) != 3 ){
+    stop( "rotationMatrix3D: only defined for 3D coordinates." )
   }
   
-  # compute angle of u with x-axis
-  u <- u / sqrt( sum( u^2 ) )
-  theta <- acos( u[1] )
+  # normalize u
+  u <- u / sqrt( sum( u^2) )
   
-  # defne matrix
-  R <- matrix( 0, ncol = 2, nrow = 2 )
-  R[1,1] <- cos(2*theta)
-  R[1,2] <- sin(2*theta)
-  R[2,1] <- sin(2*theta)
-  R[2,2] <- -cos(2*theta)
+  # Build the matrix
+  # See https://en.wikipedia.org/wiki/Rotation_matrix#In_three_dimensions
+  R <- matrix( 0, ncol = 3, nrow = 3 )
+  for( i in 1:3 ){
+    for( j in 1:3 ){
+      R[i,j] <- u[i]*u[j]*(1-cos(theta))
+    }
+  }
+  R[1,1] <- R[1,1] + cos(theta)
+  R[1,2] <- R[1,2] - u[3]*sin(theta)
+  R[1,3] <- R[1,3] + u[2]*sin(theta)
+  R[2,1] <- R[2,1] + u[3]*sin(theta)
+  R[2,2] <- R[2,2] + cos(theta)
+  R[2,3] <- R[2,3] - u[1]*sin(theta)
+  R[3,1] <- R[3,1] - u[2]*sin(theta)
+  R[3,2] <- R[3,2] + u[1]*sin(theta)
+  R[3,3] <- R[3,3] + cos(theta)
+  
   return(R)
   
 }
 
-
-turnDirection <- function( previous.dir, alpha )
-{
-  # unit vector of previous direction
-  u <- previous.dir / sqrt( sum( previous.dir^2 ) )
-  ndim <- length(u)
+# Given a direction dir and an angle theta,
+# return a random new direction (unit length)
+# at angle theta to dir.
+turnByAngle3D <- function( dir, alpha, degrees = TRUE ){
   
-  # start with new direction the same
-  new.dir <- u
-  
-  # change first coordinate to achieve the rotation
-  new.dir[1] <- ( cos(alpha) - sum( u[-1]^2 ) )/u[1]
-  
-  # rotate/reflect around axis of u for random new direction:
-  if( ndim == 2 ){
-    if( runif(1) < 0.5 ){
-      rm <- reflectionMatrix(u,ndim)
-      new.dir <- as.vector( rm %*% new.dir )
-    }
-  } else if (ndim == 3 ){
-    theta <- runif(1)*2*pi
-    rm <- rotationMatrix(theta,u,ndim)
-    new.dir <- rm %*% new.dir
+  if( degrees ){
+    alpha <- pracma::deg2rad(alpha)
   }
   
-  return(new.dir)
+  # convert direction of vector "dir" to unit vector
+  # and compute angles phi and theta of spherical coordinates
+  u <- dir / sqrt( sum( dir^2 ) )
+  theta <- acos( u[3] )
+  
+  # Special case: phi is undefined if sin(theta) = 0.
+  # In that case, u is directed along the z-axis so we will pick 
+  # a rotation around the z-axis later. This means we can choose
+  # any phi; choose zero here.
+  if( sin(theta) == 0 ){
+    phi <- 0
+  } else {
+    phi <- acos( u[1]/sin(theta) )
+  }
+  
+  # One new vector v at angle alpha to u: keep the same phi,
+  # theta2 = theta - alpha
+  theta2 <- theta - alpha
+  v <- c( sin(theta2)*cos(phi), 
+          sin(theta2)*sin(phi),
+          cos(theta2))
+  
+  
+  # Rotate around axis of u with random angle
+  ran.ang <- runif(1)*2*pi
+  Rm <- rotationMatrix3D( u, ran.ang )
+  vout <- as.vector( Rm %*% v )
+  
+  # outmatrix <- matrix(0,nrow=13, ncol=3)
+  # angles <- seq(0,2*pi,length.out=12)
+  # for( i in seq_along(angles) ){
+  #   rm <- rotationMatrix3D( u, angles[i] )
+  #   outmatrix[i+1,] <- as.vector( rm %*% v )
+  # }
+  # scatterplot3d( outmatrix, asp = 1, highlight.3d = TRUE )
+  
+  return(vout)
   
 }
+
 
 # Returns a simulated dataset by sampling from the speed and turning angle distributions from an 
 # original track dataset.
@@ -759,7 +790,10 @@ bootstrapTrack <- function( nsteps, trackdata )
 {
   
   # get dimensions of original data:
-  ndim <- ncol( trackdata[[1]] ) - 2
+  ndim <- ncol( trackdata[[1]] ) - 1
+  if( !( ndim == 2 | ndim == 3 ) ){
+    stop( "bootstrapTrack: only supported in 2D or 3D.")
+  }
   
   # get speeds and turning angles from original data:
   speeds <- sapply( subtracks( trackdata, 1 ), speed )
@@ -794,7 +828,11 @@ bootstrapTrack <- function( nsteps, trackdata )
       u <- diff( coords[(s-1):(s),] )
       
       # compute new direction
-      new.dir <- turnDirection( u, step.angle )
+      if( ndim == 2 ){
+        new.dir <- turnByAngle2D( u, step.angle, degrees = FALSE )
+      } else if ( ndim == 3 ){
+        new.dir <- turnByAngle3D( u, step.angle, degrees = FALSE )
+      }
       
       # multiply by displacement
       step <- new.dir * r
@@ -804,5 +842,12 @@ bootstrapTrack <- function( nsteps, trackdata )
     }
 
   }
+  
+  m <- matrix( 0, nrow = nrow(coords), ncol = ncol(coords) + 1 )
+  m[,1] <- seq(0,nrow(m)-1)*dt
+  m[,-1] <- coords
+  colnames(m) <- colnames( trackdata[[1]] )
+  m
+  
   
 }
