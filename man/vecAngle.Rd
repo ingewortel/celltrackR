@@ -6,7 +6,29 @@
 \usage{
 vecAngle(a, b, degrees = TRUE)
 }
+\arguments{
+\item{a}{the first vector or set of vectors. Must be a numeric vector or a
+matrix where each row represents a numeric vector.}
+
+\item{b}{the second vector or set of vectors, for which angles with the
+vector (set) a must be computed. Must have the same dimensions as a.}
+
+\item{degrees}{logical: if \code{TRUE} (default), return angles in degrees instead of radians.}
+}
+\value{
+A single angle (if a and b are single vectors) or a numeric vector of
+ angles (if a and b are matrices; in that case, the output vector contains one
+ angle for each row in matrices a and b).
+}
 \description{
-a and b can be numeric vectors or matrices in which each row represents a numeric vector.
-In the last case, one angle is returned for each row.
+Compute the angle between two vectors a and b, which can be numeric vectors
+or matrices in which each row represents a  numeric vector.
+In the last case, one angle is returned for each row. By default, angles
+are returned in degrees -- set \code{degrees = TRUE} to return radians.
+}
+\examples{
+## The angle between the vectors [0,1] and [1,0] is 90 degrees:
+vecAngle( c(0,1), c(1,0) )
+## The same holds for 3D angles:
+vecAngle( c(0,1,0), c(1,0,0) )
 }

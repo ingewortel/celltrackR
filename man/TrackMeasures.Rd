@@ -41,9 +41,10 @@ outreachRatio(x)
 
 straightness(x)
 
-overallAngle(x, from = 1, to = nrow(x), xdiff = diff(x))
+overallAngle(x, from = 1, to = nrow(x), xdiff = diff(x),
+  degrees = FALSE)
 
-meanTurningAngle(x)
+meanTurningAngle(x, degrees = FALSE)
 
 overallDot(x, from = 1, to = nrow(x), xdiff = diff(x))
 
@@ -64,6 +65,8 @@ remaining columns are a spatial coordinate.}
 \item{to}{index, or vector of indices, of last row of the track.}
 
 \item{xdiff}{row differences of x.}
+
+\item{degrees}{logical; should angles be returned in degrees rather than radians?}
 }
 \description{
 Statistics that can be used to quantify tracks. All of these functions take a single
@@ -121,13 +124,15 @@ tracks with one or more positions, \code{NA} is returned.
 segment of the given track. Angles are measured symmetrically, thus the return values
 range from 0 to pi; for instance, both a 90 degrees left and right turns yield the
 value pi/2. This function is useful to generate autocorrelation plots
-(together with \code{\link{aggregate.tracks}}).
+(together with \code{\link{aggregate.tracks}}). Angles can also be returned in degrees,
+in that case: set \code{degrees = TRUE}.
 
 \code{meanTurningAngle} averages the \code{overallAngle} over all 
 adjacent segments of a given track; a low \code{meanTurningAngle} indicates high
 persistence of orientation, whereas for an uncorrelated random walk we expect 
 90 degrees. Note that angle measurements will yield \code{NA} values for tracks 
-in which two subsequent positions are identical.
+in which two subsequent positions are identical. By default returns angles in
+radians; use \code{degrees = TRUE} to return angles in degrees instead.
 
 \code{overallDot} computes the dot product between the first and the last 
 segment of the given track. This function is useful to generate autocovariance plots
@@ -169,4 +174,8 @@ Behavior. \emph{PLoS ONE} \bold{8}(12), e80808. doi:10.1371/journal.pone.0080808
 Tillmann Gneiting and Martin Schlather (2004), Stochastic Models That Separate Fractal
 Dimension and the Hurst Effect. \emph{SIAM Review} \bold{46}(2), 269--282. 
 doi:10.1137/S0036144501394387
+}
+\seealso{
+\code{\link{AngleAnalysis}} for methods to compute angles and distances
+ between pairs of tracks, or of tracks to a reference point, direction, or plane.
 }
