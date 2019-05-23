@@ -34,6 +34,20 @@ computed to the first step in the given track.
  known in advance (e.g. when cells are known to move up a chemotactic gradient): in that case,
  the average angle to the reference direction should be less than 90 degrees. Angles are
  by default returned in degrees, use \code{degrees=FALSE} to obtain radians.
+
+\code{\link{angleSteps}} and \code{\link{distanceSteps}} return the angle/distance between a pair
+ of steps in the data that occur at the same timepoint. Angles are in degrees by default,
+ use \code{degrees=FALSE} to obtain radians. Use \code{\link{stepPairs}} to extract all pairs of
+ steps that occur at the same timepoint, and use \code{\link{analyzeStepPairs}} to do this and then
+ also obtain the angles and distances for each of these pairs.
+
+\code{\link{angleCells}} and \code{\link{distanceCells}} return the angle/distance between a pair
+ of tracks in the data. The computed angles are between the overall displacement vectors of the
+ tracks, the distance is the shortest distance between them at any timepoint they share.
+ Angles are in degrees by default, use \code{degrees=FALSE} to obtain radians.
+ Use \code{\link{cellPairs}} to extract all pairs of
+ cells in the data, and use \code{\link{analyzeCellPairs}} to do this and then
+ also obtain the angles and distances for each of these pairs.
 }
 \examples{
 ## Plotting the angle versus the distance to a reference point can be informative to

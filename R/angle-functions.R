@@ -33,7 +33,19 @@
 #'  the average angle to the reference direction should be less than 90 degrees. Angles are
 #'  by default returned in degrees, use \code{degrees=FALSE} to obtain radians.
 #'
+#' \code{\link{angleSteps}} and \code{\link{distanceSteps}} return the angle/distance between a pair
+#'  of steps in the data that occur at the same timepoint. Angles are in degrees by default,
+#'  use \code{degrees=FALSE} to obtain radians. Use \code{\link{stepPairs}} to extract all pairs of
+#'  steps that occur at the same timepoint, and use \code{\link{analyzeStepPairs}} to do this and then
+#'  also obtain the angles and distances for each of these pairs.
 #'
+#' \code{\link{angleCells}} and \code{\link{distanceCells}} return the angle/distance between a pair
+#'  of tracks in the data. The computed angles are between the overall displacement vectors of the
+#'  tracks, the distance is the shortest distance between them at any timepoint they share.
+#'  Angles are in degrees by default, use \code{degrees=FALSE} to obtain radians.
+#'  Use \code{\link{cellPairs}} to extract all pairs of
+#'  cells in the data, and use \code{\link{analyzeCellPairs}} to do this and then
+#'  also obtain the angles and distances for each of these pairs.
 #'
 #' @name AngleAnalysis
 #'
@@ -511,6 +523,239 @@ distanceToPoint <- function (x, from = 1, p = c(0,0,0) )
   r
 }
 
+#' Angle Between Two Steps
+#'
+#' Compute the angle between two steps in the dataset that occur at the same timepoint.
+#'
+#' @param X a tracks object
+#' @param trackids a vector of two indices specifying the tracks to get steps from.
+#' @param t the timepoint at which the steps should start.
+#' @param degrees logical; should angle be returned in degrees instead of radians? (defaults to \code{TRUE})
+#' @param quietly logical; should a warning be returned if one or both of the steps are missing
+#' in the data and the function returns NA?
+#'
+#' @return A single angle, or NA if the desired timepoint is missing for one or both
+#' of the tracks.
+#'
+#' @seealso \code{\link{distanceSteps}} to compute the distance between the step starting
+#' points, \code{\link{timePoints}} to list all timepoints in a dataset,
+#' and \code{\link{AngleAnalysis}} for other methods to compute angles and distances.
+#'
+#' @examples
+#' ## Find the angle between the steps of the tracks with ids 1 and 2, at the 3rd
+#' ## timepoint in the dataset.
+#' t <- timePoints( TCells )[3]
+#' angleSteps( TCells, c("1","2"), t )
+angleSteps <- function( X, trackids, t, degrees = TRUE, quietly = FALSE )
+{
+  if( !length(trackids) == 2 ){
+    stop( "angleSteps: an angle is only defined for exactly 2 steps. Please provide exactly 2 trackids.")
+  }
+
+  X2 <- selectSteps( X, trackids, t )
+  if( any( sapply(X2, is.null ) ) ){
+    if(!quietly){warning( "Warning: cannot find data for both steps. Returning NA.")}
+    return(NA)
+  }
+  if( length(X2) != 2 ){
+    if(!quietly){warning( "Warning: cannot find data for both steps. Returning NA.")}
+    return(NA)
+  }
+
+  a <- diff( X2[[1]][,-1] )
+  b <- diff( X2[[2]][,-1] )
+
+  # # Normalize a and b by their length
+  # a <- a/sqrt(sum(a^2))
+  # b <- b/sqrt(sum(b^2))
+  #
+  # # Dot product of normalized a and b; this equals cos alpha
+  # rs <- sum(a * b)
+  #
+  # # angle is acos.
+  # ang <- acos(rs)
+  ang <- vecAngle( a, b, degrees = degrees )
+  ang
+}
+
+#' Distance Between Two Steps
+#'
+#' Compute the distance between two steps in the dataset that occur at the same timepoint.
+#' The distance is the distance between the step starting points.
+#'
+#' @param X a tracks object
+#' @param trackids a vector of two indices specifying the tracks to get steps from.
+#' @param t the timepoint at which the steps should start.
+#'
+#' @return A single distance, or NA if the desired timepoint is missing for one or both
+#' of the tracks.
+#'
+#' @seealso \code{\link{angleSteps}} to compute the angle between the steps,
+#' \code{\link{timePoints}} to list all timepoints in a dataset,
+#' and \code{\link{AngleAnalysis}} for other methods to compute angles and distances.
+#'
+#' @examples
+#' ## Find the distance between the steps of the tracks with ids 1 and 2, at the 3rd
+#' ## timepoint in the dataset.
+#' t <- timePoints( TCells )[3]
+#' distanceSteps( TCells, c("1","2"), t )
+distanceSteps <- function( X, trackids, t )
+{
+  # Select the relevant tracks
+  X2 <- X[ as.character(trackids) ]
+
+  # Select the relevant timepoint, and extract coordinates (remove id/time columns)
+  coords <- as.data.frame.tracks( subtracksByTime( X2, t, 0 ) )[,-c(1,2)]
+
+  # Compute the euclidian distance
+  diffm <- diff( as.matrix(coords) )
+  return( sqrt( sum( diffm^2 ) ) )
+
+}
 
 
 
+#' Find Pairs Of Steps Occurring At The Same Time
+#'
+#' Find cell indices and timepoints where these cells both have a step.
+#'
+#' @param X a tracks object
+#' @param filter.steps optional: a function used to filter steps on. See examples.
+#'
+#' @return A dataframe with three columns: two for the indices of cellpairs that
+#' share a step, and one for the timepoint at which they do so.
+#'
+#' @examples
+#' ## Find all pairs of steps in the T cell data that displace at least 2 microns.
+#' pairs <- stepPairs( TCells, filter.steps = function(t) displacement(t) > 2 )
+stepPairs <- function( X, filter.steps=NULL )
+{
+  dout <- data.frame()
+  for( t in timePoints(X) ){
+    # All steps starting at that timepoint
+    xt <- subtracksByTime( X, t, 1 )
+
+    # Filter out steps that do not fulfill the filter criterion
+    if( length(xt) > 0 && is.function( filter.steps ) ){
+      xt <- xt[ sapply(xt,filter.steps ) ]
+    }
+
+    # Extract their ids
+    ids <- names(xt)
+
+    # Make all possible pairs
+    if( length(ids) >= 2 ){
+      pairs <- as.data.frame( t( combn( ids, 2 ) ),
+                              stringsAsFactors = FALSE )
+      colnames(pairs) <- c( "p1","p2" )
+
+      # To a dataframe
+      pairs$t <- t
+      dout <- rbind( dout, pairs )
+    }
+  }
+  dout
+}
+
+
+
+#' Find Distances And Angles For All Pairs Of Steps
+#'
+#' Find cell indices and timepoints where these cells both have a step, then return
+#' angles and distances for each pair of steps.
+#'
+#' @param X a tracks object
+#' @param filter.steps optional: a function used to filter steps on. See examples.
+#' @param ... further arguments passed on to \code{angleSteps}
+#'
+#' @return A dataframe with five columns: two for the indices of cellpairs that
+#' share a step, one for the timepoint at which they do so, one for the distance
+#' between them, and one for their angle.
+#'
+#' @details Analyzing step angles at different distances can be useful to detect
+#' directional bias or local crowding effects; see (Beltman et al, 2009).
+#'
+#' Internally, the function uses \code{\link{stepPairs}}, \code{\link{angleSteps}},
+#' and \code{\link{distanceSteps}}.
+#'
+#' @seealso \code{\link{analyzeCellPairs}} to do something similar for entire tracks
+#' rather than single steps.
+#'
+#'
+#' @references
+#' Joost B. Beltman, Athanasius F.M. Maree and Rob. J. de Boer (2009),
+#' Analysing immune cell migration. \emph{Nature Reviews Immunology} \bold{9},
+#' 789--798. doi:10.1038/nri2638
+#'
+#' @examples
+#' ## Plot distance versus angle for all step pairs, filtering for those that
+#' ## displace at least 2 microns
+#' pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2, quietly = TRUE )
+#' scatter.smooth( pairs$distance, pairs$angle )
+analyzeStepPairs <- function( X, filter.steps = NULL, ... )
+{
+  # Obtain cell paris for each timepoint
+  pairs <- stepPairs( X, filter.steps = filter.steps )
+
+  # Find the distance between the step starting points
+  distances <- unname( apply( pairs, 1, function(x) distanceSteps( X, x[1:2], as.numeric(x[3]) ) ) )
+
+  # Find the angles between the steps
+  angles <- unname( apply( pairs, 1, function(x) angleSteps( X, x[1:2], as.numeric(x[3]), ... ) ) )
+
+  # Add to dataframe and return
+  pairs$dist <- distances
+  pairs$angle <- angles
+  pairs
+}
+
+
+
+#' Find Distances And Angles For All Pairs Of Tracks
+#'
+#' Find all pairs of cells and return the shortest distance between them at any
+#' point, as well as the angle between their overall displacement vectors.
+#'
+#' @param X a tracks object
+#' @param ... further arguments passed on to \code{angleCells}
+#'
+#' @return A dataframe with four columns: two for the indices of cellpairs,
+#' one for the distance between them, and one for their angle.
+#'
+#' @details Analyzing track angles at different distances can be useful to detect
+#' directional bias or local crowding effects; see (Beltman et al, 2009).
+#'
+#' Internally, the function uses \code{\link{cellPairs}}, \code{\link{angleCells}},
+#' and \code{\link{distanceCells}}.
+#'
+#' @seealso \code{\link{analyzeStepPairs}} to do something similar for single steps
+#' rather than entire tracks.
+#'
+#'
+#' @references
+#' Joost B. Beltman, Athanasius F.M. Maree and Rob. J. de Boer (2009),
+#' Analysing immune cell migration. \emph{Nature Reviews Immunology} \bold{9},
+#' 789--798. doi:10.1038/nri2638
+#'
+#' @examples
+#' ## Plot distance versus angle for all cell pairs
+#' pairs <- analyzeCellPairs( TCells )
+#' scatter.smooth( pairs$distance, pairs$angle )
+analyzeCellPairs <- function( X, ... )
+{
+  # Make all possible pairs of cellids
+  pairs <- cellPairs( X )
+
+  # Compute angles and distances for all cell pairs in the data
+  cellangles <- apply( pairs, 1, function(x)
+    angleCells( X, x, ... ) )
+
+  celldistances <- apply( pairs, 1, function(x)
+    distanceCells( X, x ) )
+
+  # Make a dataframe
+  pairs$dist <- celldistances
+  pairs$angle <- cellangles
+  return(pairs)
+
+}
