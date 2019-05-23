@@ -5,7 +5,8 @@
 \title{Plot Tracks in 2D}
 \usage{
 \method{plot}{tracks}(x, dims = c("x", "y"), add = F,
-  col = order(names(x)), pch.start = 1, pch.end = NULL, cex = 0.5, ...)
+  col = order(names(x)), pch.start = 1, pch.end = NULL, cex = 0.5,
+  ...)
 }
 \arguments{
 \item{x}{the tracks to be plotted.}

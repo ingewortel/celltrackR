@@ -25,5 +25,8 @@ Suggests:
     scatterplot3d,
     fractaldim,
     testthat,
-    wordspace
-RoxygenNote: 6.0.1
+    wordspace,
+    knitr,
+    rmarkdown
+RoxygenNote: 6.1.1
+VignetteBuilder: knitr

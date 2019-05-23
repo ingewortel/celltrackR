@@ -4,9 +4,9 @@
 \alias{beaucheminTrack}
 \title{Simulate a 3D Cell Track Using the Beauchemin Model}
 \usage{
-beaucheminTrack(sim.time = 10, delta.t = 1, p.persist = 0, p.bias = 0.9,
-  bias.dir = c(0, 0, 0), taxis.mode = 1, t.free = 2, v.free = 18.8,
-  t.pause = 0.5)
+beaucheminTrack(sim.time = 10, delta.t = 1, p.persist = 0,
+  p.bias = 0.9, bias.dir = c(0, 0, 0), taxis.mode = 1, t.free = 2,
+  v.free = 18.8, t.pause = 0.5)
 }
 \arguments{
 \item{sim.time}{specifies the duration of the track to be generated}

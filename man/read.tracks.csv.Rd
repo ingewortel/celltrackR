@@ -4,9 +4,9 @@
 \alias{read.tracks.csv}
 \title{Read Tracks from Text File}
 \usage{
-read.tracks.csv(file, id.column = 1, time.column = 2, pos.columns = c(3,
-  4, 5), scale.t = 1, scale.pos = 1, header = TRUE, sep = "",
-  track.sep.blankline = FALSE, ...)
+read.tracks.csv(file, id.column = 1, time.column = 2,
+  pos.columns = c(3, 4, 5), scale.t = 1, scale.pos = 1,
+  header = TRUE, sep = "", track.sep.blankline = FALSE, ...)
 }
 \arguments{
 \item{file}{the name of the file which the data are to be read from, a 
