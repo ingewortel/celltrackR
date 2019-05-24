@@ -4,7 +4,8 @@
 \alias{clusterTracks}
 \title{Cluster Tracks}
 \usage{
-clusterTracks(tracks, measures, scale = TRUE, ...)
+clusterTracks(tracks, measures, scale = TRUE, labels = NULL,
+  method = "hclust", return.clust = FALSE, ...)
 }
 \arguments{
 \item{tracks}{the tracks that are to be clustered.}
@@ -31,6 +32,9 @@ The measures are applied to each of the tracks in the given
 clustered using a hierarchical clustering (see \code{\link[stats]{hclust}}).
 If \code{scale} is \code{TRUE}, the measure values are scaled to mean value 
 \eqn{0} and standard deviation \eqn{1} (per measure) before the clustering.
+
+Compute clustering
+supported methods: hclust, kmeans, cmdscale, pca, umap
 }
 \examples{
 ## Cluster tracks according to the mean of their Hust exponents along X and Y
