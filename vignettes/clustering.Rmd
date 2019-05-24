@@ -1,10 +1,10 @@
 ---
-title: "Clustering"
+title: "Clustering tracks with CelltrackR"
 author: "Inge Wortel"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Clustering}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -12,7 +12,9 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 4
 )
 ```
 
@@ -28,7 +30,7 @@ To group tracks with similar properties, one can in principle perform any cluste
 First load the package:
 
 ```{r pack, warning = FALSE, message = FALSE}
-library( MotilityLab )
+library( celltrackR )
 library( ggplot2 )
 ```
 
@@ -79,7 +81,9 @@ real.celltype <- c( tlab, blab, nlab )
 Using the function `getFeatureMatrix()`, we can quickly apply several quantification measures to all data at once (see `?TrackMeasures` for an overview of measures we can compute):
 
 ```{r}
-m <- getFeatureMatrix( all.tracks, c(speed, meanTurningAngle, outreachRatio, squareDisplacement) )
+m <- getFeatureMatrix( all.tracks, 
+                       c(speed, meanTurningAngle, 
+                         outreachRatio, squareDisplacement) )
 
 # We get a matrix with a row per track and one column for each metric:
 head(m)
@@ -102,23 +106,30 @@ When using more than two metrics at once to quantify track properties, it become
 Use `clusterTracks()` to perform a principal component analysis (PCA) based on the measures "speed" and "meanTurningAngle":
 
 ```{r}
-clusterTracks( all.tracks, c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,outreachRatio ), method = "PCA" )
+clusterTracks( all.tracks,
+               c(speed,meanTurningAngle,squareDisplacement,
+                 maxDisplacement,outreachRatio ), method = "PCA" )
 ```
 
 We can color the points by their real celltype:
 
 ```{r}
-clusterTracks( all.tracks, c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,outreachRatio ), method = "PCA", labels = real.celltype )
+clusterTracks( all.tracks, 
+               c(speed,meanTurningAngle,squareDisplacement,
+                 maxDisplacement,outreachRatio ), method = "PCA", 
+               labels = real.celltype )
 ```
 
 Or we can extract the actual data. This reveals, for example, that the first principal component is correlated with speed:
 
 ```{r, fig.show="hide"}
-pca <- clusterTracks( all.tracks, c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,outreachRatio ), 
+pca <- clusterTracks( all.tracks, 
+                      c(speed,meanTurningAngle,squareDisplacement,
+                        maxDisplacement,outreachRatio ), 
                       method = "PCA", labels = real.celltype, return.clust = TRUE )
 ```
 
-```{r, fig.width = 12 }
+```{r}
 pc1 <- pca[,1]
 pc2 <- pca[,2]
 track.speed <- sapply( all.tracks, speed )
@@ -136,7 +147,9 @@ See `?prcomp` for details on how principal components are computed, and for furt
 Another popular method for visualization is multidimensional scaling (MDS), which is also supported by `clusterTracks()`:
 
 ```{r}
-clusterTracks( all.tracks, c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,outreachRatio ), method = "MDS",
+clusterTracks( all.tracks,
+               c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,
+                 outreachRatio ), method = "MDS",
                labels = real.celltype )
 ```
 
@@ -148,7 +161,9 @@ Internally, `clusterTracks()` computes a distance matrix using `dist()` and then
 Uniform manifold approximate and projection (UMAP) is another powerful method to explore structure in high-dimensional datasets. `clusterTracks()` supports visualization of tracks in a UMAP:
 
 ```{r}
-clusterTracks( all.tracks, c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,outreachRatio ), method = "UMAP",
+clusterTracks( all.tracks,
+               c(speed,meanTurningAngle,squareDisplacement,
+                 maxDisplacement,outreachRatio ), method = "UMAP",
                labels = real.celltype )
 ```
 
@@ -163,8 +178,10 @@ Apart from visualizing similar and dissimilar tracks using multiple track featur
 
 Hierarchical clustering is performed by calling `hclust()` on a distance matrix computed via `dist()` on the feature matrix:
 
-```{r, fig.width = 12}
-clusterTracks( all.tracks, c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,outreachRatio ), method = "hclust", labels = real.celltype )
+```{r, fig.width = 9}
+clusterTracks( all.tracks,
+               c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,
+                 outreachRatio ), method = "hclust", labels = real.celltype )
 ```
 
 See methods `dist()` and `hclust()` for details.
@@ -173,8 +190,11 @@ See methods `dist()` and `hclust()` for details.
 
 Finally, `clusterTracks()` also supports k-means clustering of tracks. Note that this requires an extra argument `centers` that is passed on to the `kmeans()` function and specifies the number of clusters to make. In this case, let's use three clusters because we have three celltypes:
 
-```{r, fig.height = 12, fig.width = 12 }
-clusterTracks( all.tracks, c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,outreachRatio ), method = "kmeans", labels = real.celltype, centers = 3 )
+```{r, fig.height = 12, fig.width = 7 }
+clusterTracks( all.tracks,
+               c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,
+                 outreachRatio ), method = "kmeans", 
+               labels = real.celltype, centers = 3 )
 ```
 
 In these plots, we see the value of each feature in the feature matrix plotted for the different clusters, whereas the color indicates the "real" celltype the track came from.

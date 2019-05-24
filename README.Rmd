@@ -1,5 +1,5 @@
 ---
-title: MotilityLab README
+title: CelltrackR README
 author: Johannes Textor
 output: github_document
 ---
@@ -14,29 +14,30 @@ knitr::opts_chunk$set(
 )
 ```
 
-# MotilityLab
+# CelltrackR
 
-MotilityLab is designed to help with describing, visualizing, and quantifying tracks 
+CelltrackR is designed to help with describing, visualizing, and quantifying tracks 
 of moving objects. Many common measures used in physics and biology are implemented, such
 as mean square displacement and autocorrelation. The package also provides a flexible 
 function to import tracks from text files.
 
-The MotilityLab package has been developed as part of the project of the same name.
+The CelltrackR package has been developed as part of the MotilityLab project.
 On the project website (motilitylab.net), a simple GUI frontend to many functions in the 
 package is implemented, and public datasets are available to download and analyze.
 
 # Installation
 
-The latest development version of MotilityLab can be installed from R-forge:
+The latest development version of CelltrackR can be installed from GitHub (note: this
+requires the `devtools` package):
 
 ```{r,eval=FALSE}
-   install.packages("MotilityLab",repos="http://R-Forge.R-project.org")
+   devtools::install.github("ingewortel/celltrackR")
 ```
 
 Then the package can be loaded as usual:
 
 ```{r}
-	library(MotilityLab)
+	library(celltrackR)
 ```
 
 # Examples
@@ -100,5 +101,5 @@ Many other ways to quantify tracks are implemented in the package and described 
 PDF documentation. For an overview of the available commands, use the function
 
 ```{r,eval=FALSE}
-	help( package="MotilityLab" )
+	help( package="celltrackR" )
 ```

@@ -8,6 +8,7 @@
 #' @param from index, or vector of indices, of the first row of the track. 
 #' @param to index, or vector of indices, of last row of the track. 
 #' @param xdiff row differences of x.
+#' @param degrees logical; should angles be returned in degrees rather than radians?
 #'
 #' @details
 #' Some track measures consider only the first and last position (or steps) of a track, 
@@ -61,13 +62,15 @@
 #' segment of the given track. Angles are measured symmetrically, thus the return values
 #' range from 0 to pi; for instance, both a 90 degrees left and right turns yield the
 #' value pi/2. This function is useful to generate autocorrelation plots
-#' (together with \code{\link{aggregate.tracks}}).
+#' (together with \code{\link{aggregate.tracks}}). Angles can also be returned in degrees,
+#' in that case: set \code{degrees = TRUE}.
 #' 
 #' \code{meanTurningAngle} averages the \code{overallAngle} over all 
 #' adjacent segments of a given track; a low \code{meanTurningAngle} indicates high
 #' persistence of orientation, whereas for an uncorrelated random walk we expect 
 #' 90 degrees. Note that angle measurements will yield \code{NA} values for tracks 
-#' in which two subsequent positions are identical.
+#' in which two subsequent positions are identical. By default returns angles in
+#' radians; use \code{degrees = TRUE} to return angles in degrees instead.
 #'
 #' \code{overallDot} computes the dot product between the first and the last 
 #' segment of the given track. This function is useful to generate autocovariance plots
@@ -92,6 +95,9 @@
 #' (Gneiting and Schlather, 2004).
 #'
 #' @name TrackMeasures
+#' 
+#' @seealso \code{\link{AngleAnalysis}} for methods to compute angles and distances
+#'  between pairs of tracks, or of tracks to a reference point, direction, or plane.
 #'
 #' @examples
 #' ## show a turning angle plot with error bars for the T cell data.
@@ -115,13 +121,20 @@ NULL
 #' @rdname TrackMeasures
 trackLength <- function(x) {
 	if (nrow(x) > 2) { 
+	  # coordinates are in x[,-1,drop=FALSE] (everything but the time col of the track matrix)
+	  # apply diff over the columns to get dx,dy,(dz) for every timestep,
+	  # compute sqrt( dx^2 + dy^2 + dz^2 ) for every step, then sum up.
 		dif <- apply(x[,-1,drop=FALSE], 2, diff)
 		return(sum(sqrt(apply(dif^2, 1, sum))))
 	} else if (nrow(x) == 2) {
 		# this case is necessary because of dimension dropping by 'apply'
 		return(sqrt(sum((x[2,-1] - x[1,-1])^2)))
+	  
+	  # A track of a single coordinate has no length
 	} else if (nrow(x) == 1) {
 		return(0)
+	  
+	  # If the matrix is empty, return NA
 	} else {
 		return(NA)
 	}
@@ -129,9 +142,12 @@ trackLength <- function(x) {
 
 #' @rdname TrackMeasures
 duration <- function(x) {
+  # A track of a single point has a duration of zero
 	if( nrow(x) < 2 ){
 		return(0)
 	}
+  # Otherwise, the duration is time difference (col 1)
+  # between first and last point
 	dur <- x[nrow(x), 1] - x[1,1]
 	dur <- unname(dur)
 	return(dur)
@@ -144,6 +160,7 @@ speed <- function(x) {
 
 #' @rdname TrackMeasures
 displacement <- function( x, from=1, to=nrow(x) ) {
+  # tracks of a single coordinate have no displacement
 	if( nrow(x) < 2 ){
 		return(0)
 	}
@@ -205,37 +222,67 @@ straightness <- function(x) {
 }
 
 #' @rdname TrackMeasures
-overallAngle <- function(x, from=1, to=nrow(x), xdiff=diff(x)) {
-	r <- rep(0, length(from))
-	ft <- from<(to-1)
-	if( sum(ft)>0 ){
-		a <- xdiff[from[ft],-1,drop=FALSE]
-		b <- xdiff[to[ft]-1,-1,drop=FALSE]
-		a <- a/sqrt(.rowSums(a^2, nrow(a), ncol(a)))
-		b <- b/sqrt(.rowSums(b^2, nrow(b), ncol(b)))
-		rs <- .rowSums(a * b, nrow(a), ncol(a))
-		rs[rs>1] <- 1
-		rs[rs< -1] <- -1
-		r[ft] <- acos(rs)
-	}
-	r
+overallAngle <- function (x, from = 1, to = nrow(x), xdiff = diff(x), degrees = FALSE ) 
+{
+  # make sure that to and from are the same length
+  if( length(from) != length(to) ){
+    if( length(from) == 1 ){
+      from = rep( from, length(to) )
+    } else if ( length(to) == 1 ){
+      to = rep( to, length(from) )
+    } else {
+      stop("overallAngle: from and to must be the same length, or one of them must be a single value." )
+    }
+  }
+  
+  # Start with a zero angle for all angles to compute
+  r <- rep(0, length(from))
+  
+  # To compute an angle, we need at least two steps, so from must be at least two smaller than to.
+  ft <- from < (to - 1)
+  
+  # Check if there is anything left to compute
+  if (sum(ft) > 0) {
+    # Get displacement vectors for the steps to compute angle between.
+    # Can be multiple, in a matrix form.
+    a <- xdiff[from[ft], -1, drop = FALSE]
+    b <- xdiff[to[ft] - 1, -1, drop = FALSE]
+    
+    # get angle
+    r[ft] <- vecAngle( a, b, degrees = degrees )
+  }
+  r
 }
 
 #' @rdname TrackMeasures
-meanTurningAngle <- function(x) {
+meanTurningAngle <- function(x, degrees = FALSE) {
+  # angles are only defined for subtracks of at least two steps
+  # (three coordinate sets)
 	if(nrow(x)<3){
 		return(NaN)
 	}
-	mean(sapply(subtracks(x, 2), overallAngle),na.rm=TRUE)
+  # return the mean angle over all subtracks of 2 steps
+	mean(sapply(subtracks(x, 2), overallAngle, degrees = degrees),na.rm=TRUE)
 }
 
 #' @rdname TrackMeasures
 overallDot <- function(x, from=1, to=nrow(x), xdiff=diff(x)) {
+  
+  # Start with a NaN angle for all dot products to compute
 	r <- rep(NaN, length(from))
+	
+	# To compute a dot product, we need at least one step, so from must be at least one smaller than to.
+	# all the other ones will return NaN.
 	ft <- from<to
+	
+	# Check if there is anything left to compute
 	if( sum(ft) > 0 ){
+	  # Get displacement vectors for the steps to compute angle between.
+	  # Can be multiple, in a matrix form.
 		a <- xdiff[from[ft],-1,drop=FALSE]
 		b <- xdiff[to[ft]-1,-1,drop=FALSE]
+		
+		# get dot product
 		r[ft] <- .rowSums(a * b, nrow(a), ncol(a))
 	}
 	r
