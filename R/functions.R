@@ -326,7 +326,7 @@ normalizeToDuration <- function(x) {
 #' \code{\link{match.fun}}.
 #'
 #' @param subtrack.length an integer or a vector of integers defining which subtrack
-#' lengths are considered. In particular, \code{subtrack.length=2}
+#' lengths are considered. In particular, \code{subtrack.length=1}
 #' corresponds to a "step-based analysis" (Beltman et al, 2009).
 #'
 #' @param max.overlap an integer controlling what to do with overlapping subtracks.

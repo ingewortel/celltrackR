@@ -46,7 +46,7 @@ If the string is not equal to any of these, it is passed on to
 \code{\link{match.fun}}.}
 
 \item{subtrack.length}{an integer or a vector of integers defining which subtrack
-lengths are considered. In particular, \code{subtrack.length=2}
+lengths are considered. In particular, \code{subtrack.length=1}
 corresponds to a "step-based analysis" (Beltman et al, 2009).}
 
 \item{max.overlap}{an integer controlling what to do with overlapping subtracks.
