@@ -15,7 +15,7 @@ simulateTracks(n, expr)
 A \code{tracks} object containing \code{n} tracks.
 }
 \description{
-Generic function that executes \code{expr}, which is expected to 
+Generic function that executes \code{expr}, which is expected to
 return a track, \code{n} times and stores the output in a \code{tracks}
 object. Basically, this works like \code{\link{replicate}} but for tracks.
 }
@@ -23,4 +23,5 @@ object. Basically, this works like \code{\link{replicate}} but for tracks.
 ## Generate 10 tracks, 100 steps each, from a random walk with standard normally
 ## distributed increments and plot them
 plot( simulateTracks( 10, brownianTrack(100,3) ) )
+
 }

@@ -3,13 +3,13 @@ Type: Package
 Title: Quantitative Analysis of Motion
 Date: 2019-05-16
 Version: 0.0.0.9000
-Authors:  Johannes Textor, Katharina Dannenberg, Jeffrey Berry, Gerhard Burger, Inge Wortel
+Author:  Johannes Textor, Katharina Dannenberg, Jeffrey Berry, Gerhard Burger, Inge Wortel
 Maintainer: Johannes Textor <johannes.textor@gmx.de>
 Description: Statistics to quantify tracks of moving things (x-y-z-t data),
     such as cells, bacteria or animals. Available measures include mean square
     displacement, confinement ratio, autocorrelation, straightness, turning angle,
     and fractal dimension.
-Depends: R (>= 3.5.1)
+Depends: R (>= 3.5.0)
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
@@ -27,6 +27,9 @@ Suggests:
     testthat,
     wordspace,
     knitr,
-    rmarkdown
+    rmarkdown,
+    umap,
+    dendextend,
+    ggplot2
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr

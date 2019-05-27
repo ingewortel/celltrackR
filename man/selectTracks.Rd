@@ -22,4 +22,5 @@ measure. For instance, extract all tracks with a certain minimum length.
 \examples{
 ## Slower half of T cells
 slow.tcells <- selectTracks( TCells, speed, -Inf, median( sapply(TCells,speed) ) )
+
 }

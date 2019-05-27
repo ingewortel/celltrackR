@@ -10,7 +10,7 @@ normalizeTracks(x)
 \item{x}{the input \code{tracks} object.}
 }
 \description{
-Translates each track in a given set of tracks such that the 
+Translates each track in a given set of tracks such that the
 first position is the origin.
 }
 \examples{

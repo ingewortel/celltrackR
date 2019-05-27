@@ -2,7 +2,7 @@
 % Please edit documentation in R/angle-functions.R
 \name{analyzeCellPairs}
 \alias{analyzeCellPairs}
-\title{Find Distances And Angles For All Pairs Of Tracks}
+\title{Find Distances and Angles for all Pairs of Tracks}
 \usage{
 analyzeCellPairs(X, ...)
 }
@@ -29,7 +29,7 @@ and \code{\link{distanceCells}}.
 \examples{
 ## Plot distance versus angle for all cell pairs
 pairs <- analyzeCellPairs( TCells )
-scatter.smooth( pairs$distance, pairs$angle )
+scatter.smooth( pairs$dist, pairs$angle )
 }
 \references{
 Joost B. Beltman, Athanasius F.M. Maree and Rob. J. de Boer (2009),

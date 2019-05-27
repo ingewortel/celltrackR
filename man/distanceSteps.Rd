@@ -2,7 +2,7 @@
 % Please edit documentation in R/angle-functions.R
 \name{distanceSteps}
 \alias{distanceSteps}
-\title{Distance Between Two Steps}
+\title{Distance between Two Steps}
 \usage{
 distanceSteps(X, trackids, t)
 }

@@ -1,4 +1,4 @@
-#' Angle analysis
+#' Angle Analysis
 #'
 #' Analyzing angles to reference directions, points, or planes can be useful to detect
 #' artefacts and/or directionality in tracking datasets (Beltman et al, 2009). All these
@@ -66,8 +66,9 @@
 #' scatter.smooth( distances, angles )
 #' abline( h = 90, col = "red" )
 #'
-#' ## Get a distribution of Neutrophil step angles with the reference direction in positive y direction.
-#' ## The histogram is enriched for low angles, suggesting directed movement:
+#' ## Get a distribution of Neutrophil step angles with the reference direction
+#' ## in positive y direction. The histogram is enriched for low angles, suggesting
+#' ## directed movement:
 #' hist( sapply( steps, angleToDir, dvec=c(0,1,0) ) )
 #'
 #' ## Plotting the angle versus the distance to a reference plane can be informative to
@@ -81,6 +82,18 @@
 #' distances <- sapply( steps, distanceToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )
 #' scatter.smooth( distances, angles )
 #' abline( h = 32.7, col = "red" )
+#'
+#' ## Plot distance versus angle for all cell pairs
+#' pairs <- analyzeCellPairs( TCells )
+#' scatter.smooth( pairs$dist, pairs$angle )
+#' abline( h = 90, col = "red" )
+#'
+#' ## Plot distance versus angle for all step pairs, filtering for those that
+#' ## displace at least 2 microns
+#' pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2, quietly = TRUE )
+#' scatter.smooth( pairs$dist, pairs$angle )
+#' abline( h = 90, col = "red" )
+#'
 #'
 #' @references
 #' Joost B. Beltman, Athanasius F.M. Maree and Rob. J. de Boer (2009),
@@ -111,6 +124,7 @@ NULL
 #' vecAngle( c(0,1), c(1,0) )
 #' ## The same holds for 3D angles:
 #' vecAngle( c(0,1,0), c(1,0,0) )
+#' @export
 vecAngle <- function( a, b, degrees = TRUE )
 {
   # Check if inputs have the right dimensions
@@ -149,7 +163,7 @@ vecAngle <- function( a, b, degrees = TRUE )
   }
 }
 
-#' Angle With A Reference Point
+#' Angle with a Reference Point
 #'
 #' Compute the angle between the first step of a track and a reference point. Useful to
 #' detect directed movement towards a point (see examples).
@@ -196,6 +210,7 @@ vecAngle <- function( a, b, degrees = TRUE )
 #' distances <- sapply( steps, distanceToPoint, p = bb["max",-1] )
 #' scatter.smooth( distances, angles )
 #' abline( h = 90, col = "red" )
+#' @export
 angleToPoint <- function (x, from = 1, p = c(1,1,1), xdiff = diff(x), degrees = TRUE )
 {
 
@@ -226,7 +241,7 @@ angleToPoint <- function (x, from = 1, p = c(1,1,1), xdiff = diff(x), degrees = 
 }
 
 
-#' Angle With A Reference Direction
+#' Angle with a Reference Direction
 #'
 #' Compute the angle between the first step of a track and a reference direction.
 #' Useful to detect biased movement when the directional bias is known (see examples).
@@ -255,10 +270,11 @@ angleToPoint <- function (x, from = 1, p = c(1,1,1), xdiff = diff(x), degrees = 
 #' 789--798. doi:10.1038/nri2638
 #'
 #' @examples
-#' ## Get a distribution of Neutrophil step angles with the reference direction in positive y direction.
-#' ## The histogram is enriched for low angles, suggesting directed movement:
+#' ## Get a distribution of Neutrophil step angles with the reference direction in positive
+#' ## y direction. The histogram is enriched for low angles, suggesting directed movement:
 #' steps <- subtracks( Neutrophils, 1 )
 #' hist( sapply( steps, angleToDir, dvec=c(0,1,0) ) )
+#' @export
 angleToDir <- function (x, from = 1, dvec = c(1,1,1), xdiff = diff(x), degrees=TRUE )
 {
 
@@ -296,7 +312,7 @@ angleToDir <- function (x, from = 1, dvec = c(1,1,1), xdiff = diff(x), degrees=T
   }
 
 
-#' Angle With A Reference Plane
+#' Angle with a Reference Plane
 #'
 #' Compute the angle between the first step of a track and a reference plane.
 #' Useful to detect directed movement and/or tracking artefacts.
@@ -338,6 +354,7 @@ angleToDir <- function (x, from = 1, dvec = c(1,1,1), xdiff = diff(x), degrees=T
 #' distances <- sapply( steps, distanceToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )
 #' scatter.smooth( distances, angles )
 #' abline( h = 32.7, col = "red" )
+#' @export
 angleToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,0),
                           xdiff = diff(x), degrees =TRUE )
 {
@@ -391,7 +408,7 @@ angleToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,
   }
 
 
-#' Distance To A Reference Plane
+#' Distance to a Reference Plane
 #'
 #' Compute the (shortest) distance between the starting point of a track and a reference plane.
 #' Useful to detect directed movement and/or tracking artefacts.
@@ -401,7 +418,6 @@ angleToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,
 #' @param from index, or vector of indices, of the first row of the track. If
 #' \code{from} is a vector, distances are returned for all steps starting at
 #' the indices in \code{from}.
-#' @param xdiff row differences of x.
 #' @param p1,p2,p3 numeric vectors of coordinates of three points specifying a reference plane to
 #'  compute distances to.
 #'
@@ -422,6 +438,7 @@ angleToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,
 #' distances <- sapply( steps, distanceToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )
 #' scatter.smooth( distances, angles )
 #' abline( h = 32.7, col = "red" )
+#' @export
 distanceToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,0) )
 {
 
@@ -467,7 +484,7 @@ distanceToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1
   r
   }
 
-#' Distance To A Reference Point
+#' Distance to a Reference Point
 #'
 #' Compute the distance between the starting point of a track and a reference point.
 #' Useful to
@@ -478,7 +495,6 @@ distanceToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1
 #' @param from index, or vector of indices, of the first row of the track. If
 #' \code{from} is a vector, distances are returned for all steps starting at
 #' the indices in \code{from}.
-#' @param xdiff row differences of x.
 #' @param p numeric vector of coordinates of the reference point p to compute distances to.
 #'
 #' @return A single distance.
@@ -496,6 +512,7 @@ distanceToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1
 #' distances <- sapply( steps, distanceToPoint, p = bb["max",-1] )
 #' scatter.smooth( distances, angles )
 #' abline( h = 90, col = "red" )
+#' @export
 distanceToPoint <- function (x, from = 1, p = c(0,0,0) )
 {
   # Check if the given point has the correct dimensions
@@ -523,7 +540,7 @@ distanceToPoint <- function (x, from = 1, p = c(0,0,0) )
   r
 }
 
-#' Angle Between Two Steps
+#' Angle between Two Steps
 #'
 #' Compute the angle between two steps in the dataset that occur at the same timepoint.
 #'
@@ -546,6 +563,7 @@ distanceToPoint <- function (x, from = 1, p = c(0,0,0) )
 #' ## timepoint in the dataset.
 #' t <- timePoints( TCells )[3]
 #' angleSteps( TCells, c("1","2"), t )
+#' @export
 angleSteps <- function( X, trackids, t, degrees = TRUE, quietly = FALSE )
 {
   if( !length(trackids) == 2 ){
@@ -578,7 +596,7 @@ angleSteps <- function( X, trackids, t, degrees = TRUE, quietly = FALSE )
   ang
 }
 
-#' Distance Between Two Steps
+#' Distance between Two Steps
 #'
 #' Compute the distance between two steps in the dataset that occur at the same timepoint.
 #' The distance is the distance between the step starting points.
@@ -599,6 +617,7 @@ angleSteps <- function( X, trackids, t, degrees = TRUE, quietly = FALSE )
 #' ## timepoint in the dataset.
 #' t <- timePoints( TCells )[3]
 #' distanceSteps( TCells, c("1","2"), t )
+#' @export
 distanceSteps <- function( X, trackids, t )
 {
   # Select the relevant tracks
@@ -615,7 +634,7 @@ distanceSteps <- function( X, trackids, t )
 
 
 
-#' Find Pairs Of Steps Occurring At The Same Time
+#' Find Pairs of Steps Occurring at the Same Time
 #'
 #' Find cell indices and timepoints where these cells both have a step.
 #'
@@ -628,6 +647,8 @@ distanceSteps <- function( X, trackids, t )
 #' @examples
 #' ## Find all pairs of steps in the T cell data that displace at least 2 microns.
 #' pairs <- stepPairs( TCells, filter.steps = function(t) displacement(t) > 2 )
+#'
+#' @export
 stepPairs <- function( X, filter.steps=NULL )
 {
   dout <- data.frame()
@@ -645,7 +666,7 @@ stepPairs <- function( X, filter.steps=NULL )
 
     # Make all possible pairs
     if( length(ids) >= 2 ){
-      pairs <- as.data.frame( t( combn( ids, 2 ) ),
+      pairs <- as.data.frame( t( utils::combn( ids, 2 ) ),
                               stringsAsFactors = FALSE )
       colnames(pairs) <- c( "p1","p2" )
 
@@ -659,7 +680,7 @@ stepPairs <- function( X, filter.steps=NULL )
 
 
 
-#' Find Distances And Angles For All Pairs Of Steps
+#' Find Distances and Angles for all Pairs of Steps
 #'
 #' Find cell indices and timepoints where these cells both have a step, then return
 #' angles and distances for each pair of steps.
@@ -691,7 +712,8 @@ stepPairs <- function( X, filter.steps=NULL )
 #' ## Plot distance versus angle for all step pairs, filtering for those that
 #' ## displace at least 2 microns
 #' pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2, quietly = TRUE )
-#' scatter.smooth( pairs$distance, pairs$angle )
+#' scatter.smooth( pairs$dist, pairs$angle )
+#' @export
 analyzeStepPairs <- function( X, filter.steps = NULL, ... )
 {
   # Obtain cell paris for each timepoint
@@ -711,7 +733,7 @@ analyzeStepPairs <- function( X, filter.steps = NULL, ... )
 
 
 
-#' Find Distances And Angles For All Pairs Of Tracks
+#' Find Distances and Angles for all Pairs of Tracks
 #'
 #' Find all pairs of cells and return the shortest distance between them at any
 #' point, as well as the angle between their overall displacement vectors.
@@ -740,7 +762,8 @@ analyzeStepPairs <- function( X, filter.steps = NULL, ... )
 #' @examples
 #' ## Plot distance versus angle for all cell pairs
 #' pairs <- analyzeCellPairs( TCells )
-#' scatter.smooth( pairs$distance, pairs$angle )
+#' scatter.smooth( pairs$dist, pairs$angle )
+#' @export
 analyzeCellPairs <- function( X, ... )
 {
   # Make all possible pairs of cellids
@@ -759,3 +782,122 @@ analyzeCellPairs <- function( X, ... )
   return(pairs)
 
 }
+
+
+#' Find Pairs of Tracks
+#'
+#' Get all unique combinations of two track ids.
+#'
+#' @param X a tracks object
+#'
+#' @return A dataframe with two columns: one for each of the track ids in the pair.
+#' Each row represents a pair.
+#'
+#' @examples
+#' ## Find all pairs of cells in the T cell data
+#' pairs <- cellPairs( TCells )
+#' @export
+cellPairs <- function( X )
+{
+  cellids <- names( X )
+  pairs <- data.frame()
+
+  if( length(cellids) >= 2 ){
+    # Make all possible pairs of cellids
+    pairs <- as.data.frame( t( utils::combn( cellids, 2 ) ),
+                            stringsAsFactors = FALSE )
+    colnames(pairs) <- c( "cell1","cell2" )
+  }
+  return(pairs)
+}
+
+#' Angle between Two Tracks
+#'
+#' Compute the angle between the displacement vectors of two tracks in the dataset.
+#'
+#' @param X a tracks object
+#' @param cellids a vector of two indices specifying the tracks to get steps from.
+#' @param degrees logical; should angle be returned in degrees instead of radians? (defaults to \code{TRUE})
+#'
+#' @return A single angle.
+#'
+#' @seealso \code{\link{distanceCells}} to compute the minimum distance between the tracks,
+#' and \code{\link{AngleAnalysis}} for other methods to compute angles and distances.
+#'
+#' @examples
+#' ## Find the angle between the tracks with ids 1 and 2
+#' angleCells( TCells, c("1","2") )
+#' @export
+angleCells <- function( X, cellids, degrees = TRUE )
+{
+  X <- X[cellids]
+
+  if( any( !is.element( cellids, names(X) ) ) ){
+    stop( "angleCells: cannot find both cellids in data." )
+  }
+
+  a <- displacementVector( X[[1]] )
+  b <- displacementVector( X[[2]] )
+  return( vecAngle( a, b, degrees = degrees ) )
+
+}
+
+#' Minimum Distance between Two Cells
+#'
+#' Compute the minimum distance between two cells in the dataset (minimum over all)
+#' the timepoints where they were both measured.
+#'
+#' @param X a tracks object
+#' @param cellids a vector of two indices specifying the tracks to compute distance between.
+#'
+#' @return A single distance, or NA if the the tracks do not have overlapping timepoints.
+#'
+#' @seealso \code{\link{angleCells}} to compute the angle between the track displacement vectors,
+#' and \code{\link{AngleAnalysis}} for other methods to compute angles and distances.
+#'
+#' @examples
+#' ## Find the minimum distance between the tracks with ids 1 and 2
+#' distanceCells( TCells, c("1","2") )
+#' @export
+distanceCells <- function( X, cellids )
+{
+
+  if( any( !is.element( cellids, names(X) ) ) ){
+    stop( "distanceCells: cannot find both cellids in data." )
+  }
+
+  # Find timepoints occurring in both tracks
+  t1 <- timePoints( X[ cellids[1] ] )
+  t2 <- timePoints( X[ cellids[2] ] )
+  t <- c( t1, t2 )
+  tboth <- t[ duplicated(t) ]
+
+  # If cells have no overlapping timepts, return NA.
+  if( length(tboth) == 0 ){
+    return(NA)
+  }
+
+  # Get the coordinate matrix of both cells for the overlapping timeinterval
+  m1 <- X[[ cellids[1] ]]
+  rownames( m1 ) <- m1[,"t"]
+  m1 <- m1[ as.character(tboth), , drop =FALSE ]
+  m2 <- X[[ cellids[2] ]]
+  rownames( m2 ) <- m2[,"t"]
+  m2 <- m2[ as.character(tboth), , drop = FALSE ]
+
+  # Remove the time column from each matrix
+  m1 <- m1[,-1, drop = FALSE]
+  m2 <- m2[,-1, drop = FALSE]
+
+  # Subtract from each other to get dx,dy,dz at each t
+  mdiff <- m1 - m2
+
+  # compute distance at each timepoint
+  mdiff <- mdiff^2
+  distances <- sqrt( rowSums( mdiff ) )
+  return( min(distances) )
+
+
+}
+
+

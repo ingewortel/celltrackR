@@ -10,17 +10,17 @@
   filter.subtracks = NULL, ...)
 }
 \arguments{
-\item{x}{the tracks object whose subtracks are to be considered. 
-If a single track is given, it will be coerced to a tracks object 
+\item{x}{the tracks object whose subtracks are to be considered.
+If a single track is given, it will be coerced to a tracks object
 using \code{\link{wrapTrack}} (but note that this requires an explicit call
 \code{aggregate.tracks}).}
 
 \item{measure}{the measure that is to be computed on the subtracks.}
 
 \item{by}{a string that indicates how grouping is performed. Currently, two
-kinds of grouping are supported: 
+kinds of grouping are supported:
 \itemize{
- \item{"subtracks"}{ Apply \code{measure} to all subtracks according to 
+ \item{"subtracks"}{ Apply \code{measure} to all subtracks according to
 the parameters \code{subtrack.length} and \code{max.overlap}.}
  \item{"prefixes"}{ Apply \code{measure} to all prefixes (i.e., subtracks starting
  from a track's initial position) according to the parameter \code{subtrack.length}.}
@@ -30,23 +30,23 @@ the parameters \code{subtrack.length} and \code{max.overlap}.}
 same length. Can be a function or a string.
 If a string is given, it is first matched to the following builtin values:
 \itemize{
- \item{"mean.sd"}{ Outputs the mean and \eqn{mean - sd} as lower and 
+ \item{"mean.sd"}{ Outputs the mean and \eqn{mean - sd} as lower and
  \eqn{mean + sd} as upper bound}
- \item{"mean.se"}{ Outputs the mean and \eqn{mean - se} as lower and 
+ \item{"mean.se"}{ Outputs the mean and \eqn{mean - se} as lower and
  \eqn{mean + se} as upper bound}
- \item{"mean.ci.95"}{ Outputs the mean and upper and lower bound of a 
- parametric 95 percent confidence intervall}. 
- \item{"mean.ci.99"}{ Outputs the mean and upper and lower bound of a 
- parametric 95 percent confidence intervall}. 
- \item{"iqr"}{ Outputs the interquartile range, that is, the median, and the 
- 25-percent-quartile as a lower and and the 75-percent-quartile as an 
+ \item{"mean.ci.95"}{ Outputs the mean and upper and lower bound of a
+ parametric 95 percent confidence intervall}.
+ \item{"mean.ci.99"}{ Outputs the mean and upper and lower bound of a
+ parametric 95 percent confidence intervall}.
+ \item{"iqr"}{ Outputs the interquartile range, that is, the median, and the
+ 25-percent-quartile as a lower and and the 75-percent-quartile as an
  upper bound}
 }
-If the string is not equal to any of these, it is passed on to 
+If the string is not equal to any of these, it is passed on to
 \code{\link{match.fun}}.}
 
 \item{subtrack.length}{an integer or a vector of integers defining which subtrack
-lengths are considered. In particular, \code{subtrack.length=2} 
+lengths are considered. In particular, \code{subtrack.length=1}
 corresponds to a "step-based analysis" (Beltman et al, 2009).}
 
 \item{max.overlap}{an integer controlling what to do with overlapping subtracks.
@@ -57,7 +57,7 @@ a certain distance apart are considered. In general, for non-Brownian motion the
 be correlations between subsequent steps, such that a negative overlap may be necessary
 to get a proper error estimate.}
 
-\item{na.rm}{logical. If \code{TRUE}, then \code{NA}'s and \code{NaN}'s 
+\item{na.rm}{logical. If \code{TRUE}, then \code{NA}'s and \code{NaN}'s
 are removed prior to computing the summary statistic.}
 
 \item{filter.subtracks}{a function that can be supplied to exclude certain subtracks
@@ -67,29 +67,29 @@ a certain minimum length (see Examples).}
 \item{...}{further arguments passed to or used by methods.}
 }
 \value{
-A data frame with one row for every \eqn{i} 
-specified by \code{subtrack.length}. The first column contains the values 
+A data frame with one row for every \eqn{i}
+specified by \code{subtrack.length}. The first column contains the values
 of \eqn{i} and the remaining columns contain the values of the summary statistic
 of the measure values of tracks having exactly \eqn{i} segments.
 }
 \description{
-Computes a given measure on subtracks of a given track set, applies a summary 
+Computes a given measure on subtracks of a given track set, applies a summary
 statistic for each subtrack length, and returns the results in a convenient form.
-This important workhorse function facilitates many common motility analyses 
+This important workhorse function facilitates many common motility analyses
 such as mean square displacement, turning angle, and autocorrelation plots.
 }
 \details{
-For every number of segments \eqn{i} in the set defined by 
-\code{subtrack.length}, all subtracks of any track in the input 
-\code{tracks} object that consist of exactly \eqn{i} segments are 
-considered. The input \code{measure} is applied to the subtracks individually, 
+For every number of segments \eqn{i} in the set defined by
+\code{subtrack.length}, all subtracks of any track in the input
+\code{tracks} object that consist of exactly \eqn{i} segments are
+considered. The input \code{measure} is applied to the subtracks individually,
 and the \code{statistic} is applied to the resulting values.
 }
 \examples{
 ## A mean square displacement plot with error bars.
 dat <- aggregate(TCells, squareDisplacement, FUN="mean.se")
 with( dat ,{
-  plot( mean ~ i, xlab="time step", 
+  plot( mean ~ i, xlab="time step",
   	ylab="mean square displacement", type="l" )
   segments( i, lower, y1=upper )
 } )
@@ -97,7 +97,7 @@ with( dat ,{
 ## Compute a turning angle plot for the B cell data, taking only steps of at least
 ## 1 micrometer length into account
 check <- function(x) all( sapply( list(head(x,2),tail(x,2)), trackLength ) >= 1.0 )
-plot( aggregate( BCells, overallAngle, subtrack.length=1:10, 
+plot( aggregate( BCells, overallAngle, subtrack.length=1:10,
   filter.subtracks=check )[,2], type='l' )
 
 ## Compare 3 different variants of a mean displacement plot

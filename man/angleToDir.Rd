@@ -2,7 +2,7 @@
 % Please edit documentation in R/angle-functions.R
 \name{angleToDir}
 \alias{angleToDir}
-\title{Angle With A Reference Direction}
+\title{Angle with a Reference Direction}
 \usage{
 angleToDir(x, from = 1, dvec = c(1, 1, 1), xdiff = diff(x),
   degrees = TRUE)
@@ -35,8 +35,8 @@ The average angle of steps to a reference direction should be 90 degrees if ther
  is a uniform distribution in 2D or a sine distribution in 3D (Beltman et al, 2009).
 }
 \examples{
-## Get a distribution of Neutrophil step angles with the reference direction in positive y direction.
-## The histogram is enriched for low angles, suggesting directed movement:
+## Get a distribution of Neutrophil step angles with the reference direction in positive
+## y direction. The histogram is enriched for low angles, suggesting directed movement:
 steps <- subtracks( Neutrophils, 1 )
 hist( sapply( steps, angleToDir, dvec=c(0,1,0) ) )
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/angle-functions.R
 \name{angleToPlane}
 \alias{angleToPlane}
-\title{Angle With A Reference Plane}
+\title{Angle with a Reference Plane}
 \usage{
 angleToPlane(x, from = 1, p1 = c(0, 0, 0), p2 = c(0, 1, 0),
   p3 = c(1, 0, 0), xdiff = diff(x), degrees = TRUE)

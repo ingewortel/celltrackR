@@ -14,11 +14,11 @@ A function that computes the input measure for a given track
 and returns the result divided by the track's duration.
 }
 \description{
-Returns a measure that divides the input measure by the duration of its 
+Returns a measure that divides the input measure by the duration of its
 input track.
 }
 \examples{
-## normalizeToDuration(displacement) can be used as an indicator 
+## normalizeToDuration(displacement) can be used as an indicator
 ## for the motion's efficiency
 sapply(TCells, normalizeToDuration(displacement))
 }

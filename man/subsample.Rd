@@ -19,8 +19,9 @@ Make tracks more coarse-grained by keeping only every \emph{k}th position.
 ## Compare original and subsampled versions of the T cell tracks
 plot( TCells, col=1 )
 plot( subsample( TCells, 3 ), col=2, add=TRUE, pch.start=NULL )
+
 }
 \seealso{
-\code{interpolateTrack}, which can be used for more flexible track 
+\code{interpolateTrack}, which can be used for more flexible track
 coarse-graining.
 }

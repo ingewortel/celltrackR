@@ -2,7 +2,7 @@
 % Please edit documentation in R/angle-functions.R
 \name{angleToPoint}
 \alias{angleToPoint}
-\title{Angle With A Reference Point}
+\title{Angle with a Reference Point}
 \usage{
 angleToPoint(x, from = 1, p = c(1, 1, 1), xdiff = diff(x),
   degrees = TRUE)

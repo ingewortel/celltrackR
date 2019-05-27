@@ -2,7 +2,7 @@
 % Please edit documentation in R/angle-functions.R
 \name{distanceToPoint}
 \alias{distanceToPoint}
-\title{Distance To A Reference Point}
+\title{Distance to a Reference Point}
 \usage{
 distanceToPoint(x, from = 1, p = c(0, 0, 0))
 }
@@ -15,8 +15,6 @@ remaining columns are a spatial coordinate.}
 the indices in \code{from}.}
 
 \item{p}{numeric vector of coordinates of the reference point p to compute distances to.}
-
-\item{xdiff}{row differences of x.}
 }
 \value{
 A single distance.

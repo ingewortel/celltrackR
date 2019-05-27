@@ -31,7 +31,6 @@ First load the package:
 
 ```{r pack, warning = FALSE, message = FALSE}
 library( celltrackR )
-library( ggplot2 )
 ```
 
 The package contains a dataset of T cells imaged in a mouse peripheral lymph node using two photon microscopy. We will here use this dataset as an example of how to perform quality control.

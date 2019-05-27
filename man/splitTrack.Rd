@@ -16,7 +16,8 @@ if \code{id="X"}, then the resulting tracks are named X_1, X_2 and so forth.
 Otherwise, they are simply labelled with integer numbers.}
 
 \item{min.length}{nonnegative integer. Resulting tracks that have fewer positions than
-the value of this parameter are dropped.}
+the value of this parameter are dropped.
+@export}
 }
 \description{
 Split Track into Multiple Tracks
