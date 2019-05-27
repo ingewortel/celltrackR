@@ -4,17 +4,17 @@
 \alias{distanceToPoint}
 \title{Distance to a Reference Point}
 \usage{
-distanceToPoint(x, from = 1, p = c(0, 0, 0))
+distanceToPoint(x, p = c(0, 0, 0), from = 1)
 }
 \arguments{
 \item{x}{a single input track; a matrix whose first column is time and whose
 remaining columns are a spatial coordinate.}
 
+\item{p}{numeric vector of coordinates of the reference point p to compute distances to.}
+
 \item{from}{index, or vector of indices, of the first row of the track. If
 \code{from} is a vector, distances are returned for all steps starting at
 the indices in \code{from}.}
-
-\item{p}{numeric vector of coordinates of the reference point p to compute distances to.}
 }
 \value{
 A single distance.

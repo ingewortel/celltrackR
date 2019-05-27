@@ -4,18 +4,18 @@
 \alias{angleToPoint}
 \title{Angle with a Reference Point}
 \usage{
-angleToPoint(x, from = 1, p = c(1, 1, 1), xdiff = diff(x),
+angleToPoint(x, p = c(1, 1, 1), from = 1, xdiff = diff(x),
   degrees = TRUE)
 }
 \arguments{
 \item{x}{a single input track; a matrix whose first column is time and whose
 remaining columns are a spatial coordinate.}
 
+\item{p}{numeric vector of coordinates of the reference point p to compute angles/distances to.}
+
 \item{from}{index, or vector of indices, of the first row of the track. If
 \code{from} is a vector, angles are returned for all steps starting at
 the indices in \code{from}.}
-
-\item{p}{numeric vector of coordinates of the reference point p to compute angles/distances to.}
 
 \item{xdiff}{row differences of x.}
 

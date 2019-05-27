@@ -4,18 +4,18 @@
 \alias{angleToDir}
 \title{Angle with a Reference Direction}
 \usage{
-angleToDir(x, from = 1, dvec = c(1, 1, 1), xdiff = diff(x),
+angleToDir(x, dvec = c(1, 1, 1), from = 1, xdiff = diff(x),
   degrees = TRUE)
 }
 \arguments{
 \item{x}{a single input track; a matrix whose first column is time and whose
 remaining columns are a spatial coordinate.}
 
+\item{dvec}{numeric vector specifying a reference direction to compute angles to.}
+
 \item{from}{index, or vector of indices, of the first row of the track. If
 \code{from} is a vector, angles are returned for all steps starting at
 the indices in \code{from}.}
-
-\item{dvec}{numeric vector specifying a reference direction to compute angles to.}
 
 \item{xdiff}{row differences of x.}
 

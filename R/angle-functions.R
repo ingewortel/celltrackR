@@ -170,12 +170,13 @@ vecAngle <- function( a, b, degrees = TRUE )
 #'
 #' @param x a single input track; a matrix whose first column is time and whose
 #'  remaining columns are a spatial coordinate.
+#' @param p numeric vector of coordinates of the reference point p to compute angles/distances to.
 #' @param from index, or vector of indices, of the first row of the track. If
 #' \code{from} is a vector, angles are returned for all steps starting at
 #' the indices in \code{from}.
 #' @param xdiff row differences of x.
 #' @param degrees logical; should angles be returned in degrees rather than radians? (default = TRUE).
-#' @param p numeric vector of coordinates of the reference point p to compute angles/distances to.
+#'
 #'
 #' @return A single angle.
 #'
@@ -211,7 +212,7 @@ vecAngle <- function( a, b, degrees = TRUE )
 #' scatter.smooth( distances, angles )
 #' abline( h = 90, col = "red" )
 #' @export
-angleToPoint <- function (x, from = 1, p = c(1,1,1), xdiff = diff(x), degrees = TRUE )
+angleToPoint <- function (x, p = c(1,1,1), from = 1, xdiff = diff(x), degrees = TRUE )
 {
 
   # Check if the given point has the correct dimensions
@@ -248,12 +249,12 @@ angleToPoint <- function (x, from = 1, p = c(1,1,1), xdiff = diff(x), degrees = 
 #'
 #' @param x a single input track; a matrix whose first column is time and whose
 #'  remaining columns are a spatial coordinate.
+#' @param dvec numeric vector specifying a reference direction to compute angles to.
 #' @param from index, or vector of indices, of the first row of the track. If
 #' \code{from} is a vector, angles are returned for all steps starting at
 #' the indices in \code{from}.
 #' @param xdiff row differences of x.
 #' @param degrees logical; should angles be returned in degrees rather than radians? (default = TRUE).
-#' @param dvec numeric vector specifying a reference direction to compute angles to.
 #'
 #' @return A single angle.
 #'
@@ -275,7 +276,7 @@ angleToPoint <- function (x, from = 1, p = c(1,1,1), xdiff = diff(x), degrees = 
 #' steps <- subtracks( Neutrophils, 1 )
 #' hist( sapply( steps, angleToDir, dvec=c(0,1,0) ) )
 #' @export
-angleToDir <- function (x, from = 1, dvec = c(1,1,1), xdiff = diff(x), degrees=TRUE )
+angleToDir <- function (x, dvec = c(1,1,1), from = 1, xdiff = diff(x), degrees=TRUE )
 {
 
   # Check if the given direction has the correct dimensions
@@ -319,13 +320,13 @@ angleToDir <- function (x, from = 1, dvec = c(1,1,1), xdiff = diff(x), degrees=T
 #'
 #' @param x a single input track; a matrix whose first column is time and whose
 #'  remaining columns are a spatial coordinate.
+#' @param p1,p2,p3 numeric vectors of coordinates of three points specifying a reference plane to
+#'  compute distances to.
 #' @param from index, or vector of indices, of the first row of the track. If
 #' \code{from} is a vector, angles are returned for all steps starting at
 #' the indices in \code{from}.
 #' @param xdiff row differences of x.
 #' @param degrees logical; should angles be returned in degrees rather than radians? (default = TRUE).
-#' @param p1,p2,p3 numeric vectors of coordinates of three points specifying a reference plane to
-#'  compute distances to.
 #'
 #' @return A single angle.
 #'
@@ -355,8 +356,8 @@ angleToDir <- function (x, from = 1, dvec = c(1,1,1), xdiff = diff(x), degrees=T
 #' scatter.smooth( distances, angles )
 #' abline( h = 32.7, col = "red" )
 #' @export
-angleToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,0),
-                          xdiff = diff(x), degrees =TRUE )
+angleToPlane <- function (x, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,0),
+                          from = 1, xdiff = diff(x), degrees =TRUE )
 {
 
   # Check if the given points have the correct dimensions
@@ -415,11 +416,11 @@ angleToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,
 #'
 #' @param x a single input track; a matrix whose first column is time and whose
 #'  remaining columns are a spatial coordinate.
+#' @param p1,p2,p3 numeric vectors of coordinates of three points specifying a reference plane to
+#'  compute distances to.
 #' @param from index, or vector of indices, of the first row of the track. If
 #' \code{from} is a vector, distances are returned for all steps starting at
 #' the indices in \code{from}.
-#' @param p1,p2,p3 numeric vectors of coordinates of three points specifying a reference plane to
-#'  compute distances to.
 #'
 #' @return A single distance.
 #'
@@ -439,7 +440,7 @@ angleToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,
 #' scatter.smooth( distances, angles )
 #' abline( h = 32.7, col = "red" )
 #' @export
-distanceToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,0) )
+distanceToPlane <- function (x, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,0), from = 1  )
 {
 
   # Check if the given points have the correct dimensions
@@ -492,10 +493,10 @@ distanceToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1
 #'
 #' @param x a single input track; a matrix whose first column is time and whose
 #'  remaining columns are a spatial coordinate.
+#' @param p numeric vector of coordinates of the reference point p to compute distances to.
 #' @param from index, or vector of indices, of the first row of the track. If
 #' \code{from} is a vector, distances are returned for all steps starting at
 #' the indices in \code{from}.
-#' @param p numeric vector of coordinates of the reference point p to compute distances to.
 #'
 #' @return A single distance.
 #'
@@ -513,7 +514,7 @@ distanceToPlane <- function (x, from = 1, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1
 #' scatter.smooth( distances, angles )
 #' abline( h = 90, col = "red" )
 #' @export
-distanceToPoint <- function (x, from = 1, p = c(0,0,0) )
+distanceToPoint <- function (x, p = c(0,0,0), from = 1 )
 {
   # Check if the given point has the correct dimensions
   if( length(p) != ncol(x) - 1 ){
