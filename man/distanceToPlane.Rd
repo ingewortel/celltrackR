@@ -2,7 +2,7 @@
 % Please edit documentation in R/angle-functions.R
 \name{distanceToPlane}
 \alias{distanceToPlane}
-\title{Distance To A Reference Plane}
+\title{Distance to a Reference Plane}
 \usage{
 distanceToPlane(x, from = 1, p1 = c(0, 0, 0), p2 = c(0, 1, 0),
   p3 = c(1, 0, 0))
@@ -17,8 +17,6 @@ the indices in \code{from}.}
 
 \item{p1, p2, p3}{numeric vectors of coordinates of three points specifying a reference plane to
 compute distances to.}
-
-\item{xdiff}{row differences of x.}
 }
 \value{
 A single distance.

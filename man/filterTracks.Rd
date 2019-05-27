@@ -7,7 +7,7 @@
 filterTracks(f, x, ...)
 }
 \arguments{
-\item{f}{a function that accepts a single track as its first argument and returns a 
+\item{f}{a function that accepts a single track as its first argument and returns a
 logical value (or a value that can be coerced to a locical).}
 
 \item{x}{a tracks object.}

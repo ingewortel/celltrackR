@@ -2,7 +2,7 @@
 % Please edit documentation in R/angle-functions.R
 \name{AngleAnalysis}
 \alias{AngleAnalysis}
-\title{Angle analysis}
+\title{Angle Analysis}
 \description{
 Analyzing angles to reference directions, points, or planes can be useful to detect
 artefacts and/or directionality in tracking datasets (Beltman et al, 2009). All these
@@ -60,8 +60,9 @@ distances <- sapply( steps, distanceToPoint, p = bb["max",-1] )
 scatter.smooth( distances, angles )
 abline( h = 90, col = "red" )
 
-## Get a distribution of Neutrophil step angles with the reference direction in positive y direction.
-## The histogram is enriched for low angles, suggesting directed movement:
+## Get a distribution of Neutrophil step angles with the reference direction
+## in positive y direction. The histogram is enriched for low angles, suggesting
+## directed movement:
 hist( sapply( steps, angleToDir, dvec=c(0,1,0) ) )
 
 ## Plotting the angle versus the distance to a reference plane can be informative to
@@ -75,6 +76,18 @@ angles <- sapply( steps, angleToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = 
 distances <- sapply( steps, distanceToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )
 scatter.smooth( distances, angles )
 abline( h = 32.7, col = "red" )
+
+## Plot distance versus angle for all cell pairs
+pairs <- analyzeCellPairs( TCells )
+scatter.smooth( pairs$dist, pairs$angle )
+abline( h = 90, col = "red" )
+
+## Plot distance versus angle for all step pairs, filtering for those that
+## displace at least 2 microns
+pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2, quietly = TRUE )
+scatter.smooth( pairs$dist, pairs$angle )
+abline( h = 90, col = "red" )
+
 
 }
 \references{

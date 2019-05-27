@@ -1,4 +1,4 @@
 library(testthat)
-library(MotilityLab)
+library(celltrackR)
 
-test_check("MotilityLab")
+test_check("celltrackR")

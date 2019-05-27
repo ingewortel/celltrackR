@@ -14,7 +14,7 @@ indices) giving the dimensions to extract from each track.
 The time dimension (i.e., the first column of all tracks) is always included.}
 }
 \value{
-A tracks object is returned that contains only those dimensions 
+A tracks object is returned that contains only those dimensions
 of the input \code{tracks} that are given in \code{dims}.
 }
 \description{

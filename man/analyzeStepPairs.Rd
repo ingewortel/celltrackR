@@ -2,7 +2,7 @@
 % Please edit documentation in R/angle-functions.R
 \name{analyzeStepPairs}
 \alias{analyzeStepPairs}
-\title{Find Distances And Angles For All Pairs Of Steps}
+\title{Find Distances and Angles for all Pairs of Steps}
 \usage{
 analyzeStepPairs(X, filter.steps = NULL, ...)
 }
@@ -33,7 +33,7 @@ and \code{\link{distanceSteps}}.
 ## Plot distance versus angle for all step pairs, filtering for those that
 ## displace at least 2 microns
 pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2, quietly = TRUE )
-scatter.smooth( pairs$distance, pairs$angle )
+scatter.smooth( pairs$dist, pairs$angle )
 }
 \references{
 Joost B. Beltman, Athanasius F.M. Maree and Rob. J. de Boer (2009),

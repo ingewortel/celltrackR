@@ -2,7 +2,7 @@
 % Please edit documentation in R/angle-functions.R
 \name{stepPairs}
 \alias{stepPairs}
-\title{Find Pairs Of Steps Occurring At The Same Time}
+\title{Find Pairs of Steps Occurring at the Same Time}
 \usage{
 stepPairs(X, filter.steps = NULL)
 }
@@ -21,4 +21,5 @@ Find cell indices and timepoints where these cells both have a step.
 \examples{
 ## Find all pairs of steps in the T cell data that displace at least 2 microns.
 pairs <- stepPairs( TCells, filter.steps = function(t) displacement(t) > 2 )
+
 }

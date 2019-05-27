@@ -11,26 +11,26 @@ hotellingsTest(tracks, dim = c("x", "y"), step.spacing = 0,
 \arguments{
 \item{tracks}{the tracks whose biasedness is to be determined.}
 
-\item{dim}{vector with the names of the track's 
+\item{dim}{vector with the names of the track's
 dimensions that are to be considered. By default c("x", "y").}
 
-\item{step.spacing}{How many positions are to be left out between 
+\item{step.spacing}{How many positions are to be left out between
 the steps that are considered for the test. For persistent motion, subsequent
-steps will be correlated, which leads to too low p-values because Hotelling's 
+steps will be correlated, which leads to too low p-values because Hotelling's
 test assumes that the input data is independent. To avoid this, the resulting
-p-value should either be corrected for this dependence (e.g. by adjusting 
+p-value should either be corrected for this dependence (e.g. by adjusting
 the degrees of freedom accordingly), or `step.spacing` should be set to a value
 high enough to ensure that the considered steps are approximately independent.}
 
-\item{plot}{logical indicating whether the scatter of the step's directions, 
-origin of ordinates (green circle) and the mean of the data points (green 
-cross) are to be plotted. (In one dimension also the bounds of the 
+\item{plot}{logical indicating whether the scatter of the step's directions,
+origin of ordinates (green circle) and the mean of the data points (green
+cross) are to be plotted. (In one dimension also the bounds of the
 condfidence interval are given.) Plot works only in one or two dimensions.}
 
 \item{add}{whether to add the plot to the current plot (\code{TRUE}) or create a}
 
 \item{ellipse.col}{color with which to draw the confidence ellipse of the mean (for
-1D, this corresponds to the confidence interval of the mean). 
+1D, this corresponds to the confidence interval of the mean).
 Use \code{NA} to omit the confidence ellipse.}
 
 \item{ellipse.border}{color of the confidence ellipse border. Use \code{NA} to omit
@@ -49,7 +49,7 @@ and unbiased type of motion (e.g., a random walk without drift). This is done by
 testing whether the mean step vector is equal to the null vector.
 }
 \details{
-Computes the displacement vectors of all segments in the tracks 
+Computes the displacement vectors of all segments in the tracks
 given in \code{tracks}, and performs Hotelling's T-square Test on that vector.
 }
 \examples{

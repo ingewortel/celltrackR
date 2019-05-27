@@ -2,7 +2,7 @@
 % Please edit documentation in R/angle-functions.R
 \name{angleSteps}
 \alias{angleSteps}
-\title{Angle Between Two Steps}
+\title{Angle between Two Steps}
 \usage{
 angleSteps(X, trackids, t, degrees = TRUE, quietly = FALSE)
 }

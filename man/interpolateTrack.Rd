@@ -9,10 +9,10 @@ interpolateTrack(x, t, how = "linear")
 \arguments{
 \item{x}{the input track (a matrix or data frame).}
 
-\item{t}{the times at which to approximate track positions. These must lie 
+\item{t}{the times at which to approximate track positions. These must lie
 within the interval spanned by the track timepoints.}
 
-\item{how}{specifies how to perform the interpolation. Possible values are 
+\item{how}{specifies how to perform the interpolation. Possible values are
 \code{"linear"} (which uses \code{\link[stats]{approx}} with default values) and
 \code{"spline"} (which uses \code{\link[stats]{spline}} with default values).}
 }
@@ -26,4 +26,5 @@ bb <- boundingBox( TCells[2] )
 plot( TCells[2] )
 t2i <- interpolateTrack(TCells[[2]], seq(bb[1,"t"],bb[2,"t"],length.out=100),"spline")
 plot( tracks( t2i ), add=TRUE, col=2 )
+
 }
