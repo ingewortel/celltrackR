@@ -1,3 +1,5 @@
+^Meta$
+^doc$
 ^.editorconfig$
 ^README\.Rmd$
 ^README.md$
