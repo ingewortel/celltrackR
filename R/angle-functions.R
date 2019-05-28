@@ -90,7 +90,7 @@
 #'
 #' ## Plot distance versus angle for all step pairs, filtering for those that
 #' ## displace at least 2 microns
-#' pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2, quietly = TRUE )
+#' pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2 )
 #' scatter.smooth( pairs$dist, pairs$angle )
 #' abline( h = 90, col = "red" )
 #'
@@ -129,12 +129,12 @@ vecAngle <- function( a, b, degrees = TRUE )
 {
   # Check if inputs have the right dimensions
   if( class(a) != class(b) ){
-    stop( "vecAngle: a and b must both be numeric vectors (of the same length) or matrices (of the same size)")
+    stop( "vecAngle: a and b must both be numeric vectors of the same length or matrices of the same size")
   }
   if( any( pracma::size(a) != pracma::size(b) ) ){
     stop( "vecAngle: cannot compute angle between vectors of unequal dimensions.")
   }
-  if( is.matrix(a) && nrow(a) != nrow(b) ){
+  if( is.matrix(a) && is.matrix(b) && nrow(a) != nrow(b) ){
     stop( "vecAngle: a and b must have an equal number of rows.")
   }
 
@@ -219,6 +219,13 @@ angleToPoint <- function (x, p = c(1,1,1), from = 1, xdiff = diff(x), degrees = 
   if( length(p) != ncol(x) - 1 ){
     stop("In angleToPoint: Reference point coordinates must have the same number of dimensions as
          coordinates in the tracking data.")
+  }
+
+  # If point is equal to the first point in the track, the angle is undefined.
+  if( all( p == x[1,-1] ) ){
+    warning("In angleToPoint: Reference point is equal to the track starting point. Angle
+            is undefined, returning NA.")
+    return(NA)
   }
 
   # Initialize a vector of NAs for every index in "from".
@@ -363,12 +370,25 @@ angleToPlane <- function (x, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,0),
   # Check if the given points have the correct dimensions
   plengths <- c( length(p1), length(p2), length(p3) )
   if( length(unique(plengths)) > 1 ){
-    stop("In angleToPlane: Points p1,p2,p3 specifying the plane must have the
-         same number of coordinates.")
+    stop("In angleToPlane: Points p1,p2,p3 specifying the plane must have the same number of coordinates.")
+  }
+  if( unique(plengths) != 3 || ncol(x)-1 != 3 ){
+    stop("In angleToPlane: Method is only supported for three-dimensional data.")
+  }
+  pmatrix <- matrix( c(p1,p2,p3), nrow = 3, byrow = TRUE )
+  if( any( duplicated( pmatrix ) ) ){
+    stop("In angleToPlane: Points p1, p2, and p3 must be three unique points!")
   }
   if( length(p1) != ( ncol(x) - 1 ) ){
     stop("In angleToPlane: Plane points must have the same number of coordinates as
          coordinates in the tracking data.")
+  }
+
+  # Check if the given points actually span a plane and are not on the same line.
+  vec1 <- p2 - p1
+  vec2 <- p3 - p1
+  if( vecAngle( vec1, vec2 ) == 0 || vecAngle( vec1, vec2 ) == 180 ){
+    stop("In angleToPlane: Points p1, p2, and p3 are on the same line and do not fully specify a plane.")
   }
 
   # Initialize a vector of NAs for every index in "from".
@@ -399,11 +419,12 @@ angleToPlane <- function (x, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,0),
     # rs[rs < -1] <- -1
 
     # angle to the plane normal vector
-    r[ft] <- vecAngle( a, pnorm, degrees = TRUE )
+    rtmp <- vecAngle( a, pnorm, degrees = degrees )
 
-    # angle to the plane itself is (pi/2)-r
+    # angle to the plane itself is 90-r (or pi/2 - r )
     deg90 <- ifelse( degrees, 90, pi/2 )
-    r <- abs( deg90 - r )
+    rnew <- abs( deg90 - rtmp )
+    r[ft] <- rnew
   }
   return(r)
   }
@@ -446,15 +467,25 @@ distanceToPlane <- function (x, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,0), fro
   # Check if the given points have the correct dimensions
   plengths <- c( length(p1), length(p2), length(p3) )
   if( length(unique(plengths)) != 1){
-    stop("In distanceToPlane: Points p1,p2,p3 specifying the plane must have the
-         same number of coordinates.")
+    stop("In distanceToPlane: Points p1,p2,p3 specifying the plane must have the same number of coordinates.")
   }
-  if( unique(plengths) != 3 ){
+  if( unique(plengths) != 3 || ncol(x)-1 != 3 ){
     stop("In distanceToPlane: Method is only supported for three-dimensional data.")
+  }
+  pmatrix <- matrix( c(p1,p2,p3), nrow = 3, byrow = TRUE )
+  if( any( duplicated( pmatrix ) ) ){
+    stop("In distanceToPlane: Points p1, p2, and p3 must be three unique points!")
   }
   if( length(p1) != ( ncol(x) - 1 ) ){
     stop("In distanceToPlane: Plane points must have the same number of coordinates as
          coordinates in the tracking data. Currently, the method only supports 3D data.")
+  }
+
+  # Check if the given points actually span a plane and are not on the same line.
+  vec1 <- p2 - p1
+  vec2 <- p3 - p1
+  if( vecAngle( vec1, vec2 ) == 0 || vecAngle( vec1, vec2 ) == 180 ){
+    stop("In distanceToPlane: Points p1, p2, and p3 are on the same line and do not fully specify a plane.")
   }
 
   # Initialize a vector of NAs for every index in "from".
@@ -518,8 +549,7 @@ distanceToPoint <- function (x, p = c(0,0,0), from = 1 )
 {
   # Check if the given point has the correct dimensions
   if( length(p) != ncol(x) - 1 ){
-    stop("In distanceToPoint: Reference point coordinates must have the same number of dimensions as
-         coordinates in the tracking data.")
+    stop("In distanceToPoint: Reference point coordinates must have the same number of dimensions as coordinates in the tracking data.")
   }
 
   # Initialize a vector of NAs for every index in "from".
@@ -567,10 +597,15 @@ distanceToPoint <- function (x, p = c(0,0,0), from = 1 )
 #' @export
 angleSteps <- function( X, trackids, t, degrees = TRUE, quietly = FALSE )
 {
+  if( !is.tracks(X) ){
+    stop( "angleSteps: X must be a tracks object." )
+  }
   if( !length(trackids) == 2 ){
     stop( "angleSteps: an angle is only defined for exactly 2 steps. Please provide exactly 2 trackids.")
   }
-
+  if( any( !is.element( trackids, names(X) ) ) ){
+    stop( "angleSteps: cannot find all supplied trackids in the data.")
+  }
   X2 <- selectSteps( X, trackids, t )
   if( any( sapply(X2, is.null ) ) ){
     if(!quietly){warning( "Warning: cannot find data for both steps. Returning NA.")}
@@ -605,6 +640,8 @@ angleSteps <- function( X, trackids, t, degrees = TRUE, quietly = FALSE )
 #' @param X a tracks object
 #' @param trackids a vector of two indices specifying the tracks to get steps from.
 #' @param t the timepoint at which the steps should start.
+#' @param quietly logical; should a warning be returned if one or both of the steps are missing
+#' in the data and the function returns NA?
 #'
 #' @return A single distance, or NA if the desired timepoint is missing for one or both
 #' of the tracks.
@@ -619,10 +656,27 @@ angleSteps <- function( X, trackids, t, degrees = TRUE, quietly = FALSE )
 #' t <- timePoints( TCells )[3]
 #' distanceSteps( TCells, c("1","2"), t )
 #' @export
-distanceSteps <- function( X, trackids, t )
+distanceSteps <- function( X, trackids, t, quietly = FALSE )
 {
-  # Select the relevant tracks
-  X2 <- X[ as.character(trackids) ]
+
+  if( !is.tracks(X) ){
+    stop( "distanceSteps: X must be a tracks object." )
+  }
+  if( !length(trackids) == 2 ){
+    stop( "distanceSteps: only defined for exactly 2 steps. Please provide exactly 2 trackids.")
+  }
+  if( any( !is.element( trackids, names(X) ) ) ){
+    stop( "distanceSteps: cannot find all supplied trackids in the data.")
+  }
+  X2 <- selectSteps( X, trackids, t )
+  if( any( sapply(X2, is.null ) ) ){
+    if(!quietly){warning( "Warning: cannot find data for both steps. Returning NA.")}
+    return(NA)
+  }
+  if( length(X2) != 2 ){
+    if(!quietly){warning( "Warning: cannot find data for both steps. Returning NA.")}
+    return(NA)
+  }
 
   # Select the relevant timepoint, and extract coordinates (remove id/time columns)
   coords <- as.data.frame.tracks( subtracksByTime( X2, t, 0 ) )[,-c(1,2)]
@@ -652,6 +706,11 @@ distanceSteps <- function( X, trackids, t )
 #' @export
 stepPairs <- function( X, filter.steps=NULL )
 {
+
+  if( !is.tracks(X) ){
+    stop( "stepPairs: X must be a tracks object!" )
+  }
+
   dout <- data.frame()
   for( t in timePoints(X) ){
     # All steps starting at that timepoint
@@ -712,23 +771,30 @@ stepPairs <- function( X, filter.steps=NULL )
 #' @examples
 #' ## Plot distance versus angle for all step pairs, filtering for those that
 #' ## displace at least 2 microns
-#' pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2, quietly = TRUE )
+#' pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2 )
 #' scatter.smooth( pairs$dist, pairs$angle )
 #' @export
 analyzeStepPairs <- function( X, filter.steps = NULL, ... )
 {
+
+  if( !is.tracks(X) ){
+    stop( "analyzeStepPairs: X must be a tracks object!" )
+  }
+
   # Obtain cell paris for each timepoint
   pairs <- stepPairs( X, filter.steps = filter.steps )
 
-  # Find the distance between the step starting points
-  distances <- unname( apply( pairs, 1, function(x) distanceSteps( X, x[1:2], as.numeric(x[3]) ) ) )
+  if( nrow(pairs) > 0 ){
+    # Find the distance between the step starting points
+    distances <- unname( apply( pairs, 1, function(x) distanceSteps( X, x[1:2], as.numeric(x[3]), quietly = TRUE ) ) )
 
-  # Find the angles between the steps
-  angles <- unname( apply( pairs, 1, function(x) angleSteps( X, x[1:2], as.numeric(x[3]), ... ) ) )
+    # Find the angles between the steps
+    angles <- unname( apply( pairs, 1, function(x) angleSteps( X, x[1:2], as.numeric(x[3]), quietly = TRUE, ... ) ) )
 
-  # Add to dataframe and return
-  pairs$dist <- distances
-  pairs$angle <- angles
+    # Add to dataframe and return
+    pairs$dist <- distances
+    pairs$angle <- angles
+  }
   pairs
 }
 
@@ -767,19 +833,26 @@ analyzeStepPairs <- function( X, filter.steps = NULL, ... )
 #' @export
 analyzeCellPairs <- function( X, ... )
 {
+
+  if( !is.tracks(X) ){
+    stop( "analyzeCellPairs: X must be a tracks object!" )
+  }
+
   # Make all possible pairs of cellids
   pairs <- cellPairs( X )
 
-  # Compute angles and distances for all cell pairs in the data
-  cellangles <- apply( pairs, 1, function(x)
-    angleCells( X, x, ... ) )
+  if( nrow( pairs ) > 0 ){
+    # Compute angles and distances for all cell pairs in the data
+    cellangles <- apply( pairs, 1, function(x)
+      angleCells( X, x, ... ) )
 
-  celldistances <- apply( pairs, 1, function(x)
-    distanceCells( X, x ) )
+    celldistances <- apply( pairs, 1, function(x)
+      distanceCells( X, x ) )
 
-  # Make a dataframe
-  pairs$dist <- celldistances
-  pairs$angle <- cellangles
+    # Make a dataframe
+    pairs$dist <- celldistances
+    pairs$angle <- cellangles
+  }
   return(pairs)
 
 }
@@ -800,6 +873,10 @@ analyzeCellPairs <- function( X, ... )
 #' @export
 cellPairs <- function( X )
 {
+  if( !is.tracks(X) ){
+    stop( "cellPairs: X must be a tracks object!" )
+  }
+
   cellids <- names( X )
   pairs <- data.frame()
 
@@ -831,11 +908,13 @@ cellPairs <- function( X )
 #' @export
 angleCells <- function( X, cellids, degrees = TRUE )
 {
-  X <- X[cellids]
-
+  if( !is.tracks(X) ){
+    stop( "angleCells: X must be a tracks object!" )
+  }
   if( any( !is.element( cellids, names(X) ) ) ){
     stop( "angleCells: cannot find both cellids in data." )
   }
+  X <- X[cellids]
 
   a <- displacementVector( X[[1]] )
   b <- displacementVector( X[[2]] )
@@ -862,7 +941,9 @@ angleCells <- function( X, cellids, degrees = TRUE )
 #' @export
 distanceCells <- function( X, cellids )
 {
-
+  if( !is.tracks(X) ){
+    stop( "distanceCells: X must be a tracks object!" )
+  }
   if( any( !is.element( cellids, names(X) ) ) ){
     stop( "distanceCells: cannot find both cellids in data." )
   }

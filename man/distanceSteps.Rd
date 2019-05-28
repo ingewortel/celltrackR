@@ -4,7 +4,7 @@
 \alias{distanceSteps}
 \title{Distance between Two Steps}
 \usage{
-distanceSteps(X, trackids, t)
+distanceSteps(X, trackids, t, quietly = FALSE)
 }
 \arguments{
 \item{X}{a tracks object}
@@ -12,6 +12,9 @@ distanceSteps(X, trackids, t)
 \item{trackids}{a vector of two indices specifying the tracks to get steps from.}
 
 \item{t}{the timepoint at which the steps should start.}
+
+\item{quietly}{logical; should a warning be returned if one or both of the steps are missing
+in the data and the function returns NA?}
 }
 \value{
 A single distance, or NA if the desired timepoint is missing for one or both

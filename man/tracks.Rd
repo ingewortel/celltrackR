@@ -6,7 +6,6 @@
 \alias{as.tracks.list}
 \alias{is.tracks}
 \alias{c.tracks}
-\alias{tracks}
 \title{Tracks Objects}
 \usage{
 as.tracks(x, ...)

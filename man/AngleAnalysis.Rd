@@ -84,7 +84,7 @@ abline( h = 90, col = "red" )
 
 ## Plot distance versus angle for all step pairs, filtering for those that
 ## displace at least 2 microns
-pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2, quietly = TRUE )
+pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2 )
 scatter.smooth( pairs$dist, pairs$angle )
 abline( h = 90, col = "red" )
 
