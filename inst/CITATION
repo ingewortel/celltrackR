@@ -1,0 +1,19 @@
+citHeader("To cite celltrackR in publications use:")
+
+citEntry(entry = "Article",
+  title        = "{CelltrackR}: an R package for fast and flexible analysis of immune cell migration data",
+  author       = personList(as.person("Inge M. N. Wortel"),
+                   as.person( "Johannes Textor")),
+  journal      = "Journal",
+  year         = "YYYY",
+  volume       = "V",
+  number       = "No",
+  pages        = "1--end",
+  url          = "https:://github.com/ingewortel/celltrackR",
+
+  textVersion  =
+  paste("Inge Wortel, Johannes Textor (yyyy).",
+        "CelltrackR: an R package for fast and flexible analysis of immune cell migration data.",
+        "Journal, vol(is), pstart-pend.",
+        "URL http://www.github.com/ingewortel/celltrackR.")
+)

@@ -13,7 +13,7 @@ But it can of course process any x-y-(z)-t data, and we hope that it may be usef
 for other purposes as well.
 }
 \details{
-For a complete list of functions, use \code{library( help="celltrackR" )}.
+For a complete list of functions, use \code{help( package="celltrackR" )}.
 A handy cheat sheet is available in pdf. You can open it by calling
 the function \code{\link{cheatsheet}}.
 }
@@ -133,8 +133,10 @@ T cell movement within lymph nodes in the absence of antigen. \emph{Journal of I
 \bold{178}(9), 5505-5512. doi:10.4049/jimmunol.178.9.5505
 }
 \seealso{
-The package vignettes, available from \code{browseVignettes( package="celltrackR" )},
-  and the package cheat sheet, available by calling the function \code{\link{cheatsheet}}.
+The package vignettes, available from \code{browseVignettes( package="celltrackR" )}.
+  Make sure you have installed the package with option \code{build_vignettes = TRUE}, or
+  vignettes will not be visible. Also check out the package cheat sheet, which is available by
+  calling the function \code{\link{cheatsheet}}.
 }
 \author{
 Johannes Textor, Katharina Dannenberg, Jeffrey Berry, Gerhard Burger, Inge Wortel

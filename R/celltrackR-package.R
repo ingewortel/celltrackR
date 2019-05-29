@@ -6,7 +6,7 @@
 #' But it can of course process any x-y-(z)-t data, and we hope that it may be useful
 #' for other purposes as well.
 #'
-#' For a complete list of functions, use \code{library( help="celltrackR" )}.
+#' For a complete list of functions, use \code{help( package="celltrackR" )}.
 #' A handy cheat sheet is available in pdf. You can open it by calling
 #' the function \code{\link{cheatsheet}}.
 #'
@@ -95,8 +95,10 @@
 #'   Maintainer: Johannes Textor <johannes.textor@gmx.de>
 #'
 #' @seealso
-#'   The package vignettes, available from \code{browseVignettes( package="celltrackR" )},
-#'   and the package cheat sheet, available by calling the function \code{\link{cheatsheet}}.
+#'   The package vignettes, available from \code{browseVignettes( package="celltrackR" )}.
+#'   Make sure you have installed the package with option \code{build_vignettes = TRUE}, or
+#'   vignettes will not be visible. Also check out the package cheat sheet, which is available by
+#'   calling the function \code{\link{cheatsheet}}.
 #'
 #' @examples
 #'   ## track-based speed comparison
