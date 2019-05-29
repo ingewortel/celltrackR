@@ -4,7 +4,10 @@
 \alias{cheatsheet}
 \title{Open the package cheat sheet}
 \usage{
-cheatsheet()
+cheatsheet(opencmd = c("open", "xdg-open", "gvfs-open", "gio open"))
+}
+\arguments{
+\item{opencmd}{The command used to open pdfs from the command line.}
 }
 \description{
 Running this function will open the package cheat sheet (a pdf) via a call to
