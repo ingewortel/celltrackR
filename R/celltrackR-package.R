@@ -138,25 +138,38 @@ NULL
 #'
 #' Running this function will open the package cheat sheet (a pdf) via a call to
 #' \code{system()}.
-#' 
+#'
 #' @param opencmd The command used to open pdfs from the command line.
 #'
-#' 
+#'
 #' @export
-cheatsheet <- function( opencmd = c( "open", "xdg-open","gvfs-open","gio open" ) ){
+cheatsheet <- function( opencmd = NULL )
+{
   file <- system.file( "learnmore", "cheatsheet.pdf", package = "celltrackR" )
-  
+
+  # if command not supplied, guess based on OS.
+  if( is.null(opencmd) ){
+    if( .Platform$OS.type == "windows" ){
+      opencmd <- c("open","start")
+    } else if( grepl( "darwin", R.version$platform ) ){
+      opencmd <- c("open")
+    } else {
+      opencmd <- c("xdg-open","gvfs-open","gio open")
+    }
+  }
+
+  # Try the options
   for( cmd in opencmd ){
   	call <- paste0( cmd, ' "', file, '"' )
-  	a <- try( system( call, ignore.stderr = TRUE ) )
+  	a <- suppressWarnings( try( system( call, ignore.stderr = TRUE ) ) )
 	if( a == 0 ){ break() }
   }
 
   # If a = 1 here, all commands have failed.
   if( a == 1 ){stop( paste0( "Failed to open the pdf using commands: [",
 	      paste( opencmd ),
-	      "]. Try again by setting the open.cmd to the command
-	     you use to open pdfs from the command line in your system.") ) 
+	      "]. Try again by setting the open.cmd to the command you use to open pdfs from the command line in your system.") )
 	}
 
 }
+
