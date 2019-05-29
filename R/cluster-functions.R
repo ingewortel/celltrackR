@@ -65,6 +65,10 @@
 #' @export
 clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method = "hclust", return.clust = FALSE, ... )
 {
+  if( length( measures) == 0 ){
+    stop( "clusterTracks: no measures given! Please specify at least one.")
+  }
+
   # Get the feature matrix
   values <- getFeatureMatrix( tracks, measures )
 
