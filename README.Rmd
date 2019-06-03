@@ -23,7 +23,9 @@ function to import tracks from text files.
 
 The CelltrackR package has been developed as part of the MotilityLab project.
 On the project website (motilitylab.net), a simple GUI frontend to many functions in the 
-package is implemented, and public datasets are available to download and analyze.
+package is implemented, and public datasets are available to download and analyze. 
+Indeed, the CelltrackR package was formerly called "MotilityLab", but we changed the 
+name to make this functionality easier to find.
 
 # Installation
 
