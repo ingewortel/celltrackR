@@ -26,7 +26,7 @@
 #' @return By default, only returns a plot. If \code{return.clust=TRUE}, also returns
 #' a clustering object as returned by \code{\link[stats]{hclust}},  \code{\link[stats]{kmeans}},
 #'  \code{\link[stats]{prcomp}} (returns \code{$x}), \code{\link[stats]{cmdscale}},
-#'   or  \code{\link[]{umap}}. See the documentation of those functions for details on the
+#'   or  \code{\link[uwot]{umap}}. See the documentation of those functions for details on the
 #'   output object.
 #'
 #' @details The measures are applied to each of the tracks in the given

@@ -23,7 +23,7 @@ These are used to color points in the visualization.}
 \item{method}{\code{"hclust"} for hierarchical clustering, \code{"PCA"} for a
 scatterplot along principal components, \code{"MDS"} for multidimensional scaling,
 \code{"UMAP"} for a UMAP, \code{"kmeans"} for k-means clustering. Note that for
-\code{"UMAP"}, the \code{umap} package must be installed.}
+\code{"UMAP"}, the \code{uwot} package must be installed.}
 
 \item{return.clust}{logical: return the clustering object instead of only the plot?
 (defaults to \code{FALSE}).}
@@ -32,13 +32,13 @@ scatterplot along principal components, \code{"MDS"} for multidimensional scalin
 function: \code{\link[stats]{hclust}},  \code{\link[stats]{kmeans}},
  \code{\link[stats]{prcomp}} (for \code{method="PCA"}),
   \code{\link[stats]{cmdscale}} (for \code{method="MDS"}),
-  or  \code{\link[umap]{umap}} (for \code{method="UMAP"}).}
+  or  \code{\link[uwot]{umap}} (for \code{method="UMAP"}).}
 }
 \value{
 By default, only returns a plot. If \code{return.clust=TRUE}, also returns
 a clustering object as returned by \code{\link[stats]{hclust}},  \code{\link[stats]{kmeans}},
  \code{\link[stats]{prcomp}} (returns \code{$x}), \code{\link[stats]{cmdscale}},
-  or  \code{\link[umap]{umap}} (returns \code{$layout}). See the documentation of those functions for details on the
+  or  \code{\link[uwot]{umap}}. See the documentation of those functions for details on the
   output object.
 }
 \description{
