@@ -1,5 +1,5 @@
 ---
-title: "Clustering tracks with CelltrackR"
+title: "Clustering Tracks with CelltrackR"
 author: "Inge Wortel"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -157,17 +157,15 @@ Internally, `clusterTracks()` computes a distance matrix using `dist()` and then
 
 ### 1.3 UMAP
 
-Uniform manifold approximate and projection (UMAP) is another powerful method to explore structure in high-dimensional datasets. `clusterTracks()` supports visualization of tracks in a UMAP:
+Uniform manifold approximate and projection (UMAP) is another powerful method to explore structure in high-dimensional datasets. `clusterTracks()` supports visualization of tracks in a UMAP. Note that this option requires the `uwot` package. Please install this package first using `install.packages("uwot")`. 
+
 
 ```{r}
 clusterTracks( all.tracks,
-               c(speed,meanTurningAngle,squareDisplacement,
-                 maxDisplacement,outreachRatio ), method = "UMAP",
-               labels = real.celltype )
+        c(speed,meanTurningAngle,squareDisplacement,
+          maxDisplacement,outreachRatio ), method = "UMAP",
+          labels = real.celltype )
 ```
-
-Note that this option requires the `umap` package. Please install this package first using `install.packages("umap")`. 
-
 
 # 3 Clustering: hierarchical clustering and k-means
 

@@ -9,7 +9,7 @@ Description: Statistics to quantify tracks of moving things (x-y-z-t data),
     such as cells, bacteria or animals. Available measures include mean square
     displacement, confinement ratio, autocorrelation, straightness, turning angle,
     and fractal dimension.
-Depends: R (>= 3.5.0)
+Depends: R (>= 3.4.0)
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
@@ -28,8 +28,10 @@ Suggests:
     wordspace,
     knitr,
     rmarkdown,
-    umap,
+    uwot,
     dendextend,
-    ggplot2
+    ggplot2,
+    ggbeeswarm,
+    gridExtra
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr

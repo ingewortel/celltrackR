@@ -12,7 +12,7 @@
 #' @param method \code{"hclust"} for hierarchical clustering, \code{"PCA"} for a
 #' scatterplot along principal components, \code{"MDS"} for multidimensional scaling,
 #' \code{"UMAP"} for a UMAP, \code{"kmeans"} for k-means clustering. Note that for
-#' \code{"UMAP"}, the \code{umap} package must be installed.
+#' \code{"UMAP"}, the \code{uwot} package must be installed.
 #' @param labels optional: a vector of labels of the same length as the track object.
 #' These are used to color points in the visualization.
 #' @param return.clust logical: return the clustering object instead of only the plot?
@@ -21,12 +21,12 @@
 #' function: \code{\link[stats]{hclust}},  \code{\link[stats]{kmeans}},
 #'  \code{\link[stats]{prcomp}} (for \code{method="PCA"}),
 #'   \code{\link[stats]{cmdscale}} (for \code{method="MDS"}),
-#'   or  \code{\link[umap]{umap}} (for \code{method="UMAP"}).
+#'   or  \code{\link[uwot]{umap}} (for \code{method="UMAP"}).
 #'
 #' @return By default, only returns a plot. If \code{return.clust=TRUE}, also returns
 #' a clustering object as returned by \code{\link[stats]{hclust}},  \code{\link[stats]{kmeans}},
 #'  \code{\link[stats]{prcomp}} (returns \code{$x}), \code{\link[stats]{cmdscale}},
-#'   or  \code{\link[umap]{umap}} (returns \code{$layout}). See the documentation of those functions for details on the
+#'   or  \code{\link[uwot]{umap}}. See the documentation of those functions for details on the
 #'   output object.
 #'
 #' @details The measures are applied to each of the tracks in the given
@@ -87,7 +87,10 @@ clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method
   } else if( method == "PCA" ){
     clust <- stats::prcomp( values, ... )$x
   } else if( method == "UMAP" ){
-    clust <- umap::umap( values )$layout
+    if( !requireNamespace("uwot", quietly=TRUE ) ){
+	       stop( "clusterTracks: please install the 'uwot' package to use this functionality!" )
+    }
+    clust <- uwot::umap( values )
   } else {
     stop( "clusterTracks: unknown method! Please choose from: hclust, MDS, kmeans, PCA, or UMAP." )
   }
@@ -119,6 +122,9 @@ clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method
 
     # color the leaves of the dendrogram by label
     if( !is.null(labels) ){
+      if( !requireNamespace("dendextend", quietly=TRUE ) ){
+        stop( "clusterTracks: please install the 'dendextend' package to use this functionality!" )
+      }
       colors_to_use <- as.numeric( factor( labels ))
       colors_to_use <- colors_to_use[stats::order.dendrogram(dend)]
       dendextend::labels_colors(dend) <- colors_to_use
