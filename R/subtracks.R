@@ -74,20 +74,34 @@ prefixes <- function(x,i) {
 #'
 #' Obtain all subtracks of i steps (i+1 positions) starting at a given timepoint t.
 #'
-#' @param X Tracks object to obtain subtracks from
-#' @param t Timepoint at which the subtracks should start
-#' @param i Subtrack length (in number of steps)
-#' @param digits For numeric reasons, timepoints are rounded to this number of digits
-#'  (see details).
+#' @param X Tracks object to obtain subtracks from.
+#' @param t Timepoint at which the subtracks should start. This value is ignored if
+#' tlo and thi are specified, see below.
+#' @param i Subtrack length (in number of steps). Set this to NULL to obtain subtracks
+#' of varying length but within a specified interval [tlo, thi] (see below).
+#' @param epsilon Small error allowed when comparing timepoints because of numerical
+#' inaccuracies, see details. Timepoints in tracks are returned if they are within
+#' [tlo-epsilon, thi+epsilon].
+#' @param tlo,thi Interval specifying the timepoints to be returned. By default, these
+#' are not used and tracks starting at timepoint t with exactly i steps are returned;
+#' see details.
 #'
-#' @details Timepoints are rounded to a given number of digits for numerical reasons;
-#' otherwise timepoints that are equal can seem like a different number. The given t
-#' is then retrieved for all tracks in X that contain that timepoint, and any subtracks
-#' starting from that time that have i steps are returned.
+#' @details
+#' If i is specified, the given t is retrieved for all tracks in X that contain that
+#' timepoint, and any subtracks starting from that time that have exactly i steps are
+#' returned. For numerical reasons, timepoints in the data are allowed to deviate
+#' a small amount epsilon from t (because otherwise, equal timepoints can seem unequal
+#' because of very small deviations).
+#'
+#' If i is set to NULL, subtracks are returned with all timepoints lying in the interval
+#' [ tlo - epsilon, thi + epsilon ]. These subtracks do NOT have to be of equal length.
+#'
 #'
 #' @return A \emph{tracks} object is returned which contains all the subtracks
 #' of any track in the input \emph{tracks} object that consist of exactly `i`
-#' segments and start at the given timepoint t.
+#' segments and start at the given timepoint t, OR a
+#' \emph{tracks} object with all the timepoints
+#' of any track in the input \emph{tracks} object that are between tlo and thi.
 #'
 #' @seealso \code{\link{subtracks}} to extract all subtracks of a given length,
 #' \code{\link{prefixes}} to extract all subtracks of a given length starting
@@ -96,27 +110,57 @@ prefixes <- function(x,i) {
 #' \code{\link{timePoints}} to return all timepoints occurring in the dataset.
 #'
 #' @examples
-#' ## Get and plot all the single steps (i=1) starting at the third timepoint in the T cell tracks.
+#' ## Get all the single steps (i=1) starting at the third timepoint in the T cell tracks.
 #' subT <- subtracksByTime( TCells, timePoints(TCells)[3], 1 )
-#' plot( subT )
+#'
+#' ## These all have the same number of steps:
+#' sapply( subT, nrow )
+#'
+#' ## Or set i to NULL and return all subtracks within the five first timepoints:
+#' subT2 <- subtracksByTime( TCells, NULL, i = NULL,
+#'   tlo = timePoints( TCells )[1], thi = timePoints( TCells )[5] )
+#'
+#' ## These are not all the same length:
+#' sapply( subT2, nrow )
 #'
 #' @export
-subtracksByTime <- function( X, t, i, digits=5 )
+subtracksByTime <- function( X, t, i = 1, epsilon=1e-4, tlo = t, thi = t )
 {
+  # Adjust thi and tlo with epsilon
+  thi <- thi + epsilon
+  tlo <- tlo - epsilon
 
-  # Round timepoints to x digits; otherwise equal timepoints can seem unequal
-  t <- round( t, digits )
+  # Remove tracks that start at timepoints later than upper bound thi
+  # or tracks that end at timepoints before tlo
+  X <- X[ sapply(X, function(x) x[1,1] <= thi )]
+  if( length(X) != 0 ){
+    X <- X[ sapply(X, function(x) x[nrow(x),1] >= tlo )]
+  }
 
-  # Remove tracks that start at timepoints later than t
-  # Rounding because of numerical inaccuracies (?) which make two the same
-  # timepoints seem like a different number.
-  X <- X[ sapply(X, function(x) round(x[1,1],digits) <= t )]
+  # Filter out parts of the tracks at timepoints starting from tlo
+  if( length(X) == 0 ){
+    return(X)
+  }
+  X2 <- as.tracks( lapply( X, function(x) x[ x[,1] >= tlo, , drop=FALSE ] ) )
 
-  # Filter out parts of the tracks at timepoints starting from t
-  X2 <- as.tracks( lapply( X, function(x) x[ round(x[,1],digits) >= t, , drop=FALSE ] ) )
+  if( length(X) == 0 ){
+    return(X)
+  }
 
-  # Get subtracks of length i starting at t by using prefixes
-  sub <- prefixes( X2, i )
+  # If i is specified: get subtracks of length i starting at t by using prefixes
+  if( !is.null(i) ){
+    sub <- prefixes( X2, i )
+
+  # otherwise: return all subtracks with times between tlo and thi. These do not
+  # have to be equal length.
+  } else {
+    # Filter out parts of the tracks with timepoints until thi
+    sub <- lapply( X2, function(x) x[ x[,1] <= thi, , drop=FALSE ] )
+  }
+
+  if( length(sub) == 0 ){
+    return(sub)
+  }
 
   # Remove any cells for which there are no timepoints
   sub <- sub[ !sapply(sub, is.null) ]

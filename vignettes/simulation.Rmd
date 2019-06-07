@@ -4,7 +4,7 @@ author: "Inge Wortel"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Clustering}
+  %\VignetteIndexEntry{Simulating Tracks}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -145,7 +145,7 @@ bootstrap.tracks <- simulateTracks( 10, bootstrapTrack( nsteps = 20, TCells ) )
 plot( bootstrap.tracks )
 ```
 
-If all is as should be, the distribution of speed and turning angles should now match the real data closely. Check with a qqplot and a KS test:
+If all is as should be, the distribution of speed and turning angles should now match the real data closely. Check this:
 
 ```{r, fig.width = 7, warning = FALSE, message = FALSE }
 # Simulate more tracks to reduce noice
@@ -154,28 +154,33 @@ bootstrap.tracks <- simulateTracks( 100, bootstrapTrack( nsteps = 20, TCells ) )
 # Compare step speeds in real data to those in bootstrap data
 real.speeds <- sapply( subtracks( TCells,1 ), speed )
 bootstrap.speeds <- sapply( subtracks( bootstrap.tracks,1), speed )
-speed.ks <- signif( ks.test( real.speeds, bootstrap.speeds )$p.value )
-max.speed <- max( c(real.speeds,bootstrap.speeds))
+dspeed <- data.frame( tracks = c( rep( "data", length( real.speeds ) ),
+                                  rep( "bootstrap", length( bootstrap.speeds ) ) ),
+                      speed = c( real.speeds, bootstrap.speeds ) )
 
 # Same for turning angles
-real.angles <- sapply( subtracks( TCells,2 ), overallAngle )
-bootstrap.angles <- sapply( subtracks( bootstrap.tracks,2), overallAngle )
-angle.ks <- signif( ks.test( real.angles, bootstrap.angles )$p.value )
-max.angle <- max( c(real.angles,bootstrap.angles))
+real.angles <- sapply( subtracks( TCells,2 ), overallAngle, degrees = TRUE )
+bootstrap.angles <- sapply( subtracks( bootstrap.tracks,2), overallAngle, degrees = TRUE )
+dangle <- data.frame( tracks = c( rep( "data", length( real.angles ) ),
+                                  rep( "bootstrap", length( bootstrap.angles ) ) ),
+                      angle = c( real.angles, bootstrap.angles ) )
 
+# plot
+pspeed <- ggplot( dspeed, aes( x = tracks, y = speed ) ) +
+  geom_violin( color = NA, fill = "gray" ) +
+  geom_boxplot( width = 0.3 ) +
+  theme_classic()
 
-# Plot the result in a qqplot
-par(mfrow=c(1,2))
-qqplot( real.speeds, bootstrap.speeds,
-        main = paste0( "KS p = ", speed.ks ))
-lines( c(0,max.speed), c(0,max.speed), col = "red" )
-qqplot( real.angles, bootstrap.angles,
-        main = paste0( "KS p = ", angle.ks )) 
-lines( c(0,max.angle), c(0,max.angle), col = "red" )
+pangle <- ggplot( dangle, aes( x = tracks, y = angle ) ) +
+  geom_violin( color = NA, fill = "gray" ) +
+  geom_boxplot( width = 0.3 ) +
+  theme_classic()
+
+gridExtra::grid.arrange( pspeed, pangle, ncol = 2 )
 
 ```
 
-As it should be, the simulated and real distributions match well to each other.
+
 
 # 4 Example: Comparing data with models
 

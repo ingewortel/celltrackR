@@ -32,5 +32,6 @@ str(fm)
 }
 \seealso{
 \code{\link{clusterTracks}} for a quick method to compute the feature
-matrix and a clustering, and visualize this directly.
+matrix and a clustering, and \code{\link{trackFeatureMap}} to perform
+dimensionality reduction methods on a set of track features.
 }

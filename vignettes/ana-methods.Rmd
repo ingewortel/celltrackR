@@ -4,7 +4,7 @@ author: "Inge Wortel"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Clustering}
+  %\VignetteIndexEntry{Track Analysis Methods}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -537,23 +537,6 @@ hist( step.angles, main = "with directional bias" )
 
 In the original dataset, angles to the reference direction form a sine distribution with a mean of 90 degrees -- which is what we expect for 3D angles with a reference when there is no directional bias. But in the artificial dataset, there is an enrichment for angles below 90 degrees, indicative of a directional bias. 
 
-A qqplot of the two distributions also shows an obvious deviation from a straight line, and a Kolmogorov-Smirnov test confirms that the two distributions are significantly different: 
-
-```{r}
-qqplot( step.angles.original, step.angles )
-lines( c(0,180),c(0,180), col = "red")
-ks.test( step.angles, step.angles.original )
-```
-
-For comparison, we do not find this if we compute the angle distributions for two unbiased datasets (compare original T cell data and B cell data):
-
-```{r}
-step.angles.B <- sapply( subtracks( BCells, 1 ), angleToDir, dvec = c(1,1,1) )
-qqplot( step.angles.original, step.angles.B )
-lines( c(0,180),c(0,180), col = "red")
-ks.test( step.angles.B, step.angles.original )
-```
-
 
 #### 5.2.4 Angles and distances to reference point: detecting movement towards a single point
 
@@ -593,13 +576,7 @@ hist( step.angles.original, main = "original data" )
 hist( step.angles, main = "with point attraction" )
 ```
 
-Once again, there is a significant enrichment for small angles:
-
-```{r}
-qqplot( step.angles.original, step.angles )
-lines( c(0,180),c(0,180), col = "red")
-ks.test( step.angles, step.angles.original )
-```
+Once again, there is an significant enrichment for small angles.
 
 We can also plot the angle versus the distance to the point:
 

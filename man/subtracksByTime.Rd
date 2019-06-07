@@ -4,36 +4,58 @@
 \alias{subtracksByTime}
 \title{Extract Subtracks Starting at a Specific Time}
 \usage{
-subtracksByTime(X, t, i, digits = 5)
+subtracksByTime(X, t, i = 1, epsilon = 1e-04, tlo = t, thi = t)
 }
 \arguments{
-\item{X}{Tracks object to obtain subtracks from}
+\item{X}{Tracks object to obtain subtracks from.}
 
-\item{t}{Timepoint at which the subtracks should start}
+\item{t}{Timepoint at which the subtracks should start. This value is ignored if
+tlo and thi are specified, see below.}
 
-\item{i}{Subtrack length (in number of steps)}
+\item{i}{Subtrack length (in number of steps). Set this to NULL to obtain subtracks
+of varying length but within a specified interval [tlo, thi] (see below).}
 
-\item{digits}{For numeric reasons, timepoints are rounded to this number of digits
-(see details).}
+\item{epsilon}{Small error allowed when comparing timepoints because of numerical
+inaccuracies, see details. Timepoints in tracks are returned if they are within
+[tlo-epsilon, thi+epsilon].}
+
+\item{tlo, thi}{Interval specifying the timepoints to be returned. By default, these
+are not used and tracks starting at timepoint t with exactly i steps are returned;
+see details.}
 }
 \value{
 A \emph{tracks} object is returned which contains all the subtracks
 of any track in the input \emph{tracks} object that consist of exactly `i`
-segments and start at the given timepoint t.
+segments and start at the given timepoint t, OR a
+\emph{tracks} object with all the timepoints
+of any track in the input \emph{tracks} object that are between tlo and thi.
 }
 \description{
 Obtain all subtracks of i steps (i+1 positions) starting at a given timepoint t.
 }
 \details{
-Timepoints are rounded to a given number of digits for numerical reasons;
-otherwise timepoints that are equal can seem like a different number. The given t
-is then retrieved for all tracks in X that contain that timepoint, and any subtracks
-starting from that time that have i steps are returned.
+If i is specified, the given t is retrieved for all tracks in X that contain that
+timepoint, and any subtracks starting from that time that have exactly i steps are
+returned. For numerical reasons, timepoints in the data are allowed to deviate
+a small amount epsilon from t (because otherwise, equal timepoints can seem unequal
+because of very small deviations).
+
+If i is set to NULL, subtracks are returned with all timepoints lying in the interval
+[ tlo - epsilon, thi + epsilon ]. These subtracks do NOT have to be of equal length.
 }
 \examples{
-## Get and plot all the single steps (i=1) starting at the third timepoint in the T cell tracks.
+## Get all the single steps (i=1) starting at the third timepoint in the T cell tracks.
 subT <- subtracksByTime( TCells, timePoints(TCells)[3], 1 )
-plot( subT )
+
+## These all have the same number of steps:
+sapply( subT, nrow )
+
+## Or set i to NULL and return all subtracks within the five first timepoints:
+subT2 <- subtracksByTime( TCells, NULL, i = NULL,
+  tlo = timePoints( TCells )[1], thi = timePoints( TCells )[5] )
+
+## These are not all the same length:
+sapply( subT2, nrow )
 
 }
 \seealso{

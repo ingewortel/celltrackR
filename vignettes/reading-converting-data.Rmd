@@ -4,7 +4,7 @@ author: "Inge Wortel"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Clustering}
+  %\VignetteIndexEntry{Reading, Converting, and Filtering Tracking Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -90,7 +90,7 @@ is.matrix( t1 )
 
 If we now want to plot this track, the plotting method for tracks will not work because this is not recognized as a tracks object. We can use the frunction `wrapTrack()` to "pack" this matrix back into a tracks object:
 
-```{r fig.width =12}
+```{r fig.width =7}
 par( mfrow=c(1,2))
 plot( t1, main = "Plotting matrix directly" )
 plot( wrapTrack( t1 ), main = "After using wrapTrack()" )
@@ -172,7 +172,7 @@ is.tracks( filtered.t )
 
 Fix this by calling `as.tracks()` and plot the result:
 
-```{r, fig.width = 12 }
+```{r, fig.width = 7 }
 filtered.t <- as.tracks( filtered.t )
 is.tracks( filtered.t )
 
@@ -187,7 +187,7 @@ The package contains several built-in functions to filter and subset tracks.
 
 The function `filterTracks()` can be used to select tracks with a certain property. For example, to select all tracks with at least 15 steps (16 datapoints):
 
-```{r fig.width = 12 }
+```{r fig.width = 7 }
 # The filtering function must return TRUE or FALSE for each track given to it
 my.filter <- function(x){
   return( nrow(x) > 15 )
@@ -204,7 +204,7 @@ plot( long.tracks, main = "Long tracks only" )
 
 The function `selectTracks()` selects tracks based on upper and lower bounds of a certain measure. For example, we can get the fastest half of the T cells:
 
-```{r fig.width = 12 }
+```{r fig.width = 7 }
 
 # Filter with this function using filterTracks
 median.speed <- median( sapply( t, speed ) )
@@ -218,7 +218,7 @@ plot( fast.tracks, main = "Fastest half" )
 
 Using the function `subsample()`, we can adjust the time resolution of the data by keeping e.g. only every $k^{th}$ timepoint:
 
-```{r, fig.width = 12 }
+```{r, fig.width = 7 }
 # Lower resolution
 lower.res <- subsample( t, k = 2 )
 
@@ -304,6 +304,8 @@ str( as.tracks( t.df ), list.len = 3 )
 ```
 
 Note that the method `as.tracks.data.frame()` contains arguments `id.column`, `time.column`, and `pos.columns` to specify where information is stored, just like `read.tracks.csv`.
+
+For help, see `?as.list.tracks`, `?as.data.frame.tracks`, `?as.tracks.data.frame`, or `as.tracks.list`.
 
 
 

@@ -1,21 +1,21 @@
 ---
-title: "Quality Control"
+title: "Quality Control and Preprocessing"
 author: "Inge Wortel"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Clustering}
+  %\VignetteIndexEntry{Quality Control and Preprocessing}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 # Introduction
 
-Tracking data can be difficult to analyze because of different errors and artefacts that can occur in the data and cause bias in the analysis. This vignette will explain how the package can be used to detect and correct for some of these errors. The topics will be:
+Tracking data can be difficult to analyze because of different errors and artifacts that can occur in the data and cause bias in the analysis. This vignette will explain how the package can be used to detect and correct for some of these errors. The topics will be:
 
 1. Checking track lengths and dealing with short tracks
 2. Detecting and correcting tissue drift
-3. Detecting and correcting tracking errors and imaging artefacts using angle analyses
+3. Detecting and correcting tracking errors and imaging artifacts using angle analyses
 4. Detecting and correcting variation in timesteps
 
 # Dataset
@@ -102,7 +102,7 @@ The filtering has removed all tracks of 1-10 steps, leaving 17 out of 21 tracks 
 
 # 2 Detecting and correcting drift
 
-> ! **Note** : The methods suggested below all detect a form of global directionality in a dataset. However, any global directionality may either be an artefact from drift, *or* a true phenomenon in the data (for example because cells are following a chemotactic gradient). To distinguish between the two, it is recommended to detect and correct for drift based on tracks from structures that do not move at all, instead of the tracks from the cells of interest. If such data is absent, the original tracks can be used -- but this may also remove any true directional bias present in the data. 
+> ! **Note** : The methods suggested below all detect a form of global directionality in a dataset. However, any global directionality may either be an artifact from drift, *or* a true phenomenon in the data (for example because cells are following a chemotactic gradient). To distinguish between the two, it is recommended to detect and correct for drift based on tracks from structures that do not move at all, instead of the tracks from the cells of interest. If such data is absent, the original tracks can be used -- but this may also remove any true directional bias present in the data. 
 
 ### 2.1 Adding artificial tissue drift to the Tcell data
 
@@ -345,7 +345,7 @@ plot( normalizeTracks(TCells.corrected), col = "red", add = TRUE )
 
 While the correction is not perfect, at least the tracks resemble their original shape more.
 
-# 3 Detecting artefacts using angle analyses
+# 3 Detecting artifacts using angle analyses
 
 ### 3.1 Detecting double tracking: angle versus distance between cell pairs
 
@@ -400,7 +400,7 @@ That indeed looks like double tracking.
 
 ### 3.2 Detecting tracking errors near border or imprecise z-calibration: distances and angles to border planes
 
-A plot of angles and distances to the border planes of the imaging volume can help detect artefacts ([Beltman et al (2009)](https://www.ncbi.nlm.nih.gov/pubmed/19834485) ). We can compute these for each step using the functions `distanceToPlane` and `angleToPlane`.
+A plot of angles and distances to the border planes of the imaging volume can help detect artifacts ([Beltman et al (2009)](https://www.ncbi.nlm.nih.gov/pubmed/19834485) ). We can compute these for each step using the functions `distanceToPlane` and `angleToPlane`.
 
 To specify a border plane, we first need three points on that plane. We can either define the imaging volume manually or estimate it using `boundingBox`:
 
@@ -440,13 +440,11 @@ ggplot( df, aes( x = distances,
 
 The mean angle to the border plane should be roughly 32.7 degrees, and indeed this seems to be the case. Tracking errors near the border plane would result in a lower average angle near the left and right side of the plots, whereas imprecise z-calibration would result in a systematic deviation from the 32.7 degree angle at any distance to the plane ([Beltman et al (2009)](https://www.ncbi.nlm.nih.gov/pubmed/19834485) ). 
 
-# 4 Detecting and correcting variation in timesteps
+# 4 Detecting and correcting variation in time resolution
 
 ### 4.1 Detecting variation in timesteps
 
-Track analysis methods usually assume a constant time interval $\Delta t$ between consecutive images in a time-lapse microscopy dataset. If this assumption does not hold, most of the statistics in this package will be invalid.
-
-In reality, there are mostly at least small fluctuations in the $\Delta t$ between consecutive images. To find the $\Delta t$ of each step, we first extract single steps using the `subtracks()` function (see also the [vignette on analysis methods](./ana-methods.html)):
+Track analysis methods usually assume a constant time interval $\Delta t$ between consecutive images in a time-lapse microscopy dataset. In reality, there are mostly at least small fluctuations in the $\Delta t$ between consecutive images. To find the $\Delta t$ of each step, we first extract single steps using the `subtracks()` function (see also the [vignette on analysis methods](./ana-methods.html)):
 
 ```{r get-steps}
 # Extract all subtracks of length 1 (that is, all "steps")
@@ -480,9 +478,9 @@ hist( dt.diff.perc, xlab = "dt (percentage difference from median)" )
 
 Thus, the `TCell` dataset indeed contains fluctuations in $\Delta t$, but they are small: none are more than 1 percent of the median $\Delta t$ in the data.
 
-### 4.2 Example: large variation in timesteps
+### 4.2 Example: detecting missing data in tracks
 
-As an example of a dataset where fluctuations in $\Delta t$ are a problem, we will introduce an artificial error by removing some timepoints in a few tracks in the `TCell` data:
+As an example of a dataset containing gaps in tracks, we will introduce an artificial error by removing some timepoints in a few tracks in the `TCell` data:
 
 ```{r}
 # This function randomly removes coordinates from a track dataset with probability "prob"
@@ -516,48 +514,29 @@ hist( dt.diff.perc.gap, xlab = "dt (percentage difference from median)" )
 
 Now, the percentage difference with the median $\Delta t$ is often much larger.
 
-To see the effect of inconsistent time intervals, let's make a mean squared displacement plot of both the original dataset and the one with gaps:
+This has an effect on for example the step-based displacement:
 
-```{r msd-dt, fig.width=6}
-# Compute MSD for TCells
-msd <- aggregate( TCells, 
-                  squareDisplacement,
-                  FUN="mean.se")
-msd$gaps <- "no gaps"
+```{r}
 
-# Compute MSD for dataset with gaps
-msd.gap <- aggregate( TCells.gap, 
-                      squareDisplacement,
-                      FUN="mean.se")
-msd.gap$gaps <- "gaps"
+T.step.disp <- sapply( single.steps, displacement )
+T.gap.disp <- sapply( steps.gap, displacement )
 
-# Combine data
-msd.all <- rbind( msd, msd.gap )
-
-# Filter out time intervals for which at least
-# 50% of tracks have a long enough duration
-# (otherwise last points in MSD plot will be based
-# on very few steps)
-time.upbnd <- median( sapply( TCells, nrow) -1 )
-msd.all <- msd.all[ msd.all$i <= time.upbnd , ]
-
-# Make the plot
-ggplot( msd.all, aes( x = i, y = mean, color = gaps, fill = gaps ) ) +
-  geom_path() +
-  geom_ribbon( aes(ymin=lower,ymax=upper), alpha = 0.2,
-               color = NA) +
-  labs( x = "t", y = "displacement^2" ) +
-  scale_color_manual( values = c("gaps"="red","no gaps"="gray") ) +
-  scale_fill_manual( values = c("gaps"="red","no gaps"="gray") ) +
-  scale_x_continuous( expand=c(0,0) ) +
-  scale_y_continuous( expand=c(0,0) ) +
-  theme_classic()
-
+lapply( list( original = T.step.disp, gaps = T.gap.disp ), summary )
 ```
 
-We see that the gaps introduce an overestimation of the MSD.
+Note that the mean and median displacement are slightly higher due to the gaps, because steps with a gap in between are actually two steps and thus have a larger displacement. 
 
-### 4.3 Correcting variation in timesteps
+For a simple step-based analysis of displacement, we can use `normalizeToDuration()` to correct for differences in time resolution:
+
+```{r}
+T.norm.disp <- sapply( single.steps, normalizeToDuration( displacement ) )
+T.norm.gap.disp <- sapply( steps.gap, normalizeToDuration( displacement ) )
+lapply( list( original = T.norm.disp, gaps = T.norm.gap.disp ), summary )
+```
+
+The difference in displacements is now gone. For more complicated analyses, one might want to correct the gaps in the dataset via splitting tracks or via interpolation -- see the next section.
+
+### 4.3 Correcting gaps or variation in timesteps
 
 If a dataset contains gaps, as detected in the histogram of $\Delta t$, we can correct these using the `repairGaps` function, where we can select one of three correction methods using the `how` argument:
 
@@ -565,52 +544,69 @@ If a dataset contains gaps, as detected in the histogram of $\Delta t$, we can c
 2. Splitting tracks around the gaps(`how = "split"`)
 3. Interpolating the track (`how = "interpolate"`)
 
-Let's compare the effect of the last two. First, try splitting:
+For example:
 
 ```{r, fig.width=6}
-# Repair gaps by splitting
+
+# Repair gaps by splitting or interpolation, the number of tracks is 
+# different after each fix
 split.gap <- repairGaps( TCells.gap, how = "split" )
-
-# Compute MSD and combine data
-msd.split <- aggregate( split.gap, 
-                        squareDisplacement,
-                        FUN="mean.se")
-msd.split$gaps <- "gaps"
-msd.split$fix <- "yes (split)"
-msd.all$fix <- "no"
-d <- rbind( msd.all, msd.split )
-d <- d[ d$i <= time.upbnd , ]
-
-# plot
-ggplot( d, aes( x = i, y = mean, color = gaps, lty = fix ) ) +
-  geom_path() +
-  labs( x = "time (#steps)", y = "displacement^2" ) +
-  scale_color_manual( values = c("gaps"="red","no gaps"="gray") ) +
-  scale_x_continuous( expand=c(0,0) ) +
-  scale_y_continuous( expand=c(0,0) ) +
-  theme_classic()
-```
-
-Now try interpolation:
-
-```{r, fig.width=6}
 interpolate.gap <- repairGaps( TCells.gap, how = "interpolate" )
-msd.int <- aggregate( split.gap, 
-                      squareDisplacement,
-                      FUN="mean.sd")
-msd.int$gaps <- "gaps"
-msd.int$fix <- "yes (interpolate)"
 
-d <- rbind( msd.all, msd.int )
-d <- d[ d$i <= time.upbnd , ]
+c( "after splitting" = length( split.gap),
+   "after interpolation" = length( interpolate.gap ) )
+```
 
-ggplot( d, aes( x = i, y = mean, color = gaps, lty = fix ) ) +
-  geom_path() +
-  labs( x = "time (#steps)", y = "displacement^2" ) +
-  scale_color_manual( values = c("gaps"="red","no gaps"="gray") ) +
-  scale_y_continuous( expand=c(0,0) ) +
-  scale_x_continuous(expand=c(0,0) ) +
-  theme_classic()
+
+### 4.4 Comparing experiments with a different time resolution
+
+Finally, if we wish to compare tracks from experiments imaged at a different time resolution $\Delta t$, we can use the function `interpolateTrack()` to estimate the position of each cell at any set of timepoints of interest.
+
+For example, let's create a second T cell dataset where we keep only every second timepoint (to effectively increase $\Delta t$ twofold while keeping the same dataset):
+
+```{r}
+T2 <- subsample( TCells, k = 2 )
+```
+
+When we now perform a step-based analysis of displacement, the two will be different:
+
+```{r}
+# displacement
+T.steps <- subtracks( TCells, 1 )
+T.disp <- sapply( T.steps, displacement )
+
+T2.steps <- subtracks( T2, 1 )
+T2.disp <- sapply( T2.steps, displacement )
+
+lapply( list( T = T.disp, T2 = T2.disp ), summary )
 
 ```
 
+To correct for the difference in time resolution, we can interpolate both datasets at a fixed time resolution:
+
+```{r}
+# interpolate both datasets at the time resolution of the neutrophils
+dt <- timeStep( TCells )
+interpolate.dt <- function( x, dt, how = "spline" ){
+  trange <- range( timePoints( wrapTrack( x ) ) )
+  tvec <- seq( trange[1], trange[2], by = dt )
+  x <- interpolateTrack( x, tvec, how = how )
+  return(x)
+}
+
+T.corrected <- as.tracks( lapply( TCells, interpolate.dt, dt = dt ) )
+T2.corrected <- as.tracks( lapply( T2, interpolate.dt, dt = dt ) )
+
+# Check the effect on the displacement statistics:
+T.corr.steps <- subtracks( T.corrected, 1 )
+T.corr.disp <- sapply( T.corr.steps, displacement )
+
+T2.corr.steps <- subtracks( T2.corrected, 1 )
+T2.corr.disp <- sapply( T2.corr.steps, displacement )
+
+lapply( list( T = T.disp, T2 = T2.disp, 
+              T.corr = T.corr.disp, T2.corr = T2.corr.disp ), 
+        summary )
+```
+
+The difference is now much smaller.
