@@ -1,0 +1,182 @@
+---
+title: "Clustering Tracks with CelltrackR"
+author: "Inge Wortel"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Clustering}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 4.5,
+  fig.height = 3
+)
+```
+
+
+
+# Introduction
+
+To group tracks with similar properties, one can in principle perform any clustering method of interest on a *feature matrix* of quantification metrics for each track in the dataset. The package comes with three convenience functions -- `getFeatureMatrix()`,`trackFeatureMap()`, and `clusterTracks()` -- to easily compute several metrics on all tracks at once, visualize them in 2 dimensions, and to cluster tracks accordingly. This tutorial shows how to use these functions to explore heterogeneity in a track dataset.
+
+
+# Datasets
+
+First load the package:
+
+```{r pack, warning = FALSE, message = FALSE}
+library( celltrackR )
+```
+
+The package contains a dataset of T cells imaged in a mouse peripheral lymph node using two photon microscopy. We will here use this dataset as an example of how to perform quality control.
+
+The dataset consists of 21 tracks of individual cells in a tracks object:
+
+```{r Tdata}
+str( TCells, list.len = 2 )
+```
+
+Each element in this list is a track from a single cell, consisting of a matrix with $(x,y,z)$ coordinates and the corresponding measurement timepoints:
+
+```{r}
+head( TCells[[1]] )
+```
+
+Similarly, we will also use the `BCells` and `Neutrophils` data:
+
+```{r bdata}
+str( BCells, list.len = 2 )
+str( Neutrophils, list.len = 2 )
+```
+
+Combine them in a single dataset, where labels also indicate celltype:
+
+```{r}
+T2 <- TCells
+names(T2) <- paste0( "T", names(T2) )
+tlab <- rep( "T", length(T2) )
+
+B2 <- BCells
+names(B2) <- paste0( "B", names(B2) )
+blab <- rep( "B", length(B2) )
+
+N2 <- Neutrophils
+names(N2) <- paste0( "N", names(Neutrophils) )
+nlab <- rep( "N", length( N2) )
+
+all.tracks <- c( T2, B2, N2 )
+real.celltype <- c( tlab, blab, nlab )
+
+```
+
+
+# 1 Extracting a feature matrix
+
+Using the function `getFeatureMatrix()`, we can quickly apply several quantification measures to all data at once (see `?TrackMeasures` for an overview of measures we can compute):
+
+```{r}
+m <- getFeatureMatrix( all.tracks, 
+                       c(speed, meanTurningAngle, 
+                         outreachRatio, squareDisplacement) )
+
+# We get a matrix with a row per track and one column for each metric:
+head(m)
+```
+
+We can use this matrix to explore relationships between different metrics. For example, we can observe a negative correlation between speed and mean turning angle:
+
+```{r, fig.width = 4, fig.height = 3 }
+plot( m, xlab = "speed", ylab = "mean turning angle" )
+```
+
+
+
+# 2 Dimensionality reduction methods: PCA, MDS, and UMAP
+
+When using more than two metrics at once to quantify track properties, it becomes hard to visualize which tracks are similar to each other. Like with single-cell data, dimensionality reduction methods can help visualize high-dimensional track feature datasets. The function `trackFeatureMap()` is a wrapper method that helps to quickly visualize data using three popular methods: principal component analysis (PCA), multidimensional scaling (MDS), and uniform manifold approximate and projection (UMAP). The function `trackFeatureMap()` can be used for a quick visualization of data, or return the coordinates in the new axis system if the argument `return.mapping=TRUE`.
+
+### 1.1 PCA
+
+Use `trackFeatureMap()` to perform a principal component analysis (PCA) based on the measures "speed" and "meanTurningAngle", using the optional `labels` argument to color points by their real celltype and `return.mapping=TRUE` to also return the data rather than just the plot:
+
+```{r}
+pca <- trackFeatureMap( all.tracks, 
+               c(speed,meanTurningAngle,squareDisplacement,
+                 maxDisplacement,outreachRatio ), method = "PCA", 
+               labels = real.celltype, return.mapping = TRUE )
+```
+
+We can then inspect the data stored in `pca`. This reveals, for example, that the first principal component is correlated with speed:
+
+```{r}
+pc1 <- pca[,1]
+pc2 <- pca[,2]
+track.speed <- sapply( all.tracks, speed )
+cor.test( pc1, track.speed )
+```
+
+See `?prcomp` for details on how principal components are computed, and for further arguments that can be passed on to `trackFeatureMap()`.
+
+
+### 1.2 MDS
+
+Another popular method for visualization is multidimensional scaling (MDS), which is also supported by `trackFeatureMap()`:
+
+```{r}
+trackFeatureMap( all.tracks,
+               c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,
+                 outreachRatio ), method = "MDS",
+               labels = real.celltype )
+```
+
+Internally, `trackFeatureMap()` computes a distance matrix using `dist()` and then applies MDS using `cmdscale()`. See the documentation of `cmdscale` for details and further arguments that can be passed on via `trackFeatureMap()`.
+
+
+### 1.3 UMAP
+
+Uniform manifold approximate and projection (UMAP) is another powerful method to explore structure in high-dimensional datasets. `trackFeatureMap()` supports visualization of tracks in a UMAP. Note that this option requires the `uwot` package. Please install this package first using `install.packages("uwot")`. 
+
+
+```{r}
+trackFeatureMap( all.tracks,
+        c(speed,meanTurningAngle,squareDisplacement,
+          maxDisplacement,outreachRatio ), method = "UMAP",
+          labels = real.celltype )
+```
+
+# 3 Clustering: hierarchical clustering and k-means
+
+To go beyond visualizing similar and dissimilar tracks using multiple track features, `clusterTracks()` supports the explicit grouping of tracks into clusters using two common methods: hierarchical and k-means clustering.
+
+### 3.1 Hierarchical clustering
+
+Hierarchical clustering is performed by calling `hclust()` on a distance matrix computed via `dist()` on the feature matrix:
+
+```{r, fig.width = 7, fig.height = 3}
+clusterTracks( all.tracks,
+               c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,
+                 outreachRatio ), method = "hclust", labels = real.celltype )
+```
+
+See methods `dist()` and `hclust()` for details.
+
+### 3.2 K-means clustering
+
+Secondly, `clusterTracks()` also supports k-means clustering of tracks. Note that this requires an extra argument `centers` that is passed on to the `kmeans()` function and specifies the number of clusters to make. In this case, let's use three clusters because we have three celltypes:
+
+```{r, fig.height = 8, fig.width = 7 }
+clusterTracks( all.tracks,
+               c(speed,meanTurningAngle,squareDisplacement,maxDisplacement,
+                 outreachRatio ), method = "kmeans", 
+               labels = real.celltype, centers = 3 )
+```
+
+In these plots, we see the value of each feature in the feature matrix plotted for the different clusters, whereas the color indicates the "real" celltype the track came from.
+
+
+

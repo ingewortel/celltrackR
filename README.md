@@ -25,7 +25,7 @@ The latest development version of CelltrackR can be installed from
 GitHub (note: this requires the `devtools` package):
 
 ``` r
-   devtools::install.github("ingewortel/celltrackR")
+   devtools::install.github( "ingewortel/celltrackR" )
 ```
 
 Then the package can be loaded as usual:
