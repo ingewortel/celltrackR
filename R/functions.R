@@ -132,7 +132,10 @@ read.tracks.csv <- function(file, id.column=1, time.column=2,
 #' @param positions a vector of positive integers, given in ascending order.
 #' @param min.length nonnegative integer. Resulting tracks that have fewer positions than
 #'  the value of this parameter are dropped.
-#'  @export
+#'
+#' @return An object of class \emph{tracks} with the resulting splitted tracks.
+#' 
+#' @export
 splitTrack <- function( x, positions, id=NULL, min.length=2 ){
 	freqs <- diff(c(0,positions,nrow(x)))
 	segs <- rep( seq_len(length(positions)+1), freqs )
