@@ -2,7 +2,7 @@ Package: celltrackR
 Type: Package
 Title: Quantitative Analysis of Motion
 Date: 2019-05-16
-Version: 0.0.0.9000
+Version: 0.0.1
 Author:  Johannes Textor, Katharina Dannenberg, Jeffrey Berry, Gerhard Burger, Inge Wortel
 Maintainer: Johannes Textor <johannes.textor@gmx.de>
 Description: Statistics to quantify tracks of moving things (x-y-z-t data),

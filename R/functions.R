@@ -344,6 +344,10 @@ normalizeToDuration <- function(x) {
 #' @param filter.subtracks a function that can be supplied to exclude certain subtracks
 #' from an analysis. For instance, one may wish to compute angles only between steps of
 #' a certain minimum length (see Examples).
+#' @param count.subtracks logical. If \code{TRUE}, the returned dataframe contains an
+#' extra column \code{ntracks} showing the number of subtracks of each length. This is 
+#' useful to keep track of since the returned \code{value} estimates for high 
+#' \code{i} are often based on very few subtracks.
 #' @param ... further arguments passed to or used by methods.
 #'
 #' @details For every number of segments \eqn{i} in the set defined by
@@ -364,6 +368,10 @@ normalizeToDuration <- function(x) {
 #'   	ylab="mean square displacement", type="l" )
 #'   segments( i, lower, y1=upper )
 #' } )
+#' 
+#' ## Note that the values at high i are often based on very few subtracks:
+#' msd <- aggregate( TCells, squareDisplacement, count.subtracks = TRUE )
+#' tail( msd )
 #'
 #' ## Compute a turning angle plot for the B cell data, taking only steps of at least
 #' ## 1 micrometer length into account
@@ -390,7 +398,7 @@ normalizeToDuration <- function(x) {
 aggregate.tracks <- function( x, measure, by="subtracks", FUN=mean,
     subtrack.length=seq(1, (maxTrackLength(x)-1)),
     max.overlap=max(subtrack.length), na.rm=FALSE,
-    filter.subtracks=NULL, ... ){
+    filter.subtracks=NULL, count.subtracks=FALSE, ... ){
     if( class( x ) != "tracks" ){
     	if( class( x ) %in% c("data.frame","matrix" ) ){
     		x <- wrapTrack( x )
@@ -515,8 +523,12 @@ aggregate.tracks <- function( x, measure, by="subtracks", FUN=mean,
 	# this is necessary because of automatic insertion of NULL elements when e.g.
 	# measure.values[[5]] is assigned to
 	measure.values <- Filter( Negate(is.null), measure.values )
-	value <- sapply(measure.values, the.statistic)
+	value <- sapply(measure.values, the.statistic)	
 	ret <- rbind(i=subtrack.length, value)
+	if(count.subtracks){
+		num <- sapply( measure.values, length )
+		ret <- rbind( ret, ntracks = num )
+	}
 	return(data.frame(t(ret)))
 }
 

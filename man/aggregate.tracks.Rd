@@ -7,7 +7,7 @@
 \method{aggregate}{tracks}(x, measure, by = "subtracks", FUN = mean,
   subtrack.length = seq(1, (maxTrackLength(x) - 1)),
   max.overlap = max(subtrack.length), na.rm = FALSE,
-  filter.subtracks = NULL, ...)
+  filter.subtracks = NULL, count.subtracks = FALSE, ...)
 }
 \arguments{
 \item{x}{the tracks object whose subtracks are to be considered.
@@ -64,6 +64,11 @@ are removed prior to computing the summary statistic.}
 from an analysis. For instance, one may wish to compute angles only between steps of
 a certain minimum length (see Examples).}
 
+\item{count.subtracks}{logical. If \code{TRUE}, the returned dataframe contains an
+extra column \code{ntracks} showing the number of subtracks of each length. This is 
+useful to keep track of since the returned \code{value} estimates for high 
+\code{i} are often based on very few subtracks.}
+
 \item{...}{further arguments passed to or used by methods.}
 }
 \value{
@@ -93,6 +98,10 @@ with( dat ,{
   	ylab="mean square displacement", type="l" )
   segments( i, lower, y1=upper )
 } )
+
+## Note that the values at high i are often based on very few subtracks:
+msd <- aggregate( TCells, squareDisplacement, count.subtracks = TRUE )
+tail( msd )
 
 ## Compute a turning angle plot for the B cell data, taking only steps of at least
 ## 1 micrometer length into account
