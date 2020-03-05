@@ -128,14 +128,11 @@ NULL
 vecAngle <- function( a, b, degrees = TRUE )
 {
   # Check if inputs have the right dimensions
-  if( class(a) != class(b) ){
+  if( !( is.numeric(a) && is.numeric(b) && (is.matrix(a) == is.matrix(b)) ) ){
     stop( "vecAngle: a and b must both be numeric vectors of the same length or matrices of the same size")
   }
   if( any( pracma::size(a) != pracma::size(b) ) ){
     stop( "vecAngle: cannot compute angle between vectors of unequal dimensions.")
-  }
-  if( is.matrix(a) && is.matrix(b) && nrow(a) != nrow(b) ){
-    stop( "vecAngle: a and b must have an equal number of rows.")
   }
 
   # Convert vector to matrix if necessary

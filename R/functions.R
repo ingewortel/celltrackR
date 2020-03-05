@@ -399,8 +399,8 @@ aggregate.tracks <- function( x, measure, by="subtracks", FUN=mean,
     subtrack.length=seq(1, (maxTrackLength(x)-1)),
     max.overlap=max(subtrack.length), na.rm=FALSE,
     filter.subtracks=NULL, count.subtracks=FALSE, ... ){
-    if( class( x ) != "tracks" ){
-    	if( class( x ) %in% c("data.frame","matrix" ) ){
+    if( !is.tracks( x ) ){
+    	if( is.data.frame(x) || is.matrix(x) ){
     		x <- wrapTrack( x )
     	} else {
     		stop("Cannot coerce argument 'tracks' to tracks object" )
@@ -735,7 +735,7 @@ selectTracks <- function(x,measure,lower,upper){
 #' @importFrom stats median
 #' @export
 timeStep <- function( x, FUN=median, na.rm=FALSE ){
-	if( class(FUN) == "character" ){
+	if( is.character(FUN) ){
 		FUN=match.fun( FUN )
 	}
 	x <- .ulapply( x, function(x) diff(x[,1]) )

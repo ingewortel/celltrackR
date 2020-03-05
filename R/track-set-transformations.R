@@ -34,13 +34,13 @@ normalizeTracks <- function(x){
 #'
 #' @export
 projectDimensions <- function(x, dims=c("x","y")) {
-	if( class(x) != "tracks" ){
+	if( !is.tracks(x) ){
 		x <- as.tracks(x)
 	}
 	if( length(x) == 0 ){
 		return(x)
 	}
-	if( class(dims) == "character" ){
+	if( is.character(dims) ){
 		.dims <- match(dims,colnames(x[[1]]))
 		if( any(is.na(.dims)) ){
 			stop("dimensions not found: ",dims[is.na(.dims)])
@@ -48,7 +48,7 @@ projectDimensions <- function(x, dims=c("x","y")) {
 		as.tracks(lapply(x, function(t) {
 			t[, c(1,.dims)]
 		}))
-	} else if( class(dims) == "numeric" ){
+	} else if( is.numeric(dims) ){
 		as.tracks(lapply(x, function(t) {
 			t[, c(1,dims)]
 		}))
