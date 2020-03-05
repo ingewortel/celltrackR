@@ -1,14 +1,16 @@
 Package: celltrackR
 Type: Package
-Title: Quantitative Analysis of Motion
-Date: 2019-05-16
-Version: 0.0.1
+Title: Motion Trajectory Analysis
+Date: 2020-02-27
+Version: 0.3.0
 Author:  Johannes Textor, Katharina Dannenberg, Jeffrey Berry, Gerhard Burger, Inge Wortel
 Maintainer: Johannes Textor <johannes.textor@gmx.de>
-Description: Statistics to quantify tracks of moving things (x-y-z-t data),
-    such as cells, bacteria or animals. Available measures include mean square
-    displacement, confinement ratio, autocorrelation, straightness, turning angle,
-    and fractal dimension.
+Description: Provides methodology to analyze cells that move in a two- or three-dimensional
+	space. Available measures include displacement, confinement ratio, autocorrelation,
+	straightness, turning angle, and fractal dimension. Measures can be applied to entire tracks,
+	steps, or subtracks with varying length. While the methodology has been developed for
+	cell trajectory analysis, it is applicable to anything that moves including animals,
+	people, or vehicles.
 Depends: R (>= 3.4.0)
 License: GPL-2
 Encoding: UTF-8

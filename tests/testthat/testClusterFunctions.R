@@ -11,7 +11,7 @@ test_that("getFeatureMatrix returns correct output format", {
   expect_equal( nrow( getFeatureMatrix( TCells, c(speed) ) ), length( TCells ) )
   expect_equal( ncol( getFeatureMatrix( TCells, c(speed) ) ), 1 )
   expect_equal( ncol( getFeatureMatrix( TCells, all.measures ) ), length(all.measures) )
-  expect_equal( class( getFeatureMatrix( TCells, c( speed, meanTurningAngle ), dist = TRUE ) ), "dist" )
+  expect_s3_class( getFeatureMatrix( TCells, c( speed, meanTurningAngle ), dist = TRUE ), "dist" )
 })
 test_that("getFeatureMatrix passes arguments to dist correctly", {
   expect_equal( attr( getFeatureMatrix( TCells, c( speed, meanTurningAngle ), dist = TRUE ),"method"), "euclidean" )
@@ -35,9 +35,9 @@ test_that( "clusterTracks produces the right output", {
   expect_true( is.null( clusterTracks( TCells, c(speed), method = "kmeans", centers = 3 ) ) )
   expect_true( is.null( clusterTracks( TCells, c(speed), method = "hclust" ) ) )
   # otherwise output depends on method of choice
-  expect_equal( class( clusterTracks( TCells, c(speed), method = "hclust", return.clust = TRUE ) ),
+  expect_s3_class( clusterTracks( TCells, c(speed), method = "hclust", return.clust = TRUE ),
                 "hclust" )
-  expect_equal( class( clusterTracks( TCells, c(speed), method = "kmeans", return.clust = TRUE, centers = 2 ) ),
+  expect_s3_class( clusterTracks( TCells, c(speed), method = "kmeans", return.clust = TRUE, centers = 2 ),
                 "kmeans" )
 })
 
@@ -56,7 +56,7 @@ test_that( "trackFeatureMap produces the right output", {
   expect_true( is.null( trackFeatureMap( TCells, c(speed), method = "MDS" ) ) )
   expect_true( is.null( trackFeatureMap( TCells, c(speed), method = "UMAP" ) ) )
   # otherwise output depends on method of choice
-  expect_equal( class( trackFeatureMap( TCells, c(speed), method = "PCA", return.mapping = TRUE ) ),
+  expect_is( trackFeatureMap( TCells, c(speed), method = "PCA", return.mapping = TRUE ),
                 "matrix" )
   expect_equal( nrow( trackFeatureMap( TCells, c(speed), method = "PCA", return.mapping = TRUE ) ),
                 length(TCells) )

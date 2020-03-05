@@ -163,7 +163,7 @@ clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method
 #' @param ... additional parameters to be passed to the corresponding
 #' function: \code{\link[stats]{prcomp}} (for \code{method="PCA"}),
 #'   \code{\link[stats]{cmdscale}} (for \code{method="MDS"}),
-#'   or  \code{\link[umap]{umap}} (for \code{method="UMAP"}).
+#'   or  \code{\link[uwot]{umap}} (for \code{method="UMAP"}).
 #'
 #' @return By default, only returns a plot. If \code{return.clust=TRUE}, also returns
 #' a clustering object as returned by \code{\link[stats]{hclust}},  \code{\link[stats]{kmeans}},

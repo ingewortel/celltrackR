@@ -10,7 +10,7 @@ citEntry(entry = "Article",
   journal      = "bioRxiv",
   year         = "2019",
   pages        = "1--3",
-  url          = "https:://github.com/ingewortel/celltrackR",
+  url          = "https://github.com/ingewortel/celltrackR",
 
   textVersion  =
   paste("Inge M.N. Wortel, Katharina Dannenberg, Jeffrey C. Berry, Mark J. Miller, Johannes Textor (2019).",
