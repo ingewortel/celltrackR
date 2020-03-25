@@ -4,8 +4,7 @@
 \alias{distanceToPlane}
 \title{Distance to a Reference Plane}
 \usage{
-distanceToPlane(x, p1 = c(0, 0, 0), p2 = c(0, 1, 0), p3 = c(1, 0, 0),
-  from = 1)
+distanceToPlane(x, p1 = c(0, 0, 0), p2 = c(0, 1, 0), p3 = c(1, 0, 0), from = 1)
 }
 \arguments{
 \item{x}{a single input track; a matrix whose first column is time and whose

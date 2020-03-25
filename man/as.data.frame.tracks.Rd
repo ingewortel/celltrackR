@@ -4,8 +4,14 @@
 \alias{as.data.frame.tracks}
 \title{Convert Tracks to Data Frame}
 \usage{
-\method{as.data.frame}{tracks}(x, row.names = NULL, optional = FALSE,
-  include.timepoint.column = FALSE, idsAsFactors = TRUE, ...)
+\method{as.data.frame}{tracks}(
+  x,
+  row.names = NULL,
+  optional = FALSE,
+  include.timepoint.column = FALSE,
+  idsAsFactors = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{the \code{tracks} object to be coerced to a data frame.}

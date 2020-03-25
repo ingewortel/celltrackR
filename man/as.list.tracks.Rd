@@ -11,6 +11,11 @@
 
 \item{...}{further arguments to be passed from or to other methods.}
 }
+\value{
+A generic list of single tracks, where each track is a matrix with 
+\code{t/delta.t} rows and 4 columns. This looks a lot like a tracks object,
+except that its class is not "tracks" anymore.
+}
 \description{
 Coerces a \code{tracks} object to a list.
 }

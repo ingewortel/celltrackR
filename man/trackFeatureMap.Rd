@@ -4,8 +4,15 @@
 \alias{trackFeatureMap}
 \title{Dimensionality Reduction on Track Features}
 \usage{
-trackFeatureMap(tracks, measures, scale = TRUE, labels = NULL,
-  method = "PCA", return.mapping = FALSE, ...)
+trackFeatureMap(
+  tracks,
+  measures,
+  scale = TRUE,
+  labels = NULL,
+  method = "PCA",
+  return.mapping = FALSE,
+  ...
+)
 }
 \arguments{
 \item{tracks}{the tracks that are to be clustered.}

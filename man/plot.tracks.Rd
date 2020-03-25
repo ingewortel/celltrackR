@@ -4,9 +4,16 @@
 \alias{plot.tracks}
 \title{Plot Tracks in 2D}
 \usage{
-\method{plot}{tracks}(x, dims = c("x", "y"), add = F,
-  col = order(names(x)), pch.start = 1, pch.end = NULL, cex = 0.5,
-  ...)
+\method{plot}{tracks}(
+  x,
+  dims = c("x", "y"),
+  add = F,
+  col = order(names(x)),
+  pch.start = 1,
+  pch.end = NULL,
+  cex = 0.5,
+  ...
+)
 }
 \arguments{
 \item{x}{the tracks to be plotted.}
@@ -32,6 +39,9 @@ corresponding track.}
 to be passed to \code{\link[graphics]{plot}}
 (for \code{add=FALSE}) or \code{\link[graphics]{points}} (for \code{add=TRUE}),
 respectively.}
+}
+\value{
+None
 }
 \description{
 Plots tracks contained in a "tracks" object into a twodimensional space

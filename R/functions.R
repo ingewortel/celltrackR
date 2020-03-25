@@ -693,6 +693,8 @@ hotellingsTest <- function(tracks, dim=c("x", "y"),
 #' @param measure measure on which the selection is based (see \link{TrackMeasures}).
 #' @param lower specifies the lower bound (inclusive) of the allowable measure.
 #' @param upper specifies the upper bound (inclusive) of the allowable measure.
+#'
+#' @return A \code{\link{tracks}} object with the selected subset of tracks.
 #' @examples
 #' ## Slower half of T cells
 #' slow.tcells <- selectTracks( TCells, speed, -Inf, median( sapply(TCells,speed) ) )
@@ -764,6 +766,8 @@ timeStep <- function( x, FUN=median, na.rm=FALSE ){
 #' t2i <- interpolateTrack(TCells[[2]], seq(bb[1,"t"],bb[2,"t"],length.out=100),"spline")
 #' plot( tracks( t2i ), add=TRUE, col=2 )
 #'
+#' @return The interpolated track (a matrix or data frame).
+#'
 #' @export
 interpolateTrack <- function( x, t, how="linear" ){
 	f=stats::approx
@@ -786,6 +790,7 @@ interpolateTrack <- function( x, t, how="linear" ){
 #' input track is kept.
 #' @seealso \code{interpolateTrack}, which can be used for more flexible track
 #' coarse-graining.
+#' @return A \code{\link{tracks}} object with the new, more coarse-grained tracks.
 #' @examples
 #' ## Compare original and subsampled versions of the T cell tracks
 #' plot( TCells, col=1 )

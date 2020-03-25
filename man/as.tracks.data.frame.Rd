@@ -4,8 +4,15 @@
 \alias{as.tracks.data.frame}
 \title{Convert from Data Frame to Tracks}
 \usage{
-\method{as.tracks}{data.frame}(x, id.column = 1, time.column = 2,
-  pos.columns = c(3, 4, 5), scale.t = 1, scale.pos = 1, ...)
+\method{as.tracks}{data.frame}(
+  x,
+  id.column = 1,
+  time.column = 2,
+  pos.columns = c(3, 4, 5),
+  scale.t = 1,
+  scale.pos = 1,
+  ...
+)
 }
 \arguments{
 \item{x}{the data frame to be coerced to a \code{tracks} object.}
@@ -29,6 +36,9 @@ position. Useful for changing units.}
 
 \item{...}{further arguments to be passed to \code{read.csv}, for instance
 \code{sep="\t"} can be useful for tab-separated files.}
+}
+\value{
+A \code{tracks} object.
 }
 \description{
 Get cell tracks from a data.frame. Data are expected to be organized as

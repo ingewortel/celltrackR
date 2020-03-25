@@ -12,6 +12,9 @@ subsample(x, k = 2)
 \item{k}{a positive integer. Every \eqn{k}th position of each
 input track is kept.}
 }
+\value{
+A \code{\link{tracks}} object with the new, more coarse-grained tracks.
+}
 \description{
 Make tracks more coarse-grained by keeping only every \emph{k}th position.
 }

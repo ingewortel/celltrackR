@@ -9,6 +9,9 @@ cheatsheet(opencmd = NULL)
 \arguments{
 \item{opencmd}{The command used to open pdfs from the command line.}
 }
+\value{
+None
+}
 \description{
 Running this function will open the package cheat sheet (a pdf) via a call to
 \code{system()}.

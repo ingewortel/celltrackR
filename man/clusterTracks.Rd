@@ -4,8 +4,15 @@
 \alias{clusterTracks}
 \title{Cluster Tracks}
 \usage{
-clusterTracks(tracks, measures, scale = TRUE, labels = NULL,
-  method = "hclust", return.clust = FALSE, ...)
+clusterTracks(
+  tracks,
+  measures,
+  scale = TRUE,
+  labels = NULL,
+  method = "hclust",
+  return.clust = FALSE,
+  ...
+)
 }
 \arguments{
 \item{tracks}{the tracks that are to be clustered.}

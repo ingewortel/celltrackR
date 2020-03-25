@@ -22,6 +22,12 @@ library( celltrackR )
 library( ggplot2 )
 ```
 
+```{r, echo = FALSE}
+# Save current par() settings
+oldpar <- par( no.readonly =TRUE )
+```
+
+
 ### 1.1 Input data format
 
 Tracking data is usually stored as a table, with columns indicating the cellid, time, and coordinates of each measured point. Here we have an example in the file Tcells.txt, which we can read in as a normal dataframe:
@@ -91,7 +97,7 @@ is.matrix( t1 )
 If we now want to plot this track, the plotting method for tracks will not work because this is not recognized as a tracks object. We can use the frunction `wrapTrack()` to "pack" this matrix back into a tracks object:
 
 ```{r fig.width =7}
-par( mfrow=c(1,2))
+par( mfrow=c(1,2) )
 plot( t1, main = "Plotting matrix directly" )
 plot( wrapTrack( t1 ), main = "After using wrapTrack()" )
 ```
@@ -307,5 +313,8 @@ Note that the method `as.tracks.data.frame()` contains arguments `id.column`, `t
 
 For help, see `?as.list.tracks`, `?as.data.frame.tracks`, `?as.tracks.data.frame`, or `as.tracks.list`.
 
-
+```{r, echo = FALSE}
+# Reset par() settings
+par(oldpar)
+```
 

@@ -4,9 +4,17 @@
 \alias{hotellingsTest}
 \title{Test Unbiasedness of Motion}
 \usage{
-hotellingsTest(tracks, dim = c("x", "y"), step.spacing = 0,
-  plot = FALSE, add = FALSE, ellipse.col = "blue",
-  ellipse.border = "black", conf.level = 0.95, ...)
+hotellingsTest(
+  tracks,
+  dim = c("x", "y"),
+  step.spacing = 0,
+  plot = FALSE,
+  add = FALSE,
+  ellipse.col = "blue",
+  ellipse.border = "black",
+  conf.level = 0.95,
+  ...
+)
 }
 \arguments{
 \item{tracks}{the tracks whose biasedness is to be determined.}

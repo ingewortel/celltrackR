@@ -4,10 +4,18 @@
 \alias{aggregate.tracks}
 \title{Compute Summary Statistics of Subtracks}
 \usage{
-\method{aggregate}{tracks}(x, measure, by = "subtracks", FUN = mean,
+\method{aggregate}{tracks}(
+  x,
+  measure,
+  by = "subtracks",
+  FUN = mean,
   subtrack.length = seq(1, (maxTrackLength(x) - 1)),
-  max.overlap = max(subtrack.length), na.rm = FALSE,
-  filter.subtracks = NULL, count.subtracks = FALSE, ...)
+  max.overlap = max(subtrack.length),
+  na.rm = FALSE,
+  filter.subtracks = NULL,
+  count.subtracks = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{the tracks object whose subtracks are to be considered.

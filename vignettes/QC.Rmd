@@ -27,6 +27,11 @@ library( celltrackR )
 library( ggplot2 )
 ```
 
+```{r, echo = FALSE}
+# Save current par() settings
+oldpar <- par( no.readonly =TRUE )
+```
+
 The package contains a dataset of T cells imaged in a mouse peripheral lymph node using two photon microscopy. We will here use this dataset as an example of how to perform quality control.
 
 The dataset consists of 21 tracks of individual cells in a tracks object:
@@ -198,11 +203,11 @@ hotellingsTest( TCells.drift, dim = c("x","y","z"), step.spacing = 5 )
 # d.drift <- data.frame( step.spacing = sp,
 #                        exp = "drift",
 #                        pval = pval.drift,
-#                        T.statistic = stat.drift )
+#                        Tstatistic = stat.drift )
 # d.nodrift <- data.frame( step.spacing = sp,
 #                        exp = "no drift",
 #                        pval = pval.nodrift,
-#                        T.statistic = stat.nodrift )
+#                        Tstatistic = stat.nodrift )
 # d <- rbind( d.drift, d.nodrift )
 # 
 # p1 <- ggplot( d, aes( x = step.spacing, y = pval, color = exp ) ) +
@@ -212,7 +217,7 @@ hotellingsTest( TCells.drift, dim = c("x","y","z"), step.spacing = 5 )
 #   scale_y_log10() +
 #   theme_classic()
 # 
-# p2 <- ggplot( d, aes( x = step.spacing, y = T.statistic, color = exp ) ) +
+# p2 <- ggplot( d, aes( x = step.spacing, y = Tstatistic, color = exp ) ) +
 #   geom_line() +
 #   scale_y_continuous( limits = c(0,NA) ) +
 #   scale_color_manual( values = c( "drift" = "black", "no drift" = "gray")  ) +
@@ -518,10 +523,10 @@ This has an effect on for example the step-based displacement:
 
 ```{r}
 
-T.step.disp <- sapply( single.steps, displacement )
-T.gap.disp <- sapply( steps.gap, displacement )
+T1.step.disp <- sapply( single.steps, displacement )
+T1.gap.disp <- sapply( steps.gap, displacement )
 
-lapply( list( original = T.step.disp, gaps = T.gap.disp ), summary )
+lapply( list( original = T1.step.disp, gaps = T1.gap.disp ), summary )
 ```
 
 Note that the mean and median displacement are slightly higher due to the gaps, because steps with a gap in between are actually two steps and thus have a larger displacement. 
@@ -529,9 +534,9 @@ Note that the mean and median displacement are slightly higher due to the gaps, 
 For a simple step-based analysis of displacement, we can use `normalizeToDuration()` to correct for differences in time resolution:
 
 ```{r}
-T.norm.disp <- sapply( single.steps, normalizeToDuration( displacement ) )
-T.norm.gap.disp <- sapply( steps.gap, normalizeToDuration( displacement ) )
-lapply( list( original = T.norm.disp, gaps = T.norm.gap.disp ), summary )
+T1.norm.disp <- sapply( single.steps, normalizeToDuration( displacement ) )
+T1.norm.gap.disp <- sapply( steps.gap, normalizeToDuration( displacement ) )
+lapply( list( original = T1.norm.disp, gaps = T1.norm.gap.disp ), summary )
 ```
 
 The difference in displacements is now gone. For more complicated analyses, one might want to correct the gaps in the dataset via splitting tracks or via interpolation -- see the next section.
@@ -572,13 +577,13 @@ When we now perform a step-based analysis of displacement, the two will be diffe
 
 ```{r}
 # displacement
-T.steps <- subtracks( TCells, 1 )
-T.disp <- sapply( T.steps, displacement )
+T1.steps <- subtracks( TCells, 1 )
+T1.disp <- sapply( T1.steps, displacement )
 
 T2.steps <- subtracks( T2, 1 )
 T2.disp <- sapply( T2.steps, displacement )
 
-lapply( list( T = T.disp, T2 = T2.disp ), summary )
+lapply( list( T1 = T1.disp, T2 = T2.disp ), summary )
 
 ```
 
@@ -594,19 +599,25 @@ interpolate.dt <- function( x, dt, how = "spline" ){
   return(x)
 }
 
-T.corrected <- as.tracks( lapply( TCells, interpolate.dt, dt = dt ) )
+T1.corrected <- as.tracks( lapply( TCells, interpolate.dt, dt = dt ) )
 T2.corrected <- as.tracks( lapply( T2, interpolate.dt, dt = dt ) )
 
 # Check the effect on the displacement statistics:
-T.corr.steps <- subtracks( T.corrected, 1 )
-T.corr.disp <- sapply( T.corr.steps, displacement )
+T1.corr.steps <- subtracks( T1.corrected, 1 )
+T1.corr.disp <- sapply( T1.corr.steps, displacement )
 
 T2.corr.steps <- subtracks( T2.corrected, 1 )
 T2.corr.disp <- sapply( T2.corr.steps, displacement )
 
-lapply( list( T = T.disp, T2 = T2.disp, 
-              T.corr = T.corr.disp, T2.corr = T2.corr.disp ), 
+lapply( list( T1 = T1.disp, T2 = T2.disp, 
+              T1.corr = T1.corr.disp, T2.corr = T2.corr.disp ), 
         summary )
 ```
 
 The difference is now much smaller.
+
+```{r, echo = FALSE}
+# Reset par() settings
+par(oldpar)
+```
+

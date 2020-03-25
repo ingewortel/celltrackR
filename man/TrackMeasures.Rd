@@ -41,8 +41,7 @@ outreachRatio(x)
 
 straightness(x)
 
-overallAngle(x, from = 1, to = nrow(x), xdiff = diff(x),
-  degrees = FALSE)
+overallAngle(x, from = 1, to = nrow(x), xdiff = diff(x), degrees = FALSE)
 
 meanTurningAngle(x, degrees = FALSE)
 

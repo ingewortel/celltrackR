@@ -27,6 +27,8 @@
 #' to \code{TRUE}.
 #' @seealso \code{\link{plot3d}}
 #'
+#' @return None
+#'
 #' @export
 plot.tracks <- function(x, dims=c('x','y'), add=F,
                         col=order(names(x)), pch.start=1, pch.end=NULL,
@@ -121,6 +123,8 @@ plot.tracks <- function(x, dims=c('x','y'), add=F,
 #' plotTrackMeasures( subtracks(Neutrophils,4,0), speed, straightness,
 #'   col=3, ellipse.col=3, pch=3, add=TRUE )
 #'
+#' @return None
+#'
 #' @export
 plotTrackMeasures <- function(x, measure.x, measure.y, add=FALSE,
                               xlab=deparse(substitute(measure.x)),
@@ -166,6 +170,9 @@ plotTrackMeasures <- function(x, measure.x, measure.y, add=FALSE,
 #' if( require("scatterplot3d",quietly=TRUE) ){
 #'   plot3d( TCells )
 #' }
+#'
+#' @return None.
+#' 
 #' @export
 plot3d <- function(x,...){
   if( !requireNamespace("scatterplot3d",quietly=TRUE) ){

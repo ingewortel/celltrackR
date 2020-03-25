@@ -9,6 +9,10 @@
 #' @examples
 #' ## normalization of Neutrophil data reveals upward motion
 #' plot( normalizeTracks( Neutrophils ) )
+#'
+#' @return an output \code{tracks} object with all tracks shifted such that their
+#' starting position lies at the origin of the coordinate system.
+#'
 #' @export
 normalizeTracks <- function(x){
 	as.tracks(lapply(x, .normalizeTrack))
@@ -87,6 +91,8 @@ projectDimensions <- function(x, dims=c("x","y")) {
 #' @param split.min.length nonnegative integer. For \code{how="split"}, this
 #' discards all resulting tracks shorter than
 #' this many positions.
+#'
+#' @return A \code{\link{tracks}} object with gaps fixed according to the chosen method.
 #'
 #' @examples
 #' ## The Neutrophil data are imaged at rather nonconstant intervals

@@ -28,6 +28,13 @@ library( celltrackR )
 library( ggplot2 )
 ```
 
+
+```{r, echo = FALSE}
+# Save current par() settings
+oldpar <- par( no.readonly =TRUE )
+```
+
+
 The package contains a dataset of T cells imaged in a mouse peripheral lymph node using two photon microscopy. We will here use this dataset as an example of how we can compare real tracking data with data from a simulation model.
 
 The dataset consists of 21 tracks of individual cells in a tracks object:
@@ -240,3 +247,10 @@ ggplot( acor, aes( x = i, y = mean, ymin = lower, ymax = upper, color = data, fi
 ```
 
 Indeed, the autocovariance drops less steeply for the real T cell data, which indicates that there is a directional persistence in the T cell data that is not captured by the brownian and bootstrapping models. Thus, even when a model captures some aspects of the walk statistics in the data, it may still behave differently in other respects. 
+
+
+
+```{r, echo = FALSE}
+# Reset par() settings
+par(oldpar)
+```

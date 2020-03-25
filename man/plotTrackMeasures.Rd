@@ -4,10 +4,18 @@
 \alias{plotTrackMeasures}
 \title{Bivariate Scatterplot of Track Measures}
 \usage{
-plotTrackMeasures(x, measure.x, measure.y, add = FALSE,
+plotTrackMeasures(
+  x,
+  measure.x,
+  measure.y,
+  add = FALSE,
   xlab = deparse(substitute(measure.x)),
-  ylab = deparse(substitute(measure.y)), ellipse.col = "red",
-  ellipse.border = "black", conf.level = 0.95, ...)
+  ylab = deparse(substitute(measure.y)),
+  ellipse.col = "red",
+  ellipse.border = "black",
+  conf.level = 0.95,
+  ...
+)
 }
 \arguments{
 \item{x}{the input \code{tracks} object.}
@@ -36,6 +44,9 @@ the border.}
 
 \item{...}{additional parameters to be passed to \code{\link[graphics]{plot}}
 (in case \code{add=FALSE}) or \code{\link[graphics]{points}} (\code{add=TRUE}).}
+}
+\value{
+None
 }
 \description{
 Plots the values of two measures applied on the given tracks against each

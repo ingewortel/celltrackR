@@ -18,7 +18,10 @@ knitr::opts_chunk$set(
 )
 ```
 
-
+```{r, echo = FALSE}
+# Save current par() settings
+oldpar <- par( no.readonly =TRUE )
+```
 
 # Introduction
 
@@ -179,4 +182,8 @@ clusterTracks( all.tracks,
 In these plots, we see the value of each feature in the feature matrix plotted for the different clusters, whereas the color indicates the "real" celltype the track came from.
 
 
+```{r, echo = FALSE}
+# Reset par() settings
+par(oldpar)
+```
 

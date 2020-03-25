@@ -24,6 +24,12 @@ library( celltrackR )
 library( ggplot2 )
 ```
 
+```{r, echo = FALSE}
+# Save current par() settings
+oldpar <- par( no.readonly =TRUE )
+```
+
+
 The package contains a dataset of T cells imaged in a mouse peripheral lymph node using two photon microscopy. We will here use this dataset as an example of how to perform quality control.
 
 The dataset consists of 21 tracks of individual cells in a tracks object:
@@ -89,27 +95,27 @@ To compute a metric for each track in a dataset, use R's `sapply()` function dir
 
 ```{r}
 # Obtain mean speeds for each track using sapply
-T.speeds <- sapply( TCells, speed )
-str( T.speeds )
-summary( T.speeds )
+Tcell.speeds <- sapply( TCells, speed )
+str( Tcell.speeds )
+summary( Tcell.speeds )
 ```
 
 This returns a mean speed for each of the 22 tracks in the `TCell` dataset. Visualize the distribution:
 
 ```{r}
-hist( T.speeds )
+hist( Tcell.speeds )
 ```
 
 Now let's repeat for the other two celltypes and plot them next to each other for comparison
 
 ```{r}
-B.speeds <- sapply( BCells, speed )
-N.speeds <- sapply( Neutrophils, speed )
+Bcell.speeds <- sapply( BCells, speed )
+Nphil.speeds <- sapply( Neutrophils, speed )
 
 # Create a dataframe of all data
-dT <- data.frame( cells = "T cells", speed = T.speeds )
-dB <- data.frame( cells = "B cells", speed = B.speeds )
-dN <- data.frame( cells = "Neutrophils", speed = N.speeds )
+dT <- data.frame( cells = "T cells", speed = Tcell.speeds )
+dB <- data.frame( cells = "B cells", speed = Bcell.speeds )
+dN <- data.frame( cells = "Neutrophils", speed = Nphil.speeds )
 d <- rbind( dT, dB, dN )
 
 # Compare:
@@ -126,29 +132,29 @@ It has been suggested that cell-based analyses introduce biases, and that analys
 We can extract such steps using the `subtracks()` function (where `i` is the subtrack length, which is 1 for a single step):
 
 ```{r}
-T.steps <- subtracks( TCells, i = 1 )
+Tcell.steps <- subtracks( TCells, i = 1 )
 ```
 
 We can then proceed as before to obtain speeds for each step and further summary statistics:
 
 ```{r}
 # Obtain instantaneous speeds for each step using sapply
-T.step.speeds <- sapply( T.steps, speed )
-str( T.step.speeds )
-summary( T.step.speeds )
+Tcell.step.speeds <- sapply( Tcell.steps, speed )
+str( Tcell.step.speeds )
+summary( Tcell.step.speeds )
 ```
 
 Visualize the distribution:
 
 ```{r}
-hist( T.step.speeds )
+hist( Tcell.step.speeds )
 ```
 
 Compare cell-based versus step-based:
 
 ```{r}
-d.step <- data.frame( method = "step-based", speed = T.step.speeds )
-d.cell <- data.frame( method = "cell-based", speed = T.speeds )
+d.step <- data.frame( method = "step-based", speed = Tcell.step.speeds )
+d.cell <- data.frame( method = "cell-based", speed = Tcell.speeds )
 d.method <- rbind( d.step, d.cell )
 
 ggplot( d.method, aes( x = method, y = speed ) ) +
@@ -161,13 +167,13 @@ ggplot( d.method, aes( x = method, y = speed ) ) +
 And again compare between the different celltypes:
 
 ```{r}
-B.step.speeds <- sapply( subtracks(BCells,1), speed )
-N.step.speeds <- sapply( subtracks(Neutrophils,1), speed )
+Bcell.step.speeds <- sapply( subtracks(BCells,1), speed )
+Nphil.step.speeds <- sapply( subtracks(Neutrophils,1), speed )
 
 # Create a dataframe of all data
-dT <- data.frame( cells = "T cells", speed = T.step.speeds )
-dB <- data.frame( cells = "B cells", speed = B.step.speeds )
-dN <- data.frame( cells = "Neutrophils", speed = N.step.speeds )
+dT <- data.frame( cells = "T cells", speed = Tcell.step.speeds )
+dB <- data.frame( cells = "B cells", speed = Bcell.step.speeds )
+dN <- data.frame( cells = "Neutrophils", speed = Nphil.step.speeds )
 dstep <- rbind( dT, dB, dN )
 
 # Compare:
@@ -182,14 +188,14 @@ ggplot( dstep, aes( x = cells, y = speed ) ) +
 Note that we can do something similar for turning angles, but we need at least two steps to compute a turning angle. Therefore, use `subtracks()` with `i=2` in combination with the `overallAngle()` method:
 
 ```{r}
-T.step.angle <- sapply( subtracks(TCells,2), overallAngle )
-B.step.angle <- sapply( subtracks(BCells,2), overallAngle )
-N.step.angle <- sapply( subtracks(Neutrophils,2), overallAngle )
+Tcell.step.angle <- sapply( subtracks(TCells,2), overallAngle )
+Bcell.step.angle <- sapply( subtracks(BCells,2), overallAngle )
+Nphil.step.angle <- sapply( subtracks(Neutrophils,2), overallAngle )
 
 # Create a dataframe of all data
-dT <- data.frame( cells = "T cells", turn.angle = T.step.angle )
-dB <- data.frame( cells = "B cells", turn.angle = B.step.angle )
-dN <- data.frame( cells = "Neutrophils", turn.angle = N.step.angle )
+dT <- data.frame( cells = "T cells", turn.angle = Tcell.step.angle )
+dB <- data.frame( cells = "B cells", turn.angle = Bcell.step.angle )
+dN <- data.frame( cells = "Neutrophils", turn.angle = Nphil.step.angle )
 dangle <- rbind( dT, dB, dN )
 
 # convert radians to degrees
@@ -251,8 +257,8 @@ mean( stag, na.rm = TRUE )
 
 ```{r}
 # Compare the three different methods
-T.stag.speed <- sapply( TCells, staggered( speed ) )
-d.staggered <- data.frame( method = "staggered", speed = T.speeds )
+Tcell.stag.speed <- sapply( TCells, staggered( speed ) )
+d.staggered <- data.frame( method = "staggered", speed = Tcell.speeds )
 d.method <- rbind( d.step, d.cell, d.staggered )
 
 ggplot( d.method, aes( x = method, y = speed ) ) +
@@ -261,7 +267,7 @@ ggplot( d.method, aes( x = method, y = speed ) ) +
   theme_classic()
 
 # cell-based and staggered cell-based are slightly different:
-hist( T.speeds - T.stag.speed )
+hist( Tcell.speeds - Tcell.stag.speed )
 ```
 
 
@@ -288,14 +294,14 @@ This gives us not only the mean, but also the standard error.
 Now, if we leave out the `subtrack.length`, `aggregate()` automatically computes the metric for subtracks of all possible lengths in the dataset and returns those in a dataframe:
 
 ```{r}
-T.msd <- aggregate( TCells, squareDisplacement, FUN = "mean.se" )
-str( T.msd )
+Tcell.msd <- aggregate( TCells, squareDisplacement, FUN = "mean.se" )
+str( Tcell.msd )
 ```
 
 We can then use this for plotting:
 
 ```{r}
-ggplot( T.msd, aes( x = i, y = mean ) ) +
+ggplot( Tcell.msd, aes( x = i, y = mean ) ) +
   geom_ribbon( aes( ymin = lower, ymax = upper) , alpha = 0.2 ,color=NA ) +
   geom_line( ) +
   labs( x = expression( paste(Delta,"t (steps)") ),
@@ -318,15 +324,15 @@ Now, let's compare the MSD plot for the three different types of cells:
 # Combine into a single dataframe with one column indicating the celltype
 # To truly compare them, report subtrack length not in number of steps but
 # in their duration (which may differ between different datasets)
-T.msd$cells <- "T cells"
-T.msd$dt <- T.msd$i * timeStep( TCells )
-B.msd <- aggregate( BCells, squareDisplacement, FUN = "mean.se" )
-B.msd$cells <- "B cells"
-B.msd$dt <- B.msd$i * timeStep( BCells )
-N.msd <- aggregate( Neutrophils, squareDisplacement, FUN = "mean.se" )
-N.msd$cells <- "Neutrophils"
-N.msd$dt <- N.msd$i * timeStep( Neutrophils )
-msddata <- rbind( T.msd, B.msd, N.msd )
+Tcell.msd$cells <- "T cells"
+Tcell.msd$dt <- Tcell.msd$i * timeStep( TCells )
+Bcell.msd <- aggregate( BCells, squareDisplacement, FUN = "mean.se" )
+Bcell.msd$cells <- "B cells"
+Bcell.msd$dt <- Bcell.msd$i * timeStep( BCells )
+Nphil.msd <- aggregate( Neutrophils, squareDisplacement, FUN = "mean.se" )
+Nphil.msd$cells <- "Neutrophils"
+Nphil.msd$dt <- Nphil.msd$i * timeStep( Neutrophils )
+msddata <- rbind( Tcell.msd, Bcell.msd, Nphil.msd )
 head(msddata)
 
 # Plot
@@ -358,11 +364,11 @@ To analyze cell persistence, another good analysis is the autocorrelation plot: 
 Officially, the autocorrelation plot is a plot of $\cos \alpha$ of two steps, $\vec{s_1}$ and $\vec{s_2}$, whose starting points are $\Delta t$ apart. This is equal to the dot product between $\vec{s_1}$ and $\vec{s_2}$ after normalizing both vectors to unit length. We can compute this again using `aggregate()` (see also the previous section):
 
 ```{r, fig.width=6}
-T.acor <- aggregate( TCells, overallNormDot, FUN = "mean.se"  )
-T.acor$dt <- T.acor$i * timeStep(TCells)
-T.acor$cells <- "T cells"
+Tcell.acor <- aggregate( TCells, overallNormDot, FUN = "mean.se"  )
+Tcell.acor$dt <- Tcell.acor$i * timeStep(TCells)
+Tcell.acor$cells <- "T cells"
 
-ggplot( T.acor, aes( x = dt , y = mean, color = cells, fill = cells ) ) +
+ggplot( Tcell.acor, aes( x = dt , y = mean, color = cells, fill = cells ) ) +
   geom_hline( yintercept = 0 ) +
   geom_ribbon( aes( ymin = lower, ymax = upper) , alpha = 0.2 ,color=NA ) +
   geom_line( ) +
@@ -380,12 +386,12 @@ check <- function(x){
   all( sapply( list(head(x,2),tail(x,2)), trackLength ) >= 1.0 )
 }
 # repeat analysis
-T.acor2 <- aggregate( TCells, overallNormDot, 
+Tcell.acor2 <- aggregate( TCells, overallNormDot, 
                      FUN = "mean.se", filter.subtracks = check )
-T.acor2$dt <- T.acor2$i * timeStep(TCells)
-T.acor2$cells <- "T cells (filtered)"
+Tcell.acor2$dt <- Tcell.acor2$i * timeStep(TCells)
+Tcell.acor2$cells <- "T cells (filtered)"
 
-d <- rbind( T.acor, T.acor2 )
+d <- rbind( Tcell.acor, Tcell.acor2 )
 
 # compare
 ggplot( d, aes( x = dt , y = mean, color = cells, fill = cells ) ) +
@@ -403,14 +409,14 @@ Another solution is to make the autocovariance plot instead of the autocorrelati
 
 ```{r, fig.width=6}
 # autocovariance
-T.acov <- aggregate( TCells, overallDot, 
+Tcell.acov <- aggregate( TCells, overallDot, 
                      FUN = "mean.se" )
-T.acov$dt <- T.acov$i * timeStep(TCells)
-T.acov$cells <- "T cells"
+Tcell.acov$dt <- Tcell.acov$i * timeStep(TCells)
+Tcell.acov$cells <- "T cells"
 
 
 # compare
-ggplot( T.acov, aes( x = dt , y = mean, color = cells, fill = cells ) ) +
+ggplot( Tcell.acov, aes( x = dt , y = mean, color = cells, fill = cells ) ) +
   geom_hline( yintercept = 0 ) +
   geom_line( ) +
   labs( x = expression( paste(Delta,"t (seconds)") ),
@@ -423,20 +429,20 @@ However, the autocovariance is no longer a number between 0 and 1, which is some
 
 ```{r, fig.width = 7}
 # Normalized autocovariance
-T.acov[,2:4] <- T.acov[,2:4] / T.acov$mean[1]
+Tcell.acov[,2:4] <- Tcell.acov[,2:4] / Tcell.acov$mean[1]
 
 # Other cells
-B.acov <- aggregate( BCells, overallDot, FUN = "mean.se" )
-B.acov$cells <- "B cells"
-B.acov$dt <- B.acov$i * timeStep( BCells )
-B.acov[,2:4] <- B.acov[,2:4] / B.acov$mean[1]
+Bcell.acov <- aggregate( BCells, overallDot, FUN = "mean.se" )
+Bcell.acov$cells <- "B cells"
+Bcell.acov$dt <- Bcell.acov$i * timeStep( BCells )
+Bcell.acov[,2:4] <- Bcell.acov[,2:4] / Bcell.acov$mean[1]
 
-N.acov <- aggregate( Neutrophils, overallDot, FUN = "mean.se" )
-N.acov$cells <- "Neutrophils"
-N.acov$dt <- N.acov$i * timeStep( Neutrophils )
-N.acov[,2:4] <- N.acov[,2:4] / N.acov$mean[1]
+Nphil.acov <- aggregate( Neutrophils, overallDot, FUN = "mean.se" )
+Nphil.acov$cells <- "Neutrophils"
+Nphil.acov$dt <- Nphil.acov$i * timeStep( Neutrophils )
+Nphil.acov[,2:4] <- Nphil.acov[,2:4] / Nphil.acov$mean[1]
 
-acovdata <- rbind( T.acov, B.acov, N.acov )
+acovdata <- rbind( Tcell.acov, Bcell.acov, Nphil.acov )
 
 # compare
 p1 <- ggplot( acovdata, aes( x = dt , y = mean, color = cells, fill = cells ) ) +
@@ -632,3 +638,10 @@ ggplot( df.steps, aes( x = dist, y = angle ) ) +
 ```
 
 Again, we expect to see an average angle of 90 degrees for all distances. See also the [vignette on quality control](./QC.html).
+
+
+```{r, echo = FALSE}
+# Reset par() settings
+par(oldpar)
+```
+

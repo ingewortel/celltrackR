@@ -15,6 +15,9 @@ selectTracks(x, measure, lower, upper)
 
 \item{upper}{specifies the upper bound (inclusive) of the allowable measure.}
 }
+\value{
+A \code{\link{tracks}} object with the selected subset of tracks.
+}
 \description{
 Given a tracks object, extract a subset based on upper and lower bounds of a certain
 measure. For instance, extract all tracks with a certain minimum length.

@@ -12,6 +12,9 @@ plot3d(x, ...)
 \item{...}{further arguments to be passed on to
 \link[scatterplot3d]{scatterplot3d}}
 }
+\value{
+None.
+}
 \description{
 Takes an input tracks object and plots them in 3D using the
 \link[scatterplot3d]{scatterplot3d} function.
@@ -20,4 +23,5 @@ Takes an input tracks object and plots them in 3D using the
 if( require("scatterplot3d",quietly=TRUE) ){
   plot3d( TCells )
 }
+
 }

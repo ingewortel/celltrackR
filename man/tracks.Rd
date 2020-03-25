@@ -31,6 +31,9 @@ tracks(...)
 
  For \code{as.tracks}, further arguments passed to methods (currently not used).}
 }
+\value{
+A \code{tracks} object.
+}
 \description{
 The function \code{tracks} is used to create tracks objects. \code{as.tracks} coerces
 its argument to a tracks object, and \code{is.tracks} tests for tracks objects.

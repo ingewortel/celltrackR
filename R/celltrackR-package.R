@@ -141,6 +141,7 @@ NULL
 #'
 #' @param opencmd The command used to open pdfs from the command line.
 #'
+#' @return None
 #'
 #' @export
 cheatsheet <- function( opencmd = NULL )

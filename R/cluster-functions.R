@@ -95,6 +95,8 @@ clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method
       dendextend::labels_colors(dend) <- colors_to_use
     }
 
+	oldpar <- graphics::par(no.readonly = TRUE)
+	on.exit(graphics::par(oldpar))
     graphics::par( cex = 0.7 )
     graphics::plot( dend )
     if( !is.null(labels) ){
@@ -117,6 +119,8 @@ clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method
     # plotting area
     nc <- 2
     nrow <- ceiling( ncol(values)/nc )
+    oldpar <- graphics::par(no.readonly = TRUE)
+	on.exit(graphics::par(oldpar))
     graphics::par( mfrow=c(nrow, nc ), xpd = TRUE )
 
     # make plots for each feature
@@ -236,6 +240,8 @@ trackFeatureMap <- function( tracks, measures, scale = TRUE, labels = NULL, meth
     } else {
       lab <- rep(1,length( tracks ) )
     }
+    oldpar <- graphics::par(no.readonly = TRUE)
+	on.exit(graphics::par(oldpar))
     graphics::par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE )
     graphics::plot( clust, col = lab )
     if( !is.null(labels)){

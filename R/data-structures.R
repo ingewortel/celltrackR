@@ -112,6 +112,8 @@ as.data.frame.tracks <- function(x, row.names = NULL, optional = FALSE,
 #' @inheritParams read.tracks.csv
 #' @param x the data frame to be coerced to a \code{tracks} object.
 #'
+#' @return A \code{tracks} object.
+#'
 #' @export
 as.tracks.data.frame <- function(x, id.column=1, time.column=2,
                                  pos.columns=c(3,4,5), scale.t=1,
@@ -161,6 +163,7 @@ as.tracks.data.frame <- function(x, id.column=1, time.column=2,
 `[.tracks` <- function(x,y) as.tracks(as.list(x)[y])
 
 #' @rdname tracks
+#' @return A \code{tracks} object.
 #' @export
 as.tracks <- function(x, ...)
   UseMethod("as.tracks")
@@ -177,6 +180,9 @@ as.tracks.list <- function(x, ...)
 #'
 #' @param x the \code{tracks} object to be coerced to a list.
 #' @param ... further arguments to be passed from or to other methods.
+#' @return A generic list of single tracks, where each track is a matrix with 
+#' \code{t/delta.t} rows and 4 columns. This looks a lot like a tracks object,
+#' except that its class is not "tracks" anymore.	
 #' @export
 as.list.tracks <- function(x, ...)
   structure( x, class="list" )

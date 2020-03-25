@@ -33,6 +33,9 @@ are not considered gaps. This option is ignored for \code{how="interpolate"}.}
 discards all resulting tracks shorter than
 this many positions.}
 }
+\value{
+A \code{\link{tracks}} object with gaps fixed according to the chosen method.
+}
 \description{
 Many common motility analyses, such as mean square displacement plots, assume that
 object positions are recorded at constant time intervals. For some application domains,

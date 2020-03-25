@@ -4,8 +4,7 @@
 \alias{angleToDir}
 \title{Angle with a Reference Direction}
 \usage{
-angleToDir(x, dvec = c(1, 1, 1), from = 1, xdiff = diff(x),
-  degrees = TRUE)
+angleToDir(x, dvec = c(1, 1, 1), from = 1, xdiff = diff(x), degrees = TRUE)
 }
 \arguments{
 \item{x}{a single input track; a matrix whose first column is time and whose

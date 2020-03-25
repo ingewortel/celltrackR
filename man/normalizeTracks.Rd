@@ -9,6 +9,10 @@ normalizeTracks(x)
 \arguments{
 \item{x}{the input \code{tracks} object.}
 }
+\value{
+an output \code{tracks} object with all tracks shifted such that their
+starting position lies at the origin of the coordinate system.
+}
 \description{
 Translates each track in a given set of tracks such that the
 first position is the origin.
@@ -16,4 +20,5 @@ first position is the origin.
 \examples{
 ## normalization of Neutrophil data reveals upward motion
 plot( normalizeTracks( Neutrophils ) )
+
 }

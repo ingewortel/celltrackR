@@ -16,6 +16,9 @@ within the interval spanned by the track timepoints.}
 \code{"linear"} (which uses \code{\link[stats]{approx}} with default values) and
 \code{"spline"} (which uses \code{\link[stats]{spline}} with default values).}
 }
+\value{
+The interpolated track (a matrix or data frame).
+}
 \description{
 Approximates the track positions at given time points using linear interpolation
 (via the \code{\link[stats]{approx}} function).
