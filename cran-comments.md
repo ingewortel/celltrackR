@@ -1,5 +1,5 @@
 ## Resubmission
-This is a resubmission. In this version we have:
+This is a resubmission. As requested, we have made the following changes in this version:
 
 * DESCRIPTION : Updated the Author section using the Authors@R field, declaring 
 	Maintainer, Authors and Contributors with their appropriate roles;
