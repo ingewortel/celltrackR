@@ -68,6 +68,12 @@ clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method
     values <- scale(values)
   }
 
+  # Some of the following will adjust the 'par' settings for plotting.
+  # Ensure that these will be reset to their default values before the function
+  # exits for any reason.
+  oldpar <- graphics::par(no.readonly = TRUE)
+  on.exit(graphics::par(oldpar))
+
   # Compute clustering based on "method"
   if( method == "hclust" ){
     clust <- stats::hclust( stats::dist(values), ...)
@@ -95,8 +101,6 @@ clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method
       dendextend::labels_colors(dend) <- colors_to_use
     }
 
-	oldpar <- graphics::par(no.readonly = TRUE)
-	on.exit(graphics::par(oldpar))
     graphics::par( cex = 0.7 )
     graphics::plot( dend )
     if( !is.null(labels) ){
@@ -104,8 +108,6 @@ clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method
              fill = unique( colors_to_use ),
              border = unique( colors_to_use ), bty = "n")
     }
-    graphics::par( cex = 1 )
-
 
     # For kmeans clustering, plot each feature in the matrix for each of the k clusters.
     # Color points by label if label is given.
@@ -119,8 +121,7 @@ clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method
     # plotting area
     nc <- 2
     nrow <- ceiling( ncol(values)/nc )
-    oldpar <- graphics::par(no.readonly = TRUE)
-	on.exit(graphics::par(oldpar))
+
     graphics::par( mfrow=c(nrow, nc ), xpd = TRUE )
 
     # make plots for each feature
@@ -136,8 +137,6 @@ clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method
 
     }
 
-    # reset par
-    graphics::par( mfrow=c(1,1), xpd = FALSE)
   }
 
   if( return.clust ){
@@ -240,16 +239,19 @@ trackFeatureMap <- function( tracks, measures, scale = TRUE, labels = NULL, meth
     } else {
       lab <- rep(1,length( tracks ) )
     }
+
+    # Before adjusting the 'par' settings for plotting, ensure that they
+    # are reset whenever the function exits for any reason.
     oldpar <- graphics::par(no.readonly = TRUE)
-	on.exit(graphics::par(oldpar))
+	  on.exit(graphics::par(oldpar))
+
+	  # Plot the result
     graphics::par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE )
     graphics::plot( clust, col = lab )
     if( !is.null(labels)){
       graphics::legend("topright", legend=unique(labels), inset=c(-0.1,0),
                        col=unique(lab), pch = 1, cex=0.8)
     }
-    graphics::par( mar=c(5.1, 4.1, 4.1, 2.1), xpd = FALSE )
-
   }
 
   if( return.mapping ){

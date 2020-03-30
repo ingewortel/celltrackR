@@ -20,20 +20,23 @@
 #' subtracks of the same track, the arguments \code{from}, \code{to} and
 #' possibly \code{xdiff} are exploited by \code{\link{aggregate.tracks}}.
 #'
+#' @return
 #' \code{trackLength} sums up the distances between subsequent positsion; in other words,
 #' it estimates the length of the underlying track by linear interpolation (usually
 #' an underestimation). The estimation could be improved in some circumstances by using
-#' \code{\link{interpolateTrack}}.
+#' \code{\link{interpolateTrack}}. The function returns a single, non-negative number.
 #'
 #' \code{duration} returns the time elapsed between \code{x}'s first and last
-#' positions.
+#' positions (a single, non-negative number).
 #'
-#' \code{speed} simply divides \code{\link{trackLength}} by \code{\link{duration}}.
+#' \code{speed} simply divides \code{\link{trackLength}} by \code{\link{duration}}
 #'
 #' \code{displacement} returns the Euclidean distance between the track endpoints
 #' and \code{squareDisplacement} returns the squared Euclidean distance.
 #'
-#' \code{displacementVector} returns the vector between the track endpoints.
+#' \code{displacementVector} returns the vector between the track endpoints. This
+#' vector has an element (can be negative) for each (x,y,z) dimension of the coordinates
+#' in the track.
 #'
 #' \code{maxDisplacement} computes the maximal Euclidean distance of any position
 #' on the track from the first position.
@@ -95,6 +98,7 @@
 #' (Gneiting and Schlather, 2004).
 #'
 #' @name TrackMeasures
+#'
 #'
 #' @seealso \code{\link{AngleAnalysis}} for methods to compute angles and distances
 #'  between pairs of tracks, or of tracks to a reference point, direction, or plane.

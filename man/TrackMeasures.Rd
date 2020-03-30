@@ -67,34 +67,23 @@ remaining columns are a spatial coordinate.}
 
 \item{degrees}{logical; should angles be returned in degrees rather than radians?}
 }
-\description{
-Statistics that can be used to quantify tracks. All of these functions take a single
-track as input and give a single number as output.
-}
-\details{
-Some track measures consider only the first and last position (or steps) of a track,
-and are most useful in conjunction with \code{\link{aggregate.tracks}}; for instance,
-\code{squareDisplacement} combined with \code{\link{aggregate.tracks}} gives a mean
-square displacement plot, and \code{overallAngle} combined with
-\code{\link{aggregate.tracks}} gives a turning angle plot (see the examples for
-\code{\link{aggregate.tracks}}). To speed up computation of these measures on
-subtracks of the same track, the arguments \code{from}, \code{to} and
-possibly \code{xdiff} are exploited by \code{\link{aggregate.tracks}}.
-
+\value{
 \code{trackLength} sums up the distances between subsequent positsion; in other words,
 it estimates the length of the underlying track by linear interpolation (usually
 an underestimation). The estimation could be improved in some circumstances by using
-\code{\link{interpolateTrack}}.
+\code{\link{interpolateTrack}}. The function returns a single, non-negative number.
 
 \code{duration} returns the time elapsed between \code{x}'s first and last
-positions.
+positions (a single, non-negative number).
 
-\code{speed} simply divides \code{\link{trackLength}} by \code{\link{duration}}.
+\code{speed} simply divides \code{\link{trackLength}} by \code{\link{duration}}
 
 \code{displacement} returns the Euclidean distance between the track endpoints
 and \code{squareDisplacement} returns the squared Euclidean distance.
 
-\code{displacementVector} returns the vector between the track endpoints.
+\code{displacementVector} returns the vector between the track endpoints. This
+vector has an element (can be negative) for each (x,y,z) dimension of the coordinates
+in the track.
 
 \code{maxDisplacement} computes the maximal Euclidean distance of any position
 on the track from the first position.
@@ -154,6 +143,20 @@ For non-Brownian motion, however, this relationship
 need not hold. Intuitively, while the Hurst exponent takes a global approach to the
 track's properties, fractal dimension is a local approach to the track's properties
 (Gneiting and Schlather, 2004).
+}
+\description{
+Statistics that can be used to quantify tracks. All of these functions take a single
+track as input and give a single number as output.
+}
+\details{
+Some track measures consider only the first and last position (or steps) of a track,
+and are most useful in conjunction with \code{\link{aggregate.tracks}}; for instance,
+\code{squareDisplacement} combined with \code{\link{aggregate.tracks}} gives a mean
+square displacement plot, and \code{overallAngle} combined with
+\code{\link{aggregate.tracks}} gives a turning angle plot (see the examples for
+\code{\link{aggregate.tracks}}). To speed up computation of these measures on
+subtracks of the same track, the arguments \code{from}, \code{to} and
+possibly \code{xdiff} are exploited by \code{\link{aggregate.tracks}}.
 }
 \examples{
 ## show a turning angle plot with error bars for the T cell data.

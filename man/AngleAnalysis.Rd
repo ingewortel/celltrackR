@@ -3,6 +3,11 @@
 \name{AngleAnalysis}
 \alias{AngleAnalysis}
 \title{Angle Analysis}
+\value{
+This page is for documentation only and provides an overview of angle analysis functions
+and their use cases. The return values of each of these functions are documented separately;
+please follow the link to the documentation page of that specific function.
+}
 \description{
 Analyzing angles to reference directions, points, or planes can be useful to detect
 artefacts and/or directionality in tracking datasets (Beltman et al, 2009). All these

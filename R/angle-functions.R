@@ -55,6 +55,10 @@
 #' angle analyses.
 #' \code{browseVignettes( package = "celltrackR" )}
 #'
+#' @return This page is for documentation only and provides an overview of angle analysis functions
+#' and their use cases. The return values of each of these functions are documented separately;
+#' please follow the link to the documentation page of that specific function.
+#'
 #' @examples
 #' ## Plotting the angle versus the distance to a reference point can be informative to
 #' ## detect biased movement towards that point. We should be suspicious especially
