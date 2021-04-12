@@ -1,5 +1,6 @@
 ^Meta$
 ^doc$
+^man/figures/README-*.png$
 ^.editorconfig$
 ^README\.Rmd$
 ^README.md$
