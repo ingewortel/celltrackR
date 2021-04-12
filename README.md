@@ -44,13 +44,13 @@ implemented and can be used to visualize these datasets:
     plot( TCells, col=1 )
 ```
 
-![](.README/README-unnamed-chunk-4-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
     plot( BCells, col=2 )
 ```
 
-![](.README/README-unnamed-chunk-4-2.png)<!-- -->
+![](man/figures/README-unnamed-chunk-4-2.png)<!-- -->
 
 To generate a simple mean square displacement plot for the example
 dataset \`TCells’, use:
@@ -60,7 +60,7 @@ dataset \`TCells’, use:
     plot( msqd, type='l' )
 ```
 
-![](.README/README-unnamed-chunk-5-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
 
 This computes the squared displacement (MSD) for over all subtracks of
 the dataset, and computes the average stratified by subtrack length. To
@@ -71,14 +71,13 @@ compute the MSD for non-overlapping subtracks only, use:
     plot( msqd, type='l' )
 ```
 
-![](.README/README-unnamed-chunk-6-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
 
 MSD estimates can be biased in applications with a finite field of view
 (such as microscopy), because slower objects remain in the field of view
 for longer times. This can complicate comparisons between different
 populations. We may thus wish to restrict our comparison to subtracks of
-a certain (short) length. This can be done as
-follows:
+a certain (short) length. This can be done as follows:
 
 ``` r
     msqd.t <- aggregate( TCells, squareDisplacement, subtrack.length=1:5, max.overlap=0 )
@@ -88,7 +87,7 @@ follows:
     lines( msqd.b, col=2 )
 ```
 
-![](.README/README-unnamed-chunk-7-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-7-1.png)<!-- -->
 
 Another common measure to analyze tracks is the autocovariance function;
 geometrically speaking, this is the dot product between pairs of pairs
@@ -105,7 +104,7 @@ cells and B cells datasets, we can use:
     lines( angle.b, col=2 )
 ```
 
-![](.README/README-unnamed-chunk-8-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-8-1.png)<!-- -->
 
 Many other ways to quantify tracks are implemented in the package and
 described in the PDF documentation. For an overview of the available

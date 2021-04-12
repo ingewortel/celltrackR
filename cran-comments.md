@@ -1,4 +1,14 @@
 ## Resubmission
+Edit 30-03-2020 (2): Upon request, we have:
+
+* DESCRIPTION : updated the date field.
+
+Edit 30-03-2020: Upon request, we have made the following, additional changes:
+
+* DESCRIPTION : Added references as requested;
+* R/ : Fixed problem with resetting par() settings twice in one function;
+* man/ : Added \value to .Rd file TrackMeasures.Rd.
+
 This is a resubmission. As requested, we have made the following changes in this version:
 
 * DESCRIPTION : Updated the Author section using the Authors@R field, declaring 
