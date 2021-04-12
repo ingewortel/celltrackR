@@ -394,6 +394,7 @@ normalizeToDuration <- function(x) {
 #'
 #' @importFrom stats aggregate
 #'
+#' @aliases aggregate
 #' @export
 aggregate.tracks <- function( x, measure, by="subtracks", FUN=mean,
     subtrack.length=seq(1, (maxTrackLength(x)-1)),

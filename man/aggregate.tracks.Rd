@@ -2,6 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{aggregate.tracks}
 \alias{aggregate.tracks}
+\alias{aggregate}
 \title{Compute Summary Statistics of Subtracks}
 \usage{
 \method{aggregate}{tracks}(
