@@ -371,7 +371,7 @@ hurstExponent <- function(x) {
 #' @export
 fractalDimension <- function(x){
   if( !requireNamespace("fractaldim",quietly=TRUE) ){
-    stop("This function requires the 'fractaldim' package.")
+    stop("This function requires the 'fractaldim' package; please install manually before continuing: install.packages('fractaldim')")
   }
   return(fractaldim::fd.estim.boxcount(x[,-1])$fd)
 }

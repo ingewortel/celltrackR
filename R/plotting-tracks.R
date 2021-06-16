@@ -176,7 +176,7 @@ plotTrackMeasures <- function(x, measure.x, measure.y, add=FALSE,
 #' @export
 plot3d <- function(x,...){
   if( !requireNamespace("scatterplot3d",quietly=TRUE) ){
-    stop("This function requires the package 'scatterplot3d'.")
+    stop("This function requires the package 'scatterplot3d'; please install manually before continuing: install.packages('scatterplot3d')")
   }
   tracks_df <- as.data.frame.tracks(
     lapply( x, function(t) rbind(t,rep(NA,ncol(t)) ) ) )
