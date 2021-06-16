@@ -41,9 +41,9 @@ Imports:
     grDevices,
     graphics,
     utils,
-    ellipse
+    ellipse,
+    pracma
 Suggests:
-    pracma,
     scatterplot3d,
     fractaldim,
     testthat,
