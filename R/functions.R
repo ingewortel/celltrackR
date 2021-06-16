@@ -751,14 +751,14 @@ timeStep <- function( x, FUN=median, na.rm=FALSE ){
 #' Interpolate Track Positions
 #'
 #' Approximates the track positions at given time points using linear interpolation
-#' (via the \code{\link[stats]{approx}} function).
+#' (via the \code{\link[stats:approxfun]{approx}} function).
 #'
 #' @param x the input track (a matrix or data frame).
 #' @param t the times at which to approximate track positions. These must lie
 #' within the interval spanned by the track timepoints.
 #' @param how specifies how to perform the interpolation. Possible values are
-#' \code{"linear"} (which uses \code{\link[stats]{approx}} with default values) and
-#' \code{"spline"} (which uses \code{\link[stats]{spline}} with default values).
+#' \code{"linear"} (which uses \code{\link[stats:approxfun]{approx}} with default values) and
+#' \code{"spline"} (which uses \code{\link[stats:splinefun]{spline}} with default values).
 #'
 #' @examples
 #' ## Compare interpolated and non-interpolated versions of a track
