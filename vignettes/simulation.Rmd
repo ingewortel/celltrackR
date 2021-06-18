@@ -254,3 +254,236 @@ Indeed, the autocovariance drops less steeply for the real T cell data, which in
 # Reset par() settings
 par(oldpar)
 ```
+
+
+# 5 Fitting models on the MSD
+
+In the above, we saw that a Brownian motion model underestimated the MSD of the real T-cell dataset. Here, we show how we can do better by fitting models on the MSD.
+
+### 5.1 Before we start: dimensionality and imaging windows
+
+Before we start, let's look at the data we are fitting in more detail. If we look at the dimensions of the T-cell dataset:
+
+```{r}
+boundingBox( TCells )
+```
+
+we see that the imaging window is limited to roughly 200 x 200 x 50 $\mu$m; thus, it is smaller in the z-dimension. 
+
+A limited imaging window like this can cause artefacts in the MSD curve because cells can not be followed after they leave the imaging window. Thus, for larger $\Delta t$, we underestimate the mean (squared) displacement because the faster cells have left the imaging window and do not end up in our data. In our case, this will be particularly problematic in the z-dimension. Thus, for now we will not fit the 3D data, but instead use the 2D projection on the xy-plane:
+
+```{r}
+Txy <- projectDimensions( TCells, c("x","y") )
+```
+
+Let's look at the MSD curve we get:
+
+```{r fig.width = 6}
+# Compute MSD
+msdData <- aggregate( Txy, squareDisplacement, FUN = "mean.se" )
+
+# Scale time axis: by default, this is in number of steps; convert to minutes.
+tau <- timeStep( Txy ) / 60 # in minutes
+msdData$dt <- msdData$i * tau
+
+# plot
+ggplot( msdData, aes( x = dt, y = mean ) ) +
+  geom_ribbon( alpha = 0.3, aes( ymin = lower, ymax = upper ) ) +
+  geom_line() +
+  labs( x = expression( Delta*"t (min)" ), 
+        y = expression( "displacement"^2*"("*mu*"m"^2*")") ) +
+  coord_cartesian( xlim = c(0,NA), ylim = c(0,NA), expand = FALSE ) +
+  theme_bw()
+```
+
+Two things are worth noting here: 
+
+1. the larger $\Delta$t, the higher the uncertainty (SE); this is because at larger $\Delta$t, we have fewer subtracks of that length, and thus less data to compute a mean on;
+
+2. the MSD curve has a weird shape. This is actually the case because of the limited imaging window problem described above. We will therefore use only the first part of the curve (the first 5 minutes), where we have enough data and the imaging window problem remains manageable.
+
+```{r}
+fitThreshold <- 5 # minutes
+```
+
+Now, let's see how we can fit the two simulation models: `brownianTrack` and `beaucheminTrack` on this MSD curve.
+
+
+### 5.2 Fitting Brownian motion based on the diffusion coefficient
+
+The `brownianTrack` function takes 4 arguments: the number of steps to simulate, the number of dimensions to simulate in, and the mean and sd of the step sizes $(\Delta x, \Delta y, \Delta z) in each dimension. The number of steps depends on the time we wish to simulate, the dimension is 2 (since we projected the T cells on the xy plane) and the mean of an unbiased random walk is always 0. That leaves the standard deviation.
+
+For Brownian motion, the dimension-wise variance of the step size is related to the "diffusion coefficient" $D$ as:
+
+$$\text{var} = 2D\tau$$
+with $\tau$ the step duration. For the standard deviation, we get:
+$$\sigma_\text{dim} = \sqrt{2D\tau}$$
+we already know the $\tau$ of our data, and can obtain $D$ by fitting Furth's formula for the mean squared displacement $\langle d^2 \rangle$:
+
+$$\langle d^2 \rangle (\Delta t) = 2Dn_d \big( \Delta t - P(1-e^{-\Delta t/P} ) )$$
+Here, $D$ is the diffusion coefficient, $P$ the persistence time, $\Delta t$ the time resolution we are looking at, and $n_d$ the number of dimensions.
+
+We can fit this function using R's `nls()` on the MSD data to get $D$ and $P$:
+
+
+```{r}
+fuerthMSD <- function( dt, D, P, dim ){
+  return( 2*dim*D*( dt - P*(1-exp(-dt/P) ) ) )
+}
+
+# Fit this function using nls. We fit only on the data where 
+# dt < fitThreshold (see above), and need to provide reasonable starting
+# values or the fitting algorithm will not work properly. 
+model <- nls( mean ~ fuerthMSD( dt, D, P, dim = 2 ), 
+              data = msdData[ msdData$dt < fitThreshold, ], 
+              start = list( D = 10, P = 0.5 ), 
+              lower = list( D = 0.001, P = 0.001 ), 
+              algorithm = "port" 
+)
+D <- coefficients(model)[["D"]] # this is now in units of um^2/min
+P <- coefficients(model)[["P"]] # persistence time in minutes
+D
+P
+```
+
+Note that we will not use $P$. However, we fit Furth's formula with a non-zero persistence time $P$ because we would otherwise underestimate $D$.
+
+Now, given $D$, simulate some tracks:
+
+```{r fig.width = 5, fig.height = 5}
+# simulate tracks using the estimated D. We simulate with time unit seconds
+# to match the data, so divide D by 60 to go from um^2/min to um^2/sec.
+# The dimension-wise variance of brownian motion is 2*D*tau (with tau the step
+# duration), so use this to parametrise the model:
+tau <- timeStep( Txy )
+brownianScaled <- function( nsteps, D, tau, dim = 2 ){
+  tr <- brownianTrack( nsteps = nsteps, dim = 2, sd = sqrt( 2*(D/60)*tau ) )
+  tr[,"t"] <- tr[,"t"]*tau # scale time
+  return(tr)
+}
+brownian.tracks <- simulateTracks( 1000,  
+                                   brownianScaled( nsteps = maxTrackLength(Txy ),
+                                                   D = D, tau = tau ) )
+plot( brownian.tracks[1:10], main = "brownian motion")
+
+```
+
+Finally, get MSD and compare it to data:
+
+```{r fig.width = 6}
+# get msd of the simulated tracks and scale time to minutes
+msdBrownian <- aggregate( brownian.tracks, squareDisplacement, FUN = "mean.se" )
+tau <- timeStep( brownian.tracks ) / 60 # in minutes
+msdBrownian$dt <- msdBrownian$i * tau
+
+# Get Furth MSD using fitted P and D for comparison
+msdFuerth <- data.frame( dt = msdBrownian$dt, 
+                         mean = fuerthMSD( msdBrownian$dt, D, P, dim = 2 ))
+
+# plot
+ggplot( msdBrownian, aes( x = dt, y = mean) ) +
+  geom_point( data = msdData, shape = 21, aes( fill = dt < fitThreshold ), color = "blue", show.legend = FALSE ) +
+  geom_line( data = msdFuerth, color = "red", lty = 2 ) +
+  geom_line( )+
+  scale_fill_manual( values = c( "TRUE" = "blue", "FALSE" = "transparent" ) ) +
+  scale_x_continuous( limits = c(0,NA), expand = c(0,0) ) +
+  scale_y_continuous( limits = c(0,NA), expand = c(0,0) ) +
+  labs( color = NULL, x = expression( Delta*"t (min)"), 
+        y = expression( "displacement"^2*"("*mu*"m"^2*")") , fill = NULL ) +
+  theme_bw()
+```
+
+Here, we see the data in blue, where the colored circles are the data the fit is based on. The red line is the Furth's MSD, the black line is the Brownian model. The Brownian model does not describe the data well especially on short time scales, because it does not contain the persistence that the Furth formula does. Nevertheless, this fit is better than the one with matched displacements on short time scales.
+
+Next, let's look at a slightly more complicated model.
+
+### 5.3 Fitting the Beauchemin model
+
+We now use a similar approach to fit the model proposed by [Beauchemin et al (2007)](https://www.ncbi.nlm.nih.gov/pubmed/17442932), which was designed for T-cell migration in the lymph node. 
+
+The MSD of this model can be derived analytically [(Textor et al (2013), proposition 12)](https://doi.org/10.1186/1471-2105-14-S6-S10) : 
+
+$$\langle d^2 \rangle (\Delta t)= 2Mt - 2Mt_\text{free} \cdot \begin{cases}
+\frac{1}{3} & t \geq t_\text{free} \\
+\frac{1}{3} \big(t/t_\text{free}\big)^3 - \big(t/t_\text{free}\big)^2 + \big(t/t_\text{free}\big) & t < t_\text{free}
+\end{cases}$$
+
+where $M$ is the motility coefficient, which should be the same as our diffusion coefficient $D$ (see above). $M$ is related to the model parameters [(Textor et al (2013), equation 2)](https://doi.org/10.1186/1471-2105-14-S6-S10):
+
+$$M = \frac{v_\text{free}^2\cdot t_\text{free}^2}{6(t_\text{free}+t_\text{pause})}$$
+
+We should note here that the Beauchemin has three parameters ($v_\text{free}$, $t_\text{free}$, $t_\text{pause}$), but that these are underdefined based on MSD: multiple parameter combinations can give the exact same MSD (see [Beauchemin et al (2007)](https://www.ncbi.nlm.nih.gov/pubmed/17442932), [Textor et al (2013)](https://doi.org/10.1186/1471-2105-14-S6-S10)). This means we cannot fit all three parameters based on the MSD. Here, we'll set $t_\text{pause}$ to the literature value of 0.5 minute, and fit the other parameters $v_\text{free}$ and $t_\text{free}$ based on the MSD to show how this works: 
+
+```{r}
+# analytical formula
+beauchemin.msd <- function( x, M=60, t.free=2, t.pause=0.5, dim=2 ){
+  v.free <- sqrt( 6 * M * (t.free+t.pause) ) / t.free
+  M <- (v.free^2 * t.free^2) / 6 / (t.free + t.pause)
+  multiplier <- rep(1/3, length(x))
+  xg <- x[x<t.free]
+  multiplier[x<t.free] <- 1/3 * (xg/t.free)^3 - (xg/t.free)^2 + (xg/t.free)
+  2 * M * x * dim - 2 * M * dim * t.free * multiplier
+}
+# Again, fit on the first fitThreshold min, before confinement becomes an issue.
+beaucheminFit <- nls( mean ~ beauchemin.msd( dt, M, t.free ), 
+                      msdData[ msdData$dt < fitThreshold, ], 
+                      start=list(M=30, t.free=1))
+
+# extract parameters M and t.free
+M <- coef(beaucheminFit)[["M"]] # in um^2/min
+t.free <- coef(beaucheminFit)[["t.free"]] # in min
+```
+
+If everything went correctly, $M$ should not be too different from the diffusion coefficient $D$ we fitted earlier:
+
+```{r}
+c( D = D, M = M )
+```
+
+Indeed, they are very similar, which is good news.
+
+Using these fitted values, get the MSD and compare to data:
+
+```{r fig.width = 6}
+# Get the fitted MSD using these values
+msdBeauchemin <- data.frame(
+  dt = msdBrownian$dt,
+  mean = beauchemin.msd( msdBrownian$dt, M, t.free )
+)
+
+# plot
+ggplot( msdBeauchemin, aes( x = dt, y = mean) ) +
+  geom_point( data = msdData, shape = 21, aes( fill = dt < fitThreshold ), color = "blue", show.legend = FALSE ) +
+  geom_line( )+
+  scale_fill_manual( values = c( "TRUE" = "blue", "FALSE" = "transparent" ) ) +
+  scale_x_continuous( limits = c(0,NA), expand = c(0,0) ) +
+  scale_y_continuous( limits = c(0,NA), expand = c(0,0) ) +
+  labs( color = NULL, x = expression( Delta*"t (min)"), 
+        y = expression( "displacement"^2*"("*mu*"m"^2*")") , fill = NULL ) +
+  theme_bw()
+```
+
+This model seems to fit the data much better!
+
+Now, let's use the discovered parameters to simulate some tracks on a longer time scale:
+
+```{r fig.width=5, fig.height = 5}
+# t.free has been fitted; set t.pause to its fixed value and 
+# compute v.free from the fitted M:
+t.pause <- 0.5 # fixed
+v.free <- sqrt( 6 * M * (t.free+t.pause) ) / t.free
+
+# simulate tracks using the fitted parameters.
+# we don't use the arguments p.persist, p.bias, bias.dir, and taxis.mode,
+# since these are not parameters of the original Beauchemin model.
+tau <- timeStep( Txy )
+beauchemin.tracks <- simulateTracks( 10,  
+                                   beaucheminTrack( sim.time = 10*max( timePoints( Txy) ),
+                                                    delta.t = tau,
+                                                    t.free = t.free,
+                                                    v.free = v.free,
+                                                    t.pause = t.pause ) )
+
+plot( beauchemin.tracks, main = "Beauchemin tracks")
+```
+

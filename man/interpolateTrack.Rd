@@ -13,15 +13,15 @@ interpolateTrack(x, t, how = "linear")
 within the interval spanned by the track timepoints.}
 
 \item{how}{specifies how to perform the interpolation. Possible values are
-\code{"linear"} (which uses \code{\link[stats]{approx}} with default values) and
-\code{"spline"} (which uses \code{\link[stats]{spline}} with default values).}
+\code{"linear"} (which uses \code{\link[stats:approxfun]{approx}} with default values) and
+\code{"spline"} (which uses \code{\link[stats:splinefun]{spline}} with default values).}
 }
 \value{
 The interpolated track (a matrix or data frame).
 }
 \description{
 Approximates the track positions at given time points using linear interpolation
-(via the \code{\link[stats]{approx}} function).
+(via the \code{\link[stats:approxfun]{approx}} function).
 }
 \examples{
 ## Compare interpolated and non-interpolated versions of a track
