@@ -8,7 +8,7 @@ test_that("turning angles work",{
 })
 
 test_that("maxTrackLength works",{
-	expect_equal( maxTrackLength(TCells), 39 )
-	expect_equal( maxTrackLength(BCells), 39 )
-	expect_equal( maxTrackLength(Neutrophils), 55 )
+	expect_equal( maxTrackLength(TCells), 40 )
+	expect_equal( maxTrackLength(BCells), 40 )
+	expect_equal( maxTrackLength(Neutrophils), 40 )
 })
