@@ -1,5 +1,5 @@
 set.seed(2345)
-
+tSample <- TCells[ sample( names(TCells), 10 ) ]
 
 # vecAngle
 a <- c(1,2,3)
@@ -51,7 +51,7 @@ test_that("vecAngle returns correct output", {
 
 # angleToPoint
 test_that("angleToPoint responds to input correctly", {
-  expect_error( angleToPoint( TCells[[1]], p = c(1,1) ),
+  expect_error( angleToPoint( TCells[[1]], p = c(1,1,1) ),
     "In angleToPoint: Reference point coordinates must have the same number of dimensions as
          coordinates in the tracking data." )
   expect_warning( angleToPoint( TCells[[1]], p = TCells[[1]][1,-1] ),
@@ -61,66 +61,99 @@ test_that("angleToPoint responds to input correctly", {
 
 t.steps <- subtracks( TCells, 1 )
 test_that("angleToPoint returns correct output", {
-  expect_true( is.numeric( angleToPoint( TCells[[1]], p = c(1,1,1) ) ) )
-  expect_true( all( is.numeric( sapply( t.steps, angleToPoint, p = rnorm(3) ) ) ) )
-  expect_true( all( ( sapply( t.steps, angleToPoint, p = rnorm(3) ) ) >= 0 ) )
-  expect_true( all( ( sapply( t.steps, angleToPoint, p = rnorm(3) ) ) <= 180 ) )
-  expect_true( all( ( sapply( t.steps, angleToPoint, p = rnorm(3), degrees = FALSE ) ) <= pi ) )
+  expect_true( is.numeric( angleToPoint( TCells[[1]], p = c(1,1) ) ) )
+  expect_true( all( is.numeric( sapply( t.steps, angleToPoint, p = rnorm(2) ) ) ) )
+  expect_true( all( ( sapply( t.steps, angleToPoint, p = rnorm(2) ) ) >= 0 ) )
+  expect_true( all( ( sapply( t.steps, angleToPoint, p = rnorm(2) ) ) <= 180 ) )
+  expect_true( all( ( sapply( t.steps, angleToPoint, p = rnorm(2), degrees = FALSE ) ) <= pi ) )
+})
+
+# fake track of two steps that starts at (0,0), via a random coordinate, to (0,1);
+# angle to (1,0) should be 90 degrees no matter the middle coordinate.
+fake.track <- rbind( c(0,0), 10*rnorm(2), c(0,1) )
+fake.track <- cbind( seq(1,3), fake.track )
+colnames( fake.track ) <- c("t","x","y")
+
+test_that("angleToPoint returns correct value", {
+  expect_equal( angleToPoint( fake.track, p = c(1,0) ), 90 )
 })
 
 # angleToDir
 test_that("angleToDir responds to input correctly", {
-  expect_error( angleToDir( TCells[[1]], dvec = c(1,1) ),
+  expect_error( angleToDir( TCells[[1]], dvec = c(1,1,1) ),
                 "In angleToDir: Direction vector must have the same number of dimensions as
          coordinates in the tracking data." )
 })
 
 test_that("angleToDir returns correct output", {
-  expect_true( is.numeric( angleToDir( TCells[[1]], dvec = c(1,1,1) ) ) )
-  expect_true( all( is.numeric( sapply( t.steps, angleToDir, dvec = rnorm(3) ) ) ) )
-  expect_true( all( ( sapply( t.steps, angleToDir, dvec = rnorm(3) ) ) >= 0 ) )
-  expect_true( all( ( sapply( t.steps, angleToDir, dvec = rnorm(3) ) ) <= 180 ) )
-  expect_true( all( ( sapply( t.steps, angleToDir, dvec = rnorm(3), degrees = FALSE ) ) <= pi ) )
+  expect_true( is.numeric( angleToDir( TCells[[1]], dvec = c(1,1) ) ) )
+  expect_true( all( is.numeric( sapply( t.steps, angleToDir, dvec = rnorm(2) ) ) ) )
+  expect_true( all( ( sapply( t.steps, angleToDir, dvec = rnorm(2) ) ) >= 0 ) )
+  expect_true( all( ( sapply( t.steps, angleToDir, dvec = rnorm(2) ) ) <= 180 ) )
+  expect_true( all( ( sapply( t.steps, angleToDir, dvec = rnorm(2), degrees = FALSE ) ) <= pi ) )
+})
+
+# fake track of two steps that starts at (0,0), via a random coordinate, to (0,1);
+# angle to direction (1,0) should be 90 degrees no matter the middle coordinate.
+fake.track <- rbind( c(0,0), 10*rnorm(2), c(0,1) )
+fake.track <- cbind( seq(1,3), fake.track )
+colnames( fake.track ) <- c("t","x","y")
+
+test_that("angleToDir returns correct value", {
+  expect_equal( angleToDir( fake.track, dvec = c(1,0) ), 90 )
 })
 
 # angleToPlane
+load( system.file("extdata", "TCellsRaw.rda", package="celltrackR" ) )
 test_that("angleToPlane responds to input correctly", {
-  expect_error( angleToPlane( TCells[[1]], p1 = c(1,1), p2 = c(0,0,0), p3 = c(1,1,1) ),
+  expect_error( angleToPlane( TCells[[1]], p1 = c(0,1), p2 = c(0,0,0), p3 = c(1,1) ),
                 "In angleToPlane: Points p1,p2,p3 specifying the plane must have the same number of coordinates." )
-  expect_error( angleToPlane( projectDimensions(TCells[[1]]), p1 = c(1,1), p2 = c(0,0), p3 = c(1,0) ) ,
+  expect_error( angleToPlane( projectDimensions(TCellsRaw[[1]]), p1 = c(1,1), p2 = c(0,0), p3 = c(1,0) ) ,
                 "In angleToPlane: Method is only supported for three-dimensional data.")
-  expect_error( angleToPlane( TCells[[1]], p1 = c(1,1), p2 = c(0,0), p3 = c(1,0) ) ,
+  expect_error( angleToPlane( TCellsRaw[[1]], p1 = c(1,1), p2 = c(0,0), p3 = c(1,0) ) ,
                 "In angleToPlane: Method is only supported for three-dimensional data.")
-  expect_error( angleToPlane( TCells[[1]], p1 = c(1,1,1), p2 = c(0,0,0), p3 = c(1,1,1) ),
+  expect_error( angleToPlane( TCellsRaw[[1]], p1 = c(1,1,1), p2 = c(0,0,0), p3 = c(1,1,1) ),
                 "In angleToPlane: Points p1, p2, and p3 must be three unique points!" )
-  expect_error( angleToPlane( TCells[[1]], p1 = c(1,1,1), p2 = c(0,0,0), p3 = c(2,2,2) ),
+  expect_error( angleToPlane( TCellsRaw[[1]], p1 = c(1,1,1), p2 = c(0,0,0), p3 = c(2,2,2) ),
                 "In angleToPlane: Points p1, p2, and p3 are on the same line and do not fully specify a plane." )
 })
 
 p1 <- rnorm(3)
 p2 <- p1 + c(1,2,3)
 p3 <- p1 + c(-1,2,-3)
+traw.steps <- subtracks( TCellsRaw, 1 )
 test_that("angleToPlane returns correct output", {
-  expect_true( is.numeric( angleToPlane( TCells[[1]], p1 = c(1,1,1), p2 = c(0,0,0), p3 = c(1,0,0) ) ) )
-  expect_true( all( is.numeric( sapply( t.steps, angleToPlane, p1 = p1, p2 = p2, p3 = p3 ) ) ) )
-  expect_true( all( ( sapply( t.steps, angleToPlane, p1 = p1, p2 = p2, p3 = p3 ) ) >= 0 ) )
-  expect_true( all( ( sapply( t.steps, angleToPlane, p1 = p1, p2 = p2, p3 = p3 ) ) <= 90 ) )
-  expect_true( all( ( sapply( t.steps, angleToPlane, p1 = p1, p2 = p2, p3 = p3, degrees = FALSE ) ) <= pi/2 ) )
+  expect_true( is.numeric( angleToPlane( TCellsRaw[[1]], p1 = c(1,1,1), p2 = c(0,0,0), p3 = c(1,0,0) ) ) )
+  expect_true( all( is.numeric( sapply( traw.steps, angleToPlane, p1 = p1, p2 = p2, p3 = p3 ) ) ) )
+  expect_true( all( ( sapply( traw.steps, angleToPlane, p1 = p1, p2 = p2, p3 = p3 ) ) >= 0 ) )
+  expect_true( all( ( sapply( traw.steps, angleToPlane, p1 = p1, p2 = p2, p3 = p3 ) ) <= 90 ) )
+  expect_true( all( ( sapply( traw.steps, angleToPlane, p1 = p1, p2 = p2, p3 = p3, degrees = FALSE ) ) <= pi/2 ) )
+})
+
+# fake track of two steps that starts at (0,0,0), via a random coordinate, to (0,1,0);
+# angle to z-plane should be 0 degrees no matter the middle coordinate because the 
+# overall displacement lies in the xy plane.
+fake.track3d <- rbind( c(0,0,0), 10*rnorm(3), c(0,1,0) )
+fake.track3d <- cbind( seq(1,3), fake.track3d )
+colnames( fake.track3d ) <- c("t","x","y","z")
+
+test_that("angleToPlane returns correct value", {
+  expect_equal( angleToPlane( fake.track3d, p1 = c(1,1,0), p2 = c(0,0,0), p3 = c(1,0,0) ), 0 )
 })
 
 
 
 # distanceToPlane
 test_that("distanceToPlane responds to input correctly", {
-  expect_error( distanceToPlane( TCells[[1]], p1 = c(1,1), p2 = c(0,0,0), p3 = c(1,1,1) ),
+  expect_error( distanceToPlane( TCellsRaw[[1]], p1 = c(1,1), p2 = c(0,0,0), p3 = c(1,1,1) ),
                 "In distanceToPlane: Points p1,p2,p3 specifying the plane must have the same number of coordinates." )
-  expect_error( distanceToPlane( TCells[[1]], p1 = c(1,1), p2 = c(0,0), p3 = c(1,0) ) ,
+  expect_error( distanceToPlane( TCellsRaw[[1]], p1 = c(1,1), p2 = c(0,0), p3 = c(1,0) ) ,
                 "In distanceToPlane: Method is only supported for three-dimensional data.")
-  expect_error( distanceToPlane( projectDimensions(TCells[[1]]), p1 = c(1,1), p2 = c(0,0), p3 = c(1,0) ) ,
+  expect_error( distanceToPlane( projectDimensions(TCellsRaw[[1]]), p1 = c(1,1), p2 = c(0,0), p3 = c(1,0) ) ,
                 "In distanceToPlane: Method is only supported for three-dimensional data.")
-  expect_error( distanceToPlane( TCells[[1]], p1 = c(1,1,1), p2 = c(0,0,0), p3 = c(1,1,1) ),
+  expect_error( distanceToPlane( TCellsRaw[[1]], p1 = c(1,1,1), p2 = c(0,0,0), p3 = c(1,1,1) ),
                 "In distanceToPlane: Points p1, p2, and p3 must be three unique points!" )
-  expect_error( distanceToPlane( TCells[[1]], p1 = c(1,1,1), p2 = c(0,0,0), p3 = c(2,2,2) ),
+  expect_error( distanceToPlane( TCellsRaw[[1]], p1 = c(1,1,1), p2 = c(0,0,0), p3 = c(2,2,2) ),
                 "In distanceToPlane: Points p1, p2, and p3 are on the same line and do not fully specify a plane." )
 })
 
@@ -128,64 +161,64 @@ p1 <- rnorm(3)
 p2 <- p1 + c(1,2,3)
 p3 <- p1 + c(-1,2,-3)
 test_that("distanceToPlane returns correct output", {
-  expect_true( is.numeric( distanceToPlane( TCells[[1]], p1 = c(1,1,1), p2 = c(0,0,0), p3 = c(1,0,0) ) ) )
-  expect_true( all( is.numeric( sapply( t.steps, distanceToPlane, p1 = p1, p2 = p2, p3 = p3 ) ) ) )
-  expect_true( all( ( sapply( t.steps, distanceToPlane, p1 = p1, p2 = p2, p3 = p3 ) ) >= 0 ) )
+  expect_true( is.numeric( distanceToPlane( TCellsRaw[[1]], p1 = c(1,1,1), p2 = c(0,0,0), p3 = c(1,0,0) ) ) )
+  expect_true( all( is.numeric( sapply( traw.steps, distanceToPlane, p1 = p1, p2 = p2, p3 = p3 ) ) ) )
+  expect_true( all( ( sapply( traw.steps, distanceToPlane, p1 = p1, p2 = p2, p3 = p3 ) ) >= 0 ) )
 })
 
 # distanceToPoint
 test_that("distanceToPoint responds to input correctly", {
-  expect_error( distanceToPoint( TCells[[1]], p = c(1,1) ),
+  expect_error( distanceToPoint( TCells[[1]], p = c(1,1,1) ),
                 "In distanceToPoint: Reference point coordinates must have the same number of dimensions as coordinates in the tracking data." )
 })
 
 test_that("distanceToPoint returns correct output", {
-  expect_true( is.numeric( distanceToPoint( TCells[[1]], p = c(1,1,1) ) ) )
-  expect_true( all( is.numeric( sapply( t.steps, distanceToPoint, p = rnorm(3) ) ) ) )
-  expect_true( all( ( sapply( t.steps, distanceToPoint, p = rnorm(3) ) ) >= 0 ) )
+  expect_true( is.numeric( distanceToPoint( TCells[[1]], p = c(1,1) ) ) )
+  expect_true( all( is.numeric( sapply( t.steps, distanceToPoint, p = rnorm(2) ) ) ) )
+  expect_true( all( ( sapply( t.steps, distanceToPoint, p = rnorm(2) ) ) >= 0 ) )
 })
 
 
 # angleSteps
 test_that("angleSteps responds to input correctly", {
-  expect_error( angleSteps( TCells, c("1","2","3"), timePoints(TCells)[1] ),
+  expect_error( angleSteps( TCells, names(TCells)[1:3], timePoints(TCells)[1] ),
                 "angleSteps: an angle is only defined for exactly 2 steps. Please provide exactly 2 trackids." )
-  expect_error( angleSteps( "a", c("1","2") , timePoints(TCells)[1]),
+  expect_error( angleSteps( "a", names(TCells)[1:2] , timePoints(TCells)[1]),
                 "angleSteps: X must be a tracks object." )
-  expect_error( angleSteps( TCells[[1]], c("1","2") , timePoints(TCells)[1]),
+  expect_error( angleSteps( TCells[[1]], names(TCells)[1:2] , timePoints(TCells)[1]),
                 "angleSteps: X must be a tracks object." )
   expect_error( angleSteps( TCells, c("1","x" ), timePoints(TCells)[1] ),
                 "angleSteps: cannot find all supplied trackids in the data." )
-  expect_warning( angleSteps( TCells, c("1","2"), timePoints(TCells)[20] ),
+  expect_warning( angleSteps( TCells, names(TCells)[1:2], timePoints(TCells)[20] ),
                   "Warning: cannot find data for both steps. Returning NA.")
 })
 
 test_that("angleSteps returns correct output", {
-  expect_true( is.numeric( angleSteps( TCells, c("1","2"), timePoints( TCells )[1] ) ) )
-  expect_length( angleSteps( TCells, c("1","2"), timePoints(TCells)[1]), 1 )
-  expect_true( angleSteps( TCells, c("1","2"), timePoints(TCells)[1]) >= 0 )
-  expect_true( angleSteps( TCells, c("1","2"), timePoints(TCells)[1]) <= 180 )
-  expect_true( angleSteps( TCells, c("1","2"), timePoints(TCells)[1], degrees = FALSE ) <= pi )
+  expect_true( is.numeric( angleSteps( TCells, names(TCells)[1:2], timePoints( TCells )[1] ) ) )
+  expect_length( angleSteps( TCells, names(TCells)[1:2], timePoints(TCells)[1]), 1 )
+  expect_true( angleSteps( TCells, names(TCells)[1:2], timePoints(TCells)[1]) >= 0 )
+  expect_true( angleSteps( TCells, names(TCells)[1:2], timePoints(TCells)[1]) <= 180 )
+  expect_true( angleSteps( TCells, names(TCells)[1:2], timePoints(TCells)[1], degrees = FALSE ) <= pi )
 })
 
 # distanceSteps
 test_that("distanceSteps responds to input correctly", {
-  expect_error( distanceSteps( TCells, c("1","2","3"), timePoints(TCells)[1] ),
+  expect_error( distanceSteps( TCells, names(TCells)[1:3], timePoints(TCells)[1] ),
                 "distanceSteps: only defined for exactly 2 steps. Please provide exactly 2 trackids." )
-  expect_error( distanceSteps( "a", c("1","2") , timePoints(TCells)[1]),
+  expect_error( distanceSteps( "a", names(TCells)[1:2], timePoints(TCells)[1]),
                 "distanceSteps: X must be a tracks object." )
-  expect_error( distanceSteps( TCells[[1]], c("1","2") , timePoints(TCells)[1]),
+  expect_error( distanceSteps( TCells[[1]], names(TCells)[1:2] , timePoints(TCells)[1]),
                 "distanceSteps: X must be a tracks object." )
   expect_error( distanceSteps( TCells, c("1","x" ), timePoints(TCells)[1] ),
                 "distanceSteps: cannot find all supplied trackids in the data." )
-  expect_warning( distanceSteps( TCells, c("1","2"), timePoints(TCells)[20] ),
+  expect_warning( distanceSteps( TCells, names(TCells)[1:2], timePoints(TCells)[20] ),
                   "Warning: cannot find data for both steps. Returning NA.")
 })
 
 test_that("distanceSteps returns correct output", {
-  expect_true( is.numeric( distanceSteps( TCells, c("1","2"), timePoints( TCells )[1] ) ) )
-  expect_length( distanceSteps( TCells, c("1","2"), timePoints(TCells)[1]), 1 )
-  expect_true( distanceSteps( TCells, c("1","2"), timePoints(TCells)[1]) >= 0 )
+  expect_true( is.numeric( distanceSteps( TCells, names(TCells)[1:2], timePoints( TCells )[1] ) ) )
+  expect_length( distanceSteps( TCells, names(TCells)[1:2], timePoints(TCells)[1]), 1 )
+  expect_true( distanceSteps( TCells, names(TCells)[1:2], timePoints(TCells)[1]) >= 0 )
 })
 
 # stepPairs
@@ -217,7 +250,7 @@ test_that("analyzeStepPairs responds to input correctly",{
   expect_error( analyzeStepPairs( TCells[[1]] ), "analyzeStepPairs: X must be a tracks object." )
 })
 
-tpairs <- analyzeStepPairs( TCells )
+tpairs <- analyzeStepPairs( tSample ) # use sample for speed
 test_that("analyzeStepPairs returns correct output", {
   expect_true( is.data.frame( tpairs ) )
   expect_true( is.data.frame( analyzeStepPairs(empty.tracks) ) )
@@ -231,7 +264,7 @@ test_that("analyzeStepPairs returns correct output", {
   expect_true( is.numeric( tpairs[,4] ) )
   expect_true( is.numeric( tpairs[,5] ) )
   expect_equal( ncol( analyzeStepPairs(
-    TCells, filter.steps = function(t) displacement(t) < 0 ) ), 0 )
+    tSample, filter.steps = function(t) displacement(t) < 0 ) ), 0 )
 })
 
 # analyzeCellPairs
@@ -240,7 +273,7 @@ test_that("analyzeCellPairs responds to input correctly",{
   expect_error( analyzeCellPairs( TCells[[1]] ), "analyzeCellPairs: X must be a tracks object." )
 })
 
-tcpairs <- analyzeCellPairs( TCells )
+tcpairs <- analyzeCellPairs( tSample ) # use sample for speed
 test_that("analyzeCellPairs returns correct output", {
   expect_true( is.data.frame( tcpairs ) )
   expect_true( is.data.frame( analyzeCellPairs(empty.tracks) ) )
@@ -274,31 +307,31 @@ test_that("cellPairs returns correct output", {
 
 # angleCells
 test_that("angleCells responds to input correctly",{
-  expect_error( angleCells( "a", c("1","2") ), "angleCells: X must be a tracks object!" )
-  expect_error( angleCells( TCells[[1]], c("1","2" ) ), "angleCells: X must be a tracks object!" )
+  expect_error( angleCells( "a", names(TCells)[1:2]), "angleCells: X must be a tracks object!" )
+  expect_error( angleCells( TCells[[1]], names(TCells)[1:2] ), "angleCells: X must be a tracks object!" )
   expect_error( angleCells( TCells, c("1","a") ), "angleCells: cannot find both cellids in data." )
 })
 test_that("angleCells returns correct output", {
-  expect_true( is.numeric( angleCells( TCells, c("1","2" ) ) ) )
+  expect_true( is.numeric( angleCells( TCells, names(TCells)[1:2] ) ) )
   expect_equal( angleCells( TCells, c("1","1") ), 0 )
   expect_true( angleCells( TCells, sample( names(TCells), 2 ) ) >= 0 )
   expect_true( angleCells( TCells, sample( names(TCells), 2 ) ) <= 180 )
   expect_true( angleCells( TCells, sample( names(TCells), 2 ), degrees = FALSE ) <= pi )
   expect_equal( overallAngle( subtracks( TCells, 2)[[1]], degrees = TRUE ),
-                angleCells( subtracks( TCells[1], 1 ), c("0.1","0.2") ) )
+                angleCells( subtracks( TCells[1], 1 ), c("1.1","1.2") ) )
 })
 
 # distanceCells
 test_that("angleCells responds to input correctly",{
-  expect_error( distanceCells( "a", c("1","2") ), "distanceCells: X must be a tracks object!" )
-  expect_error( distanceCells( TCells[[1]], c("1","2" ) ), "distanceCells: X must be a tracks object!" )
+  expect_error( distanceCells( "a", names(TCells)[1:2]), "distanceCells: X must be a tracks object!" )
+  expect_error( distanceCells( TCells[[1]], names(TCells)[1:2] ), "distanceCells: X must be a tracks object!" )
   expect_error( distanceCells( TCells, c("1","a") ), "distanceCells: cannot find both cellids in data." )
 })
 dist <- distanceCells( TCells, sample( names(TCells), 2 ) )
 test_that("distanceCells returns correct output", {
-  expect_true( is.numeric( distanceCells( TCells, c("1","2" ) ) ) )
+  expect_true( is.numeric( distanceCells( TCells, names(TCells)[1:2] ) ) )
   expect_equal( distanceCells( TCells, c("1","1") ), 0 )
-  expect_true( is.na( distanceCells( TCells, c("6","8" ) ) ) )
+  expect_true( is.na( distanceCells( TCells, c("3","9658" ) ) ) )
   expect_true(  is.na(dist) || dist >= 0 )
-  expect_equal( distanceCells( subtracks( TCells, 2 ), c("0.1","0.2") ), 0 )
+  expect_equal( distanceCells( subtracks( TCells, 2 ), c("1.1","1.2") ), 0 )
 })
