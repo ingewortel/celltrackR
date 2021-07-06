@@ -116,12 +116,13 @@ as.data.frame.tracks <- function(x, row.names = NULL, optional = FALSE,
 #'
 #' @export
 as.tracks.data.frame <- function(x, id.column=1, time.column=2,
-                                 pos.columns=c(3,4,5), scale.t=1,
+                                 pos.columns=3:ncol(x), scale.t=1,
                                  scale.pos=1, ...) {
-  if( ncol(x) < length(pos.columns) + 1) {
+                                 
+  if( ncol(x) < length(pos.columns) + 2) {
     stop("Data frame does not contain enough columns! (Perhaps you need to specify 'sep')")
   }
-  if( length(pos.columns) < 1 ){
+  if( length(pos.columns) < 1 | ncol(x) < 3 ){
     stop("At least one position column needs to be specified!")
   }
 

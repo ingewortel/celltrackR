@@ -8,7 +8,7 @@
   x,
   id.column = 1,
   time.column = 2,
-  pos.columns = c(3, 4, 5),
+  pos.columns = 3:ncol(x),
   scale.t = 1,
   scale.pos = 1,
   ...
