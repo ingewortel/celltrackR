@@ -11,8 +11,8 @@
 #'
 #' \code{\link{angleToPoint}} and \code{\link{distanceToPoint}} return the angle/distance of the track to the
 #'  reference point. The distance returned is between the first coordinate in the track and the
-#'  reference point. The angle is between the direction of the first step in the track and the
-#'  line between its first coordinate and the reference point. Angles are by default returned in
+#'  reference point. The angle is between the overall displacement vector of the track and the
+#'  vector from its first coordinate to the reference point. Angles are by default returned in
 #'  degrees, use \code{degrees=FALSE} to obtain radians. These functions are useful to detect
 #'  directional bias towards a point of interest, which would result in an average angle of less
 #'  than 90 degrees with the reference point (especially for tracks at a small distance to the
@@ -21,13 +21,14 @@
 #' \code{\link{angleToPlane}} and \code{\link{distanceToPlane}} return the angle/distance of the track to a
 #'  plane of interest. This plane must be specified by three points lying on it.
 #'  The distance returned is between the first coordinate in the track and the
-#'  reference point. The angle is between the direction of the first step in the track and the
+#'  reference point. The angle is between the overall displacement vector of the track and the
 #'  plane of interest. These functions are useful to detect tracking artefacts near the borders
 #'  of the imaging volume. Use \code{\link{boundingBox}} to guess where those borders are.
 #'  Angles are by default returned in
 #'  degrees, use \code{degrees=FALSE} to obtain radians.
 #'
-#' \code{\link{angleToDir}} returns the angle of the first step in a track to a direction of interest.
+#' \code{\link{angleToDir}} returns the angle of a track's overall displacement vector 
+#'  to a direction of interest.
 #'  This function is useful to detect directionality in cases where the direction of the bias is
 #'  known in advance (e.g. when cells are known to move up a chemotactic gradient): in that case,
 #'  the average angle to the reference direction should be less than 90 degrees. Angles are
@@ -73,14 +74,15 @@
 #' ## Get a distribution of Neutrophil step angles with the reference direction
 #' ## in positive y direction. The histogram is enriched for low angles, suggesting
 #' ## directed movement:
-#' hist( sapply( steps, angleToDir, dvec=c(0,1,0) ) )
+#' hist( sapply( steps, angleToDir, dvec=c(1,-1) ) )
 #'
 #' ## Plotting the angle versus the distance to a reference plane can be informative to
 #' ## detect tracking artefacts near the border of the imaging volume.
 #' ## We should be suspicious especially when small angles are more frequent at low distances
-#' ## to the border planes.
-#' steps <- subtracks( TCells, 1 )
-#' minz <- boundingBox( TCells )["min","z"]
+#' ## to the border planes; as is the case in the z-dimension for the raw data:
+#' load( system.file("extdata", "TCellsRaw.rda", package="celltrackR" ) )
+#' steps <- subtracks( TCellsRaw, 1 )
+#' minz <- boundingBox( TCellsRaw )["min","z"]
 #' ## Compute angles and distances to the lower plane in z-dimension
 #' angles <- sapply( steps, angleToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )
 #' distances <- sapply( steps, distanceToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )
@@ -166,7 +168,8 @@ vecAngle <- function( a, b, degrees = TRUE )
 
 #' Angle with a Reference Point
 #'
-#' Compute the angle between the first step of a track and a reference point. Useful to
+#' Compute the angle between a track's overall displacement vector and the vector from
+#' it's first coordinate to a reference point. Useful to
 #' detect directed movement towards a point (see examples).
 #'
 #' @param x a single input track; a matrix whose first column is time and whose
@@ -175,7 +178,6 @@ vecAngle <- function( a, b, degrees = TRUE )
 #' @param from index, or vector of indices, of the first row of the track. If
 #' \code{from} is a vector, angles are returned for all steps starting at
 #' the indices in \code{from}.
-#' @param xdiff row differences of x.
 #' @param degrees logical; should angles be returned in degrees rather than radians? (default = TRUE).
 #'
 #'
@@ -196,15 +198,15 @@ vecAngle <- function( a, b, degrees = TRUE )
 #'
 #' @examples
 #' ## Get a distribution of step angles with a reference point
-#' ## Use bb to get the corner with highest x,y,and z value
+#' ## Use bb to get the corner with highest x,y (,z) value
 #' ## The histogram is enriched for low angles, suggesting directed movement:
 #' steps <- subtracks( Neutrophils, 1 )
 #' bb <- boundingBox( Neutrophils )
 #' hist( sapply( steps, angleToPoint, p = bb["max",-1] ) )
 #'
-#' ## The same does not hold for movement of T cells towards the point (0,0,0)
+#' ## The same does not hold for movement of T cells towards the point (0,0)
 #' steps <- subtracks( TCells, 1 )
-#' hist( sapply( steps, angleToPoint, p = c(0,0,0) ) )
+#' hist( sapply( steps, angleToPoint, p = c(0,0) ) )
 #'
 #' ## Plotting the angle versus the distance to the reference point can also be informative,
 #' ## especially when small angles are more frequent at lower distances.
@@ -213,7 +215,7 @@ vecAngle <- function( a, b, degrees = TRUE )
 #' scatter.smooth( distances, angles )
 #' abline( h = 90, col = "red" )
 #' @export
-angleToPoint <- function (x, p = c(1,1,1), from = 1, xdiff = diff(x), degrees = TRUE )
+angleToPoint <- function (x, p = c(1,1,1), from = 1, degrees = TRUE )
 {
 
   # Check if the given point has the correct dimensions
@@ -237,7 +239,9 @@ angleToPoint <- function (x, p = c(1,1,1), from = 1, xdiff = diff(x), degrees = 
   ft <- from < nrow(x)
   if( sum(ft) > 0 ){
     # x,y,z components of the step vectors a to compute angle with refpoint with
-    a <- xdiff[from[ft], -1, drop = FALSE]
+    starts <- x[from[ft], -1, drop = FALSE]
+    # displacements from these 'from' points to the track endpoint
+    a <- t( apply( starts, 1, function(t) x[nrow(x),-1] - t ) )
 
     # compute vectors of step starting points with the refpoint
     b <- x[from[ft],-1,drop=FALSE]
@@ -252,7 +256,7 @@ angleToPoint <- function (x, p = c(1,1,1), from = 1, xdiff = diff(x), degrees = 
 
 #' Angle with a Reference Direction
 #'
-#' Compute the angle between the first step of a track and a reference direction.
+#' Compute the angle between a track's overall displacement and a reference direction.
 #' Useful to detect biased movement when the directional bias is known (see examples).
 #'
 #' @param x a single input track; a matrix whose first column is time and whose
@@ -261,7 +265,6 @@ angleToPoint <- function (x, p = c(1,1,1), from = 1, xdiff = diff(x), degrees = 
 #' @param from index, or vector of indices, of the first row of the track. If
 #' \code{from} is a vector, angles are returned for all steps starting at
 #' the indices in \code{from}.
-#' @param xdiff row differences of x.
 #' @param degrees logical; should angles be returned in degrees rather than radians? (default = TRUE).
 #'
 #' @return A single angle.
@@ -282,9 +285,9 @@ angleToPoint <- function (x, p = c(1,1,1), from = 1, xdiff = diff(x), degrees = 
 #' ## Get a distribution of Neutrophil step angles with the reference direction in positive
 #' ## y direction. The histogram is enriched for low angles, suggesting directed movement:
 #' steps <- subtracks( Neutrophils, 1 )
-#' hist( sapply( steps, angleToDir, dvec=c(0,1,0) ) )
+#' hist( sapply( steps, angleToDir, dvec=c(1,-1) ) )
 #' @export
-angleToDir <- function (x, dvec = c(1,1,1), from = 1, xdiff = diff(x), degrees=TRUE )
+angleToDir <- function (x, dvec = c(1,1,1), from = 1, degrees=TRUE )
 {
 
   # Check if the given direction has the correct dimensions
@@ -301,7 +304,9 @@ angleToDir <- function (x, dvec = c(1,1,1), from = 1, xdiff = diff(x), degrees=T
   ft <- from < nrow(x)
   if( sum(ft) > 0 ){
     # x,y,z components of the step vectors a to compute angle with dvec with
-    a <- xdiff[from[ft], -1, drop = FALSE]
+    starts <- x[from[ft], -1, drop = FALSE]
+    # displacements from these 'from' points to the track endpoint
+    a <- t( apply( starts, 1, function(t) x[nrow(x),-1] - t ) )
     b <- matrix( rep( dvec, nrow(a)),
                  ncol = length(dvec), byrow = TRUE )
 
@@ -323,7 +328,7 @@ angleToDir <- function (x, dvec = c(1,1,1), from = 1, xdiff = diff(x), degrees=T
 
 #' Angle with a Reference Plane
 #'
-#' Compute the angle between the first step of a track and a reference plane.
+#' Compute the angle between a track's overall displacement and a reference plane.
 #' Useful to detect directed movement and/or tracking artefacts.
 #'
 #' @param x a single input track; a matrix whose first column is time and whose
@@ -333,7 +338,6 @@ angleToDir <- function (x, dvec = c(1,1,1), from = 1, xdiff = diff(x), degrees=T
 #' @param from index, or vector of indices, of the first row of the track. If
 #' \code{from} is a vector, angles are returned for all steps starting at
 #' the indices in \code{from}.
-#' @param xdiff row differences of x.
 #' @param degrees logical; should angles be returned in degrees rather than radians? (default = TRUE).
 #'
 #' @return A single angle.
@@ -365,7 +369,7 @@ angleToDir <- function (x, dvec = c(1,1,1), from = 1, xdiff = diff(x), degrees=T
 #' abline( h = 32.7, col = "red" )
 #' @export
 angleToPlane <- function (x, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,0),
-                          from = 1, xdiff = diff(x), degrees =TRUE )
+                          from = 1, degrees =TRUE )
 {
 
   # Check if the given points have the correct dimensions
@@ -400,7 +404,9 @@ angleToPlane <- function (x, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,0),
   ft <- from < nrow(x)
   if( sum(ft) > 0 ){
     # x,y,z components of the step vectors a to compute angle with plane with
-    a <- xdiff[from[ft], -1, drop = FALSE]
+    starts <- x[from[ft], -1, drop = FALSE]
+    # displacements from these 'from' points to the track endpoint
+    a <- t( apply( starts, 1, function(t) x[nrow(x),-1] - t ) )
 
     # Compute the normal vector of the plane. Use the three points to get
     # two vectors in the plane, then use their cross product to get the normal.
@@ -842,7 +848,7 @@ analyzeCellPairs <- function( X, ... )
   # Make all possible pairs of cellids
   pairs <- cellPairs( X )
 
-  if( nrow( pairs ) > 0 ){
+    if( nrow( pairs ) > 0 ){
     # Compute angles and distances for all cell pairs in the data
     cellangles <- apply( pairs, 1, function(x)
       angleCells( X, x, ... ) )
