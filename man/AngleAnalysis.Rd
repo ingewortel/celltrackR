@@ -18,8 +18,8 @@ computed to the first step in the given track.
 \details{
 \code{\link{angleToPoint}} and \code{\link{distanceToPoint}} return the angle/distance of the track to the
  reference point. The distance returned is between the first coordinate in the track and the
- reference point. The angle is between the direction of the first step in the track and the
- line between its first coordinate and the reference point. Angles are by default returned in
+ reference point. The angle is between the overall displacement vector of the track and the
+ vector from its first coordinate to the reference point. Angles are by default returned in
  degrees, use \code{degrees=FALSE} to obtain radians. These functions are useful to detect
  directional bias towards a point of interest, which would result in an average angle of less
  than 90 degrees with the reference point (especially for tracks at a small distance to the
@@ -28,13 +28,14 @@ computed to the first step in the given track.
 \code{\link{angleToPlane}} and \code{\link{distanceToPlane}} return the angle/distance of the track to a
  plane of interest. This plane must be specified by three points lying on it.
  The distance returned is between the first coordinate in the track and the
- reference point. The angle is between the direction of the first step in the track and the
+ reference point. The angle is between the overall displacement vector of the track and the
  plane of interest. These functions are useful to detect tracking artefacts near the borders
  of the imaging volume. Use \code{\link{boundingBox}} to guess where those borders are.
  Angles are by default returned in
  degrees, use \code{degrees=FALSE} to obtain radians.
 
-\code{\link{angleToDir}} returns the angle of the first step in a track to a direction of interest.
+\code{\link{angleToDir}} returns the angle of a track's overall displacement vector 
+ to a direction of interest.
  This function is useful to detect directionality in cases where the direction of the bias is
  known in advance (e.g. when cells are known to move up a chemotactic gradient): in that case,
  the average angle to the reference direction should be less than 90 degrees. Angles are
@@ -68,14 +69,15 @@ abline( h = 90, col = "red" )
 ## Get a distribution of Neutrophil step angles with the reference direction
 ## in positive y direction. The histogram is enriched for low angles, suggesting
 ## directed movement:
-hist( sapply( steps, angleToDir, dvec=c(0,1,0) ) )
+hist( sapply( steps, angleToDir, dvec=c(1,-1) ) )
 
 ## Plotting the angle versus the distance to a reference plane can be informative to
 ## detect tracking artefacts near the border of the imaging volume.
 ## We should be suspicious especially when small angles are more frequent at low distances
-## to the border planes.
-steps <- subtracks( TCells, 1 )
-minz <- boundingBox( TCells )["min","z"]
+## to the border planes; as is the case in the z-dimension for the raw data:
+load( system.file("extdata", "TCellsRaw.rda", package="celltrackR" ) )
+steps <- subtracks( TCellsRaw, 1 )
+minz <- boundingBox( TCellsRaw )["min","z"]
 ## Compute angles and distances to the lower plane in z-dimension
 angles <- sapply( steps, angleToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )
 distances <- sapply( steps, distanceToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )

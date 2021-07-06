@@ -10,7 +10,6 @@ angleToPlane(
   p2 = c(0, 1, 0),
   p3 = c(1, 0, 0),
   from = 1,
-  xdiff = diff(x),
   degrees = TRUE
 )
 }
@@ -25,15 +24,13 @@ compute distances to.}
 \code{from} is a vector, angles are returned for all steps starting at
 the indices in \code{from}.}
 
-\item{xdiff}{row differences of x.}
-
 \item{degrees}{logical; should angles be returned in degrees rather than radians? (default = TRUE).}
 }
 \value{
 A single angle.
 }
 \description{
-Compute the angle between the first step of a track and a reference plane.
+Compute the angle between a track's overall displacement and a reference plane.
 Useful to detect directed movement and/or tracking artefacts.
 }
 \details{

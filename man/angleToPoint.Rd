@@ -4,7 +4,7 @@
 \alias{angleToPoint}
 \title{Angle with a Reference Point}
 \usage{
-angleToPoint(x, p = c(1, 1, 1), from = 1, xdiff = diff(x), degrees = TRUE)
+angleToPoint(x, p = c(1, 1, 1), from = 1, degrees = TRUE)
 }
 \arguments{
 \item{x}{a single input track; a matrix whose first column is time and whose
@@ -16,15 +16,14 @@ remaining columns are a spatial coordinate.}
 \code{from} is a vector, angles are returned for all steps starting at
 the indices in \code{from}.}
 
-\item{xdiff}{row differences of x.}
-
 \item{degrees}{logical; should angles be returned in degrees rather than radians? (default = TRUE).}
 }
 \value{
 A single angle.
 }
 \description{
-Compute the angle between the first step of a track and a reference point. Useful to
+Compute the angle between a track's overall displacement vector and the vector from
+it's first coordinate to a reference point. Useful to
 detect directed movement towards a point (see examples).
 }
 \details{
@@ -35,15 +34,15 @@ The average angle of steps to a reference point should be 90 degrees if there is
 }
 \examples{
 ## Get a distribution of step angles with a reference point
-## Use bb to get the corner with highest x,y,and z value
+## Use bb to get the corner with highest x,y (,z) value
 ## The histogram is enriched for low angles, suggesting directed movement:
 steps <- subtracks( Neutrophils, 1 )
 bb <- boundingBox( Neutrophils )
 hist( sapply( steps, angleToPoint, p = bb["max",-1] ) )
 
-## The same does not hold for movement of T cells towards the point (0,0,0)
+## The same does not hold for movement of T cells towards the point (0,0)
 steps <- subtracks( TCells, 1 )
-hist( sapply( steps, angleToPoint, p = c(0,0,0) ) )
+hist( sapply( steps, angleToPoint, p = c(0,0) ) )
 
 ## Plotting the angle versus the distance to the reference point can also be informative,
 ## especially when small angles are more frequent at lower distances.

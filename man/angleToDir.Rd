@@ -4,7 +4,7 @@
 \alias{angleToDir}
 \title{Angle with a Reference Direction}
 \usage{
-angleToDir(x, dvec = c(1, 1, 1), from = 1, xdiff = diff(x), degrees = TRUE)
+angleToDir(x, dvec = c(1, 1, 1), from = 1, degrees = TRUE)
 }
 \arguments{
 \item{x}{a single input track; a matrix whose first column is time and whose
@@ -16,15 +16,13 @@ remaining columns are a spatial coordinate.}
 \code{from} is a vector, angles are returned for all steps starting at
 the indices in \code{from}.}
 
-\item{xdiff}{row differences of x.}
-
 \item{degrees}{logical; should angles be returned in degrees rather than radians? (default = TRUE).}
 }
 \value{
 A single angle.
 }
 \description{
-Compute the angle between the first step of a track and a reference direction.
+Compute the angle between a track's overall displacement and a reference direction.
 Useful to detect biased movement when the directional bias is known (see examples).
 }
 \details{
@@ -37,7 +35,7 @@ The average angle of steps to a reference direction should be 90 degrees if ther
 ## Get a distribution of Neutrophil step angles with the reference direction in positive
 ## y direction. The histogram is enriched for low angles, suggesting directed movement:
 steps <- subtracks( Neutrophils, 1 )
-hist( sapply( steps, angleToDir, dvec=c(0,1,0) ) )
+hist( sapply( steps, angleToDir, dvec=c(1,-1) ) )
 }
 \references{
 Joost B. Beltman, Athanasius F.M. Maree and Rob. J. de Boer (2009),
