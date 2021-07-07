@@ -9,6 +9,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(dpi=72)
+```
 
 # Introduction
 
@@ -29,23 +32,23 @@ library( ggplot2 )
 ```
 
 
-```{r, echo = FALSE}
+```{r savepar, echo = FALSE}
 # Save current par() settings
 oldpar <- par( no.readonly =TRUE )
 ```
 
 
-The package contains a dataset of T cells imaged in a mouse peripheral lymph node using two photon microscopy. We will here use this dataset as an example of how we can compare real tracking data with data from a simulation model.
+The package contains a dataset of T cells imaged in a mouse cervical lymph node using two-photon microscopy. We will here use this dataset as an example of how we can compare real tracking data with data from a simulation model. While the original data contained 3D coordinates, we'll use the 2D projection on the XY plane (see the vignette on [preprocessing of the package datasets](./data-QC.html) for details). 
 
-The dataset consists of 21 tracks of individual cells in a tracks object:
+The dataset consists of 199 tracks of individual cells in a tracks object:
 
 ```{r Tdata}
 str( TCells, list.len = 3 )
 ```
 
-Each element in this list is a track from a single cell, consisting of a matrix with $(x,y,z)$ coordinates and the corresponding measurement timepoints:
+Each element in this list is a track from a single cell, consisting of a matrix with $(x,y)$ coordinates and the corresponding measurement timepoints:
 
-```{r}
+```{r showTdata}
 head( TCells[[1]] )
 ```
 
@@ -56,20 +59,20 @@ head( TCells[[1]] )
 
 We can use the function `brownianTrack()` to simulate a simple random walk (here in 3 dimensions):
 
-```{r}
+```{r brownian1}
 brownian <- brownianTrack( nsteps = 20, dim = 3 )
 str(brownian)
 ```
 
 Note that this returns a single track matrix, which we can turn into a track object by using `wrapTrack()`:
 
-```{r}
+```{r plotSingleBrownian}
 plot( wrapTrack(brownian) )
 ```
 
 We can also simulate multiple tracks at once using the `simulateTracks()` function. Do this and compare to the T cell tracks:
 
-```{r, fig.width = 7 }
+```{r plotBrownian, fig.width = 7 }
 brownian.tracks <- simulateTracks( 10, brownianTrack( nsteps = 20, dim = 3 ) )
 par(mfrow=c(1,2))
 plot( brownian.tracks, main = "simulated random walk" )
@@ -80,7 +83,7 @@ plot( normalizeTracks( TCells ), main = "real T cell data" )
 
 In this simulation, the displacement vector for each step is sampled randomly in each dimension from a normal distribution of $\mu=0, \sigma=1$. To match the average displacement observed in the T cell data:
 
-```{r, fig.width = 7 }
+```{r matchDisp, fig.width = 7 }
 # get displacement vectors
 step.displacements <- t( sapply( subtracks(TCells,1), displacementVector ) )
 
@@ -113,11 +116,13 @@ plot( normalizeTracks( TCells ), main = "real T cell data" )
 
 ```
 
+> Note: this is not the best method for matching a Brownian model to data; the best method would be to use the diffusion coefficient as estimated using Furth's equation. An example of this method is given later in this vignette.
+
 ### 1.3 A biased random walk
 
 We can bias movement in a certain direction by setting the mean in each dimension:
 
-```{r}
+```{r biasedWalk}
 
 # simulate brownian motion with bias
 brownian.tracks.bias <- simulateTracks( 10, brownianTrack( nsteps = 20, dim = 3,
@@ -133,7 +138,7 @@ plot( brownian.tracks.bias, main = "biased random walk" )
 
 Aside from a simple random walk, the package also implements a slightly different model proposed by [Beauchemin et al (2007)](https://www.ncbi.nlm.nih.gov/pubmed/17442932). In contrast to the simple random walk, this model has a tuneable amount of persistence, and the cell pauses briefly between each step as it needs to reorient itself, which takes some time. For these reasons, the Beauchemin model generates tracks that are a bit more realistic than a simple random walk.
 
-```{r}
+```{r beauchemin}
 beauchemin.tracks <- simulateTracks( 10, beaucheminTrack(sim.time=20) )
 plot( beauchemin.tracks )
 ```
@@ -147,16 +152,16 @@ The final simulation method provided in the package is `bootstrapTrack()`, which
 
 For example, we can do this for the T cell data:
 
-```{r}
+```{r bootstrap}
 bootstrap.tracks <- simulateTracks( 10, bootstrapTrack( nsteps = 20, TCells ) )
 plot( bootstrap.tracks )
 ```
 
 If all is as should be, the distribution of speed and turning angles should now match the real data closely. Check this:
 
-```{r, fig.width = 7, warning = FALSE, message = FALSE }
+```{r distributionComp, fig.width = 7, warning = FALSE, message = FALSE }
 # Simulate more tracks to reduce noice
-bootstrap.tracks <- simulateTracks( 100, bootstrapTrack( nsteps = 20, TCells ) )
+bootstrap.tracks <- simulateTracks( 50, bootstrapTrack( nsteps = 20, TCells ) )
 
 # Compare step speeds in real data to those in bootstrap data
 real.speeds <- sapply( subtracks( TCells,1 ), speed )
@@ -195,12 +200,12 @@ gridExtra::grid.arrange( pspeed, pangle, ncol = 2 )
 
 To compare two different models with the real T cell data, we make a mean square displacement plot. To remove the effect of noise, we simulate a greater number of tracks than before:
 
-```{r, fig.width=6}
+```{r msdComp, fig.width=6}
 # Simulate more tracks
-brownian.tracks <- simulateTracks( 100, brownianTrack( nsteps = 20, dim = 3,
+brownian.tracks <- simulateTracks( 50, brownianTrack( nsteps = 20, dim = 3,
                                                               mean = step.means,
                                                               sd = step.sd ) )
-bootstrap.tracks <- simulateTracks( 100, bootstrapTrack( nsteps = 20, TCells ) )
+bootstrap.tracks <- simulateTracks( 50, bootstrapTrack( nsteps = 20, TCells ) )
 
 msd.data <- aggregate( TCells, squareDisplacement, FUN = "mean.se" )
 msd.data$data <- "data"
@@ -215,11 +220,12 @@ ggplot( msd, aes( x = i, y = mean, ymin = lower, ymax = upper, color = data, fil
   geom_line() +
   labs( x = "t (steps)",
         y = "square displacement" ) +
-  scale_x_continuous(limits= c(0,20) ) +
+  scale_x_log10(limits= c(NA,10) ) +
+  scale_y_log10() +
   theme_bw()
 ```
 
-Both the random walk model and the bootstrapped tracks underestimate the MSD as observed in real data - even though the bootstrapped data at least matches speed and turning angle distributions well. 
+Both the random walk model and the bootstrapped tracks underestimate the MSD as observed in real data -- even though the bootstrapped data at least matches speed and turning angle distributions well. 
 
 This suggests there is more directional persistence in the real data than those models assume. In the next section, we will check this by making the autocorrelation plot.
 
@@ -227,7 +233,7 @@ This suggests there is more directional persistence in the real data than those 
 
 To check for directional persistence, we generate an autocovariance plot:
 
-```{r, fig.width=6}
+```{r acovComp, fig.width=6}
 # compute autocorrelation
 acor.data <- aggregate( TCells, overallDot, FUN = "mean.se" )
 acor.data$data <- "data"
@@ -242,18 +248,11 @@ ggplot( acor, aes( x = i, y = mean, ymin = lower, ymax = upper, color = data, fi
   geom_line() +
   labs( x = "dt (steps)",
         y = "autocovariance" ) +
-  scale_x_continuous(limits= c(0,20) ) +
+  scale_x_continuous(limits= c(0,10) ) +
   theme_bw()
 ```
 
 Indeed, the autocovariance drops less steeply for the real T cell data, which indicates that there is a directional persistence in the T cell data that is not captured by the brownian and bootstrapping models. Thus, even when a model captures some aspects of the walk statistics in the data, it may still behave differently in other respects. 
-
-
-
-```{r, echo = FALSE}
-# Reset par() settings
-par(oldpar)
-```
 
 
 # 5 Fitting models on the MSD
@@ -264,7 +263,7 @@ In the above, we saw that a Brownian motion model underestimated the MSD of the 
 
 Before we start, let's look at the data we are fitting in more detail. If we look at the dimensions of the T-cell dataset:
 
-```{r}
+```{r bb}
 boundingBox( TCells )
 ```
 
@@ -272,13 +271,13 @@ we see that the imaging window is limited to roughly 200 x 200 x 50 $\mu$m; thus
 
 A limited imaging window like this can cause artefacts in the MSD curve because cells can not be followed after they leave the imaging window. Thus, for larger $\Delta t$, we underestimate the mean (squared) displacement because the faster cells have left the imaging window and do not end up in our data. In our case, this will be particularly problematic in the z-dimension. Thus, for now we will not fit the 3D data, but instead use the 2D projection on the xy-plane:
 
-```{r}
+```{r project}
 Txy <- projectDimensions( TCells, c("x","y") )
 ```
 
 Let's look at the MSD curve we get:
 
-```{r fig.width = 6}
+```{r msdXY, fig.width = 6}
 # Compute MSD
 msdData <- aggregate( Txy, squareDisplacement, FUN = "mean.se" )
 
@@ -302,7 +301,7 @@ Two things are worth noting here:
 
 2. the MSD curve has a weird shape. This is actually the case because of the limited imaging window problem described above. We will therefore use only the first part of the curve (the first 5 minutes), where we have enough data and the imaging window problem remains manageable.
 
-```{r}
+```{r fitThreshold}
 fitThreshold <- 5 # minutes
 ```
 
@@ -326,7 +325,7 @@ Here, $D$ is the diffusion coefficient, $P$ the persistence time, $\Delta t$ the
 We can fit this function using R's `nls()` on the MSD data to get $D$ and $P$:
 
 
-```{r}
+```{r furthFit}
 fuerthMSD <- function( dt, D, P, dim ){
   return( 2*dim*D*( dt - P*(1-exp(-dt/P) ) ) )
 }
@@ -350,7 +349,7 @@ Note that we will not use $P$. However, we fit Furth's formula with a non-zero p
 
 Now, given $D$, simulate some tracks:
 
-```{r fig.width = 5, fig.height = 5}
+```{r fittedBrownian, fig.width = 5, fig.height = 5}
 # simulate tracks using the estimated D. We simulate with time unit seconds
 # to match the data, so divide D by 60 to go from um^2/min to um^2/sec.
 # The dimension-wise variance of brownian motion is 2*D*tau (with tau the step
@@ -370,7 +369,7 @@ plot( brownian.tracks[1:10], main = "brownian motion")
 
 Finally, get MSD and compare it to data:
 
-```{r fig.width = 6}
+```{r msdFittedBrownian, fig.width = 6}
 # get msd of the simulated tracks and scale time to minutes
 msdBrownian <- aggregate( brownian.tracks, squareDisplacement, FUN = "mean.se" )
 tau <- timeStep( brownian.tracks ) / 60 # in minutes
@@ -386,8 +385,8 @@ ggplot( msdBrownian, aes( x = dt, y = mean) ) +
   geom_line( data = msdFuerth, color = "red", lty = 2 ) +
   geom_line( )+
   scale_fill_manual( values = c( "TRUE" = "blue", "FALSE" = "transparent" ) ) +
-  scale_x_continuous( limits = c(0,NA), expand = c(0,0) ) +
-  scale_y_continuous( limits = c(0,NA), expand = c(0,0) ) +
+  scale_x_log10( expand = c(0,0) ) +
+  scale_y_log10( expand = c(0,0) ) +
   labs( color = NULL, x = expression( Delta*"t (min)"), 
         y = expression( "displacement"^2*"("*mu*"m"^2*")") , fill = NULL ) +
   theme_bw()
@@ -414,7 +413,7 @@ $$M = \frac{v_\text{free}^2\cdot t_\text{free}^2}{6(t_\text{free}+t_\text{pause}
 
 We should note here that the Beauchemin has three parameters ($v_\text{free}$, $t_\text{free}$, $t_\text{pause}$), but that these are underdefined based on MSD: multiple parameter combinations can give the exact same MSD (see [Beauchemin et al (2007)](https://www.ncbi.nlm.nih.gov/pubmed/17442932), [Textor et al (2013)](https://doi.org/10.1186/1471-2105-14-S6-S10)). This means we cannot fit all three parameters based on the MSD. Here, we'll set $t_\text{pause}$ to the literature value of 0.5 minute, and fit the other parameters $v_\text{free}$ and $t_\text{free}$ based on the MSD to show how this works: 
 
-```{r}
+```{r fittedBeauchemin}
 # analytical formula
 beauchemin.msd <- function( x, M=60, t.free=2, t.pause=0.5, dim=2 ){
   v.free <- sqrt( 6 * M * (t.free+t.pause) ) / t.free
@@ -436,7 +435,7 @@ t.free <- coef(beaucheminFit)[["t.free"]] # in min
 
 If everything went correctly, $M$ should not be too different from the diffusion coefficient $D$ we fitted earlier:
 
-```{r}
+```{r compareFittedParms}
 c( D = D, M = M )
 ```
 
@@ -444,7 +443,7 @@ Indeed, they are very similar, which is good news.
 
 Using these fitted values, get the MSD and compare to data:
 
-```{r fig.width = 6}
+```{r beaucheminMSD, fig.width = 6}
 # Get the fitted MSD using these values
 msdBeauchemin <- data.frame(
   dt = msdBrownian$dt,
@@ -456,8 +455,8 @@ ggplot( msdBeauchemin, aes( x = dt, y = mean) ) +
   geom_point( data = msdData, shape = 21, aes( fill = dt < fitThreshold ), color = "blue", show.legend = FALSE ) +
   geom_line( )+
   scale_fill_manual( values = c( "TRUE" = "blue", "FALSE" = "transparent" ) ) +
-  scale_x_continuous( limits = c(0,NA), expand = c(0,0) ) +
-  scale_y_continuous( limits = c(0,NA), expand = c(0,0) ) +
+  scale_x_log10( expand = c(0,0) ) +
+  scale_y_log10( expand = c(0,0) ) +
   labs( color = NULL, x = expression( Delta*"t (min)"), 
         y = expression( "displacement"^2*"("*mu*"m"^2*")") , fill = NULL ) +
   theme_bw()
@@ -467,17 +466,17 @@ This model seems to fit the data much better!
 
 Now, let's use the discovered parameters to simulate some tracks on a longer time scale:
 
-```{r fig.width=5, fig.height = 5}
+```{r beaucheminParameters, fig.width=5, fig.height = 5}
 # t.free has been fitted; set t.pause to its fixed value and 
 # compute v.free from the fitted M:
 t.pause <- 0.5 # fixed
 v.free <- sqrt( 6 * M * (t.free+t.pause) ) / t.free
 
-# simulate tracks using the fitted parameters.
+# simulate 3 tracks using the fitted parameters.
 # we don't use the arguments p.persist, p.bias, bias.dir, and taxis.mode,
 # since these are not parameters of the original Beauchemin model.
 tau <- timeStep( Txy )
-beauchemin.tracks <- simulateTracks( 10,  
+beauchemin.tracks <- simulateTracks( 3,  
                                    beaucheminTrack( sim.time = 10*max( timePoints( Txy) ),
                                                     delta.t = tau,
                                                     t.free = t.free,
@@ -487,3 +486,7 @@ beauchemin.tracks <- simulateTracks( 10,
 plot( beauchemin.tracks, main = "Beauchemin tracks")
 ```
 
+```{r resetpar, echo = FALSE}
+# Reset par() settings
+par(oldpar)
+```

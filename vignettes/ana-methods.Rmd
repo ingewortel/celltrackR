@@ -1,5 +1,5 @@
 ---
-title: "Track Analysis"
+title: "Track Analysis Methods"
 author: "Inge Wortel"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -9,6 +9,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(dpi=72)
+```
 
 
 # Introduction
@@ -30,15 +34,15 @@ oldpar <- par( no.readonly =TRUE )
 ```
 
 
-The package contains a dataset of T cells imaged in a mouse peripheral lymph node using two photon microscopy. We will here use this dataset as an example of how to perform quality control.
+The package contains a dataset of B and T cells in a mouse cervical lymph node, and neutrophils responding to an *S.aureus* infection in a mouse ear, all imaged using two-photon microscopy. While the original data contained 3D coordinates, we'll use the 2D projection on the XY plane (see the vignettes on [quality control methods](./QC.html) and [preprocessing of the package datasets](./data-QC.html) for details). We will here use this dataset as an example of how to apply analysis metrics.
 
-The dataset consists of 21 tracks of individual cells in a tracks object:
+For example, the T-cell dataset consists of 199 tracks of individual cells in a tracks object:
 
 ```{r Tdata}
-str( TCells, list.len = 3 )
+str( TCells, list.len = 1 )
 ```
 
-Each element in this list is a track from a single cell, consisting of a matrix with $(x,y,z)$ coordinates and the corresponding measurement timepoints:
+Each element in this list is a track from a single cell, consisting of a matrix with $(x,y)$ coordinates and the corresponding measurement timepoints:
 
 ```{r}
 head( TCells[[1]] )
@@ -47,41 +51,67 @@ head( TCells[[1]] )
 Similarly, we will also use the `BCells` and `Neutrophils` data:
 
 ```{r bdata}
-str( BCells, list.len = 3 )
-str( Neutrophils, list.len = 3 )
+str( BCells, list.len = 1 )
+str( Neutrophils, list.len = 1 )
+```
+
+For the purpose of this tutorial, we'll just sample a subset from these datasets (Normally you would not do this, but it will help here to speed things up and to avoid cluttered plots; the same methods would apply to a full dataset).
+
+```{r}
+# for reproducibility
+set.seed(2021)
+
+# sample names, sort them in numeric order, and use them to subset the tracks
+Bsample <- sample( names(BCells),50)
+BCells2 <- BCells[ Bsample ]
+
+# same for the T cells
+Tsample <- sample( names(TCells),50)
+TCells2 <- TCells[ Tsample ]
+
+# and the neutrophils
+Nsample <- sample( names(Neutrophils),50)
+Neutrophils2 <- Neutrophils[ Nsample ]
+
 ```
 
 # 1 Simple track visualization
 
 ### 1.1 2D and 3D plotting
 
-The standard plotting method for tracks plots the projection of 3D tracks on the $(x,y)$ plane:
+The standard plotting method for tracks plots the projection of tracks on the $(x,y)$ plane (if tracks are in 3D, the z-coordinate is ignored to obtain a projection):
 
-```{r, fig.width = 7, fig.height=7 }
-par( mfrow = c(2,2) )
-plot( TCells, main = "T cells" )
-plot( BCells, main = "B cells" )
-plot( Neutrophils, main = "Neutrophils" )
+```{r, fig.width = 6, fig.height=2 }
+par( mfrow = c(1,3), mar = c(2,2,3,1)+0.1 )
+plot( TCells2, main = "T cells" )
+plot( BCells2, main = "B cells" )
+plot( Neutrophils2, main = "Neutrophils" )
 ```
 
 We can also plot 3D tracks using the function `plot3d()` (which requires the package `scatterplot3d`):
 
-```{r, fig.width = 7, fig.height=7 }
-par( mfrow = c(2,2) )
-plot3d( TCells, main = "T cells" )
-plot3d( BCells, main = "B cells" )
-plot3d( Neutrophils, main = "Neutrophils" )
+```{r, fig.width = 8, fig.height=2.5 }
+# load original, 3D tracks as an example, since the processed tracks are 2D
+load( system.file("extdata", "TCellsRaw.rda", package="celltrackR" ) )
+load( system.file("extdata", "BCellsRaw.rda", package="celltrackR" ) )
+load( system.file("extdata", "NeutrophilsRaw.rda", package="celltrackR" ) )
+
+# omit axes and labels to save space here;
+par( mfrow = c(1,3), mar = c(0,0,2,0) + 0.1 )
+plot3d( TCellsRaw, main = "T cells", tick.marks = FALSE )
+plot3d( BCellsRaw, main = "B cells", tick.marks = FALSE )
+plot3d( NeutrophilsRaw, main = "Neutrophils", tick.marks = FALSE )
 ```
 
-### 1.2 Star plots
+### 1.2 Star plots (Rose plots)
 
 Finally, we can overlay the track starting points using `normalizeTracks()` -- which is useful to detect directionality:
 
-```{r, fig.width=7, fig.height=7 }
-par( mfrow = c(2,2) )
-plot( normalizeTracks(TCells), main = "T cells" )
-plot( normalizeTracks(BCells), main = "B cells" )
-plot( normalizeTracks(Neutrophils), main = "Neutrophils" )
+```{r, fig.width = 6, fig.height=2 }
+par( mfrow = c(1,3), mar = c(2,2,3,1)+0.1 )
+plot( normalizeTracks(TCells2), main = "T cells" )
+plot( normalizeTracks(BCells2), main = "B cells" )
+plot( normalizeTracks(Neutrophils2), main = "Neutrophils" )
 ```
 
 
@@ -95,22 +125,22 @@ To compute a metric for each track in a dataset, use R's `sapply()` function dir
 
 ```{r}
 # Obtain mean speeds for each track using sapply
-Tcell.speeds <- sapply( TCells, speed )
+Tcell.speeds <- sapply( TCells2, speed )
 str( Tcell.speeds )
 summary( Tcell.speeds )
 ```
 
-This returns a mean speed for each of the 22 tracks in the `TCell` dataset. Visualize the distribution:
+This returns a mean speed for each of the 199 tracks in the `TCell` dataset, which can be analyzed further or plotted using any of R's default methods, e.g.:
 
-```{r}
+```{r eval = FALSE}
 hist( Tcell.speeds )
 ```
 
 Now let's repeat for the other two celltypes and plot them next to each other for comparison
 
 ```{r}
-Bcell.speeds <- sapply( BCells, speed )
-Nphil.speeds <- sapply( Neutrophils, speed )
+Bcell.speeds <- sapply( BCells2, speed )
+Nphil.speeds <- sapply( Neutrophils2, speed )
 
 # Create a dataframe of all data
 dT <- data.frame( cells = "T cells", speed = Tcell.speeds )
@@ -132,7 +162,7 @@ It has been suggested that cell-based analyses introduce biases, and that analys
 We can extract such steps using the `subtracks()` function (where `i` is the subtrack length, which is 1 for a single step):
 
 ```{r}
-Tcell.steps <- subtracks( TCells, i = 1 )
+Tcell.steps <- subtracks( TCells2, i = 1 )
 ```
 
 We can then proceed as before to obtain speeds for each step and further summary statistics:
@@ -142,12 +172,6 @@ We can then proceed as before to obtain speeds for each step and further summary
 Tcell.step.speeds <- sapply( Tcell.steps, speed )
 str( Tcell.step.speeds )
 summary( Tcell.step.speeds )
-```
-
-Visualize the distribution:
-
-```{r}
-hist( Tcell.step.speeds )
 ```
 
 Compare cell-based versus step-based:
@@ -167,8 +191,8 @@ ggplot( d.method, aes( x = method, y = speed ) ) +
 And again compare between the different celltypes:
 
 ```{r}
-Bcell.step.speeds <- sapply( subtracks(BCells,1), speed )
-Nphil.step.speeds <- sapply( subtracks(Neutrophils,1), speed )
+Bcell.step.speeds <- sapply( subtracks(BCells2,1), speed )
+Nphil.step.speeds <- sapply( subtracks(Neutrophils2,1), speed )
 
 # Create a dataframe of all data
 dT <- data.frame( cells = "T cells", speed = Tcell.step.speeds )
@@ -176,9 +200,10 @@ dB <- data.frame( cells = "B cells", speed = Bcell.step.speeds )
 dN <- data.frame( cells = "Neutrophils", speed = Nphil.step.speeds )
 dstep <- rbind( dT, dB, dN )
 
-# Compare:
+# Compare (violin plot now because there are many individual steps)
 ggplot( dstep, aes( x = cells, y = speed ) ) +
-  ggbeeswarm::geom_quasirandom( size = 0.3 ) +
+  geom_violin() +
+  #ggbeeswarm::geom_quasirandom( size = 0.3 ) +
   scale_y_continuous( limits = c(0,NA) ) +
   theme_classic()
 
@@ -188,9 +213,9 @@ ggplot( dstep, aes( x = cells, y = speed ) ) +
 Note that we can do something similar for turning angles, but we need at least two steps to compute a turning angle. Therefore, use `subtracks()` with `i=2` in combination with the `overallAngle()` method:
 
 ```{r}
-Tcell.step.angle <- sapply( subtracks(TCells,2), overallAngle )
-Bcell.step.angle <- sapply( subtracks(BCells,2), overallAngle )
-Nphil.step.angle <- sapply( subtracks(Neutrophils,2), overallAngle )
+Tcell.step.angle <- sapply( subtracks(TCells2,2), overallAngle )
+Bcell.step.angle <- sapply( subtracks(BCells2,2), overallAngle )
+Nphil.step.angle <- sapply( subtracks(Neutrophils2,2), overallAngle )
 
 # Create a dataframe of all data
 dT <- data.frame( cells = "T cells", turn.angle = Tcell.step.angle )
@@ -203,7 +228,8 @@ dangle$turn.angle <- pracma::rad2deg( dangle$turn.angle )
 
 # Compare:
 ggplot( dangle, aes( x = cells, y = turn.angle ) ) +
-  ggbeeswarm::geom_quasirandom( size = 0.3 ) +
+  #ggbeeswarm::geom_quasirandom( size = 0.3 ) +
+  geom_violin() +
   scale_y_continuous( limits = c(0,NA) ) +
   theme_classic()
 
@@ -213,16 +239,18 @@ ggplot( dangle, aes( x = cells, y = turn.angle ) ) +
 
 Another approach is to compute metrics not only on "steps" (subtracks of length one), but on all possible subtracks in a track. This is called a "staggered" analysis ([Mohktari et al (2013)](https://www.ncbi.nlm.nih.gov/pubmed/24324630)).
 
-To see how this works on a single track, use `applyStaggered` with `matrix=TRUE`. For example, consider track number 8 in the `TCells` data, which has 8 coordinates (7 steps):
+To see how this works on a single track, use `applyStaggered` with `matrix=TRUE`. For example, consider track number 4 (id = "6782") in the `TCells2` data, which has 8 coordinates (7 steps):
+
 
 ```{r}
-x <- TCells[[8]]
+x <- TCells2[[4]]
 x
 ```
 
 If we compute the speed on all staggered subtracks, we get the following matrix:
 
 ```{r}
+options(width = 120)
 stag <- applyStaggered( x, speed, matrix = TRUE )
 stag
 ```
@@ -239,7 +267,7 @@ filled.contour( stag )
 Now do it again for a longer track:
 
 ```{r, fig.width=4}
-filled.contour( applyStaggered( TCells[[3]], speed, matrix = TRUE ) )
+filled.contour( applyStaggered( TCells2[[1]], speed, matrix = TRUE ) )
 ```
 
 
@@ -249,7 +277,7 @@ If we leave out the `matrix=TRUE`, the function simply returns the mean of all n
 
 ```{r}
 # These are the same:
-applyStaggered( TCells[[8]], speed )
+applyStaggered( TCells2[[1]], speed )
 mean( stag, na.rm = TRUE )
 ```
 
@@ -257,7 +285,7 @@ mean( stag, na.rm = TRUE )
 
 ```{r}
 # Compare the three different methods
-Tcell.stag.speed <- sapply( TCells, staggered( speed ) )
+Tcell.stag.speed <- sapply( TCells2, staggered( speed ) )
 d.staggered <- data.frame( method = "staggered", speed = Tcell.speeds )
 d.method <- rbind( d.step, d.cell, d.staggered )
 
@@ -267,7 +295,7 @@ ggplot( d.method, aes( x = method, y = speed ) ) +
   theme_classic()
 
 # cell-based and staggered cell-based are slightly different:
-hist( Tcell.speeds - Tcell.stag.speed )
+summary( Tcell.speeds - Tcell.stag.speed )
 ```
 
 
@@ -278,7 +306,7 @@ A common analysis on migration data is generating mean square displacement (MSD)
 We can use the `subtracks()` function with varying `i` argument to obtain subtracks of different lengths, and then use `sapply()` to find a mean metric for each of these datasets. However, the package also contains a convenience function that does this automatically: `aggregate()`. For example, use this function to directly get the mean square displacement of all single steps:
 
 ```{r}
-aggregate( TCells, squareDisplacement, subtrack.length = 1 )
+aggregate( TCells2, squareDisplacement, subtrack.length = 1 )
 ```
 
 where "i" is the subtrack length in number of steps, and "value" is the average value of the applied metric (in this case, square displacement) for all subtracks of that length in the data.
@@ -286,7 +314,7 @@ where "i" is the subtrack length in number of steps, and "value" is the average 
 We can also report different summary statistics by changing the `FUN` argument (see `?aggregate.tracks`):
 
 ```{r}
-aggregate( TCells, squareDisplacement, subtrack.length = 1, FUN = "mean.se" )
+aggregate( TCells2, squareDisplacement, subtrack.length = 1, FUN = "mean.se" )
 ```
 
 This gives us not only the mean, but also the standard error. 
@@ -294,7 +322,7 @@ This gives us not only the mean, but also the standard error.
 Now, if we leave out the `subtrack.length`, `aggregate()` automatically computes the metric for subtracks of all possible lengths in the dataset and returns those in a dataframe:
 
 ```{r}
-Tcell.msd <- aggregate( TCells, squareDisplacement, FUN = "mean.se" )
+Tcell.msd <- aggregate( TCells2, squareDisplacement, FUN = "mean.se" )
 str( Tcell.msd )
 ```
 
@@ -313,8 +341,8 @@ Plotting the standard error is useful because, as $\Delta t$ increases, the numb
 
 Compare for example the number of subtracks of length 10 to the number of length 35:
 ```{r}
-num10 <- length( subtracks( TCells, 10 ) )
-num35 <- length( subtracks( TCells, 35 ) )
+num10 <- length( subtracks( TCells2, 10 ) )
+num35 <- length( subtracks( TCells2, 35 ) )
 c( "10" = num10, "35" = num35 )
 ```
 
@@ -325,13 +353,13 @@ Now, let's compare the MSD plot for the three different types of cells:
 # To truly compare them, report subtrack length not in number of steps but
 # in their duration (which may differ between different datasets)
 Tcell.msd$cells <- "T cells"
-Tcell.msd$dt <- Tcell.msd$i * timeStep( TCells )
-Bcell.msd <- aggregate( BCells, squareDisplacement, FUN = "mean.se" )
+Tcell.msd$dt <- Tcell.msd$i * timeStep( TCells2 )
+Bcell.msd <- aggregate( BCells2, squareDisplacement, FUN = "mean.se" )
 Bcell.msd$cells <- "B cells"
-Bcell.msd$dt <- Bcell.msd$i * timeStep( BCells )
-Nphil.msd <- aggregate( Neutrophils, squareDisplacement, FUN = "mean.se" )
+Bcell.msd$dt <- Bcell.msd$i * timeStep( BCells2 )
+Nphil.msd <- aggregate( Neutrophils2, squareDisplacement, FUN = "mean.se" )
 Nphil.msd$cells <- "Neutrophils"
-Nphil.msd$dt <- Nphil.msd$i * timeStep( Neutrophils )
+Nphil.msd$dt <- Nphil.msd$i * timeStep( Neutrophils2 )
 msddata <- rbind( Tcell.msd, Bcell.msd, Nphil.msd )
 head(msddata)
 
@@ -341,13 +369,17 @@ p1 <- ggplot( msddata, aes( x = dt , y = mean, color = cells, fill = cells ) ) +
   geom_line( ) +
   labs( x = expression( paste(Delta,"t (seconds)") ),
         y = "mean square displacement") +
-  theme_classic()
+  theme_classic() + theme(
+    legend.position = "top"
+  )
 # Also make a zoomed version to look only at first part of the plot
-pzoom <- p1 + coord_cartesian( xlim = c(0,500), ylim = c(0,5000) ) 
+pzoom <- p1 + coord_cartesian( xlim = c(0,500), ylim = c(0,3000) ) 
 gridExtra::grid.arrange( p1, pzoom, ncol = 2 ) 
 ```
 
-Note that `aggregate()` can also make MSD plots from non-overlapping subtracks or from subtracks starting at the first position of each track; see `?aggregate.tracks` for details.
+Note here that the bigger $\Delta t$, the less reliable the MSD becomes. This is especially the case when the imaging window is limited (as is often the case for two-photon experiments). The longer $\Delta t$, the more cells have the chance to leave the imaging window during that time, which means that there will be less data available to compute a mean on. Moreover, the data that is still there is biased: faster and more persistent cells will leave the imaging window more quickly, and are therefore underrepresented in the displacements measured at large $\Delta t$. This, for example, is one reason why the T-cell curve seems to flatten at larger $\Delta t$. 
+
+> Tip: `aggregate()` can also make MSD plots from non-overlapping subtracks or from subtracks starting at the first position of each track; see `?aggregate.tracks` for details.
 
 # 4 Analyzing persistence
 
@@ -364,8 +396,8 @@ To analyze cell persistence, another good analysis is the autocorrelation plot: 
 Officially, the autocorrelation plot is a plot of $\cos \alpha$ of two steps, $\vec{s_1}$ and $\vec{s_2}$, whose starting points are $\Delta t$ apart. This is equal to the dot product between $\vec{s_1}$ and $\vec{s_2}$ after normalizing both vectors to unit length. We can compute this again using `aggregate()` (see also the previous section):
 
 ```{r, fig.width=6}
-Tcell.acor <- aggregate( TCells, overallNormDot, FUN = "mean.se"  )
-Tcell.acor$dt <- Tcell.acor$i * timeStep(TCells)
+Tcell.acor <- aggregate( TCells2, overallNormDot, FUN = "mean.se"  )
+Tcell.acor$dt <- Tcell.acor$i * timeStep(TCells2)
 Tcell.acor$cells <- "T cells"
 
 ggplot( Tcell.acor, aes( x = dt , y = mean, color = cells, fill = cells ) ) +
@@ -386,9 +418,9 @@ check <- function(x){
   all( sapply( list(head(x,2),tail(x,2)), trackLength ) >= 1.0 )
 }
 # repeat analysis
-Tcell.acor2 <- aggregate( TCells, overallNormDot, 
+Tcell.acor2 <- aggregate( TCells2, overallNormDot, 
                      FUN = "mean.se", filter.subtracks = check )
-Tcell.acor2$dt <- Tcell.acor2$i * timeStep(TCells)
+Tcell.acor2$dt <- Tcell.acor2$i * timeStep(TCells2)
 Tcell.acor2$cells <- "T cells (filtered)"
 
 d <- rbind( Tcell.acor, Tcell.acor2 )
@@ -409,9 +441,9 @@ Another solution is to make the autocovariance plot instead of the autocorrelati
 
 ```{r, fig.width=6}
 # autocovariance
-Tcell.acov <- aggregate( TCells, overallDot, 
-                     FUN = "mean.se" )
-Tcell.acov$dt <- Tcell.acov$i * timeStep(TCells)
+Tcell.acov <- aggregate( TCells2, overallDot, 
+                     FUN = "mean.se", filter.subtracks = check )
+Tcell.acov$dt <- Tcell.acov$i * timeStep(TCells2)
 Tcell.acov$cells <- "T cells"
 
 
@@ -432,19 +464,19 @@ However, the autocovariance is no longer a number between 0 and 1, which is some
 Tcell.acov[,2:4] <- Tcell.acov[,2:4] / Tcell.acov$mean[1]
 
 # Other cells
-Bcell.acov <- aggregate( BCells, overallDot, FUN = "mean.se" )
+Bcell.acov <- aggregate( BCells2, overallDot, FUN = "mean.se" )
 Bcell.acov$cells <- "B cells"
-Bcell.acov$dt <- Bcell.acov$i * timeStep( BCells )
+Bcell.acov$dt <- Bcell.acov$i * timeStep( BCells2 )
 Bcell.acov[,2:4] <- Bcell.acov[,2:4] / Bcell.acov$mean[1]
 
-Nphil.acov <- aggregate( Neutrophils, overallDot, FUN = "mean.se" )
+Nphil.acov <- aggregate( Neutrophils2, overallDot, FUN = "mean.se" )
 Nphil.acov$cells <- "Neutrophils"
-Nphil.acov$dt <- Nphil.acov$i * timeStep( Neutrophils )
+Nphil.acov$dt <- Nphil.acov$i * timeStep( Neutrophils2 )
 Nphil.acov[,2:4] <- Nphil.acov[,2:4] / Nphil.acov$mean[1]
 
 acovdata <- rbind( Tcell.acov, Bcell.acov, Nphil.acov )
 
-# compare
+# compare;
 p1 <- ggplot( acovdata, aes( x = dt , y = mean, color = cells, fill = cells ) ) +
   geom_hline( yintercept = 0 ) +
   geom_ribbon( aes( ymin = lower, ymax = upper) , alpha = 0.2 ,color=NA ) +
@@ -452,13 +484,15 @@ p1 <- ggplot( acovdata, aes( x = dt , y = mean, color = cells, fill = cells ) ) 
   labs( x = expression( paste(Delta,"t (seconds)") ),
         y = "autocovariance" ) +
   theme_classic() + 
-  theme( axis.line.x = element_blank() )
+  theme( axis.line.x = element_blank(), 
+         legend.position = "top" )
 
-pzoom <- p1 + coord_cartesian( xlim = c(0,500) )
+pzoom <- p1 + coord_cartesian( xlim = c(0,500), ylim  = c(-0.1,1) )
 gridExtra::grid.arrange( p1, pzoom, ncol = 2 )
 ```
 
-B cells lose their autocovariance most rapidly, making them the least persistent. Neutrophils maintain directional persistence over longer timescales.
+Note that neutrophils have a rapid initial drop in autocorrelation, but then maintain directional persistence over longer timescales; this is an indication of global directionality in the data (see below).
+T cells have a similar initial drop, but without the long-term directionality. 
 
 
 # 5 Analyzing directionality
@@ -473,11 +507,11 @@ For example, applying Hotelling's test to the `Neutrophil` data:
 
 ```{r, fig.width = 6, fig.height = 3}
 par( mfrow=c(1,2) )
-plot( Neutrophils )
-hotellingsTest( Neutrophils, plot = TRUE, step.spacing = 3 )
+plot( Neutrophils2 )
+hotellingsTest( Neutrophils2, plot = TRUE, col = "gray", step.spacing = 10 )
 ```
 
-This shows there is a bias towards movement in the positive $y$ direction. See the discussion of tissue drift in the [vignette on quality control](./QC.html) for a more extensive discussion on how to use Hotelling's test to detect a global directional bias.
+This shows there is a bias towards movement in the  $(1,-1)$ direction. See the discussion of tissue drift in the [vignette on quality control](./QC.html) for a more extensive discussion on how to use Hotelling's test to detect a global directional bias.
 
 ### 5.2 Angle analyses
 
@@ -501,11 +535,11 @@ Angles and distances in reference to a plane are useful to detect tracking artef
 
 While Hotelling's test may be used to test for directionality in an unknown direction, we can increase the power of testing when the direction is known (for example, in an experiment with an artificial chemotactic gradient in a known direction).
 
-As an example, let's make an artificial dataset with additional movement in the direction $(1,1,1)$:
+As an example, let's make an artificial dataset with additional movement in the direction $(1,1)$:
 
 ```{r, fig.width = 7}
 # Directional movement is 0.05 micron/sec in each dimension
-directional.speed <- c( 0.05, 0.05, 0.05 )
+directional.speed <- c( 0.05, 0.05 )
 add.dir <- function( x, speed.vector )
 {
   # separate timepoints and coordinates
@@ -523,19 +557,19 @@ add.dir <- function( x, speed.vector )
 }
 
 # Create data with directionality
-TCells.dir <- as.tracks( lapply( TCells, add.dir, directional.speed ) )
+TCells2.dir <- as.tracks( lapply( TCells2, add.dir, directional.speed ) )
 
 # Plot both for comparison
-par(mfrow=c(1,2) )
-plot(TCells, main = "original data" )
-plot(TCells.dir, main = "with directional bias" )
+# par(mfrow=c(1,2) )
+# plot(TCells2, main = "original data" )
+# plot(TCells2.dir, main = "with directional bias" )
 ```
 
 Now, let's view the distribution of step angles with the reference direction, and compare this to the original data:
 
 ```{r, fig.width = 6}
-step.angles <- sapply( subtracks( TCells.dir, 1), angleToDir, dvec = c(1,1,1) )
-step.angles.original <- sapply( subtracks( TCells, 1 ), angleToDir, dvec = c(1,1,1) )
+step.angles <- sapply( subtracks( TCells2.dir, 1), angleToDir, dvec = c(1,1) )
+step.angles.original <- sapply( subtracks( TCells2, 1 ), angleToDir, dvec = c(1,1) )
 par(mfrow=c(1,2) )
 hist( step.angles.original, main = "original data" )
 hist( step.angles, main = "with directional bias" )
@@ -550,7 +584,7 @@ Sometimes a directional bias is not in a fixed direction, but towards a fixed po
 
 As an extreme example, let's make an artificial dataset by normalizing all T cell tracks so that they end at the same endpoint:
 
-```{r, fig.width = 7.5, fig.height=4 }
+```{r }
 # Normalize the endpoint by subtracting its coordinates from all other coordinates:
 normalize.endpoint <- function( x ){
   coords <- x[,-1]
@@ -558,25 +592,23 @@ normalize.endpoint <- function( x ){
   x[,-1] <- coords.norm
   return(x)
 }
-TCells.point <- as.tracks( lapply( TCells, normalize.endpoint ) )
+TCells2.point <- as.tracks( lapply( TCells2, normalize.endpoint ) )
 
 # Plot for comparison:
-par( mfrow = c(1,2) )
-plot( TCells, main = "original data" )
-plot( TCells.point, main = "with point attraction" )
+plot( TCells2.point, main = "with point attraction" )
 ```
 
 Hotelling's test cannot detect this bias, because the direction of the bias depends on where the track started:
 
 ```{r}
-hotellingsTest( TCells.point, plot = TRUE, step.spacing = 3 )
+hotellingsTest( TCells2.point, step.spacing = 10, col = "gray" )
 ```
 
-Now, given that we know in which direction we expect the cells to move (towards point $(0,0,0)$), we can again use angle analysis to compute the step angles towards the central point:
+Now, given that we know in which direction we expect the cells to move (towards point $(0,0)$), we can again use angle analysis to compute the step angles towards the central point:
 
 ```{r, fig.width = 7 }
-step.angles <- sapply( subtracks( TCells.point, 1), angleToPoint, p = c(1,1,1) )
-step.angles.original <- sapply( subtracks( TCells, 1 ), angleToPoint, p = c(1,1,1) )
+step.angles <- sapply( subtracks( TCells2.point, 1), angleToPoint, p = c(0,0) )
+step.angles.original <- sapply( subtracks( TCells2, 1 ), angleToPoint, p = c(0,0) )
 par(mfrow=c(1,2) )
 hist( step.angles.original, main = "original data" )
 hist( step.angles, main = "with point attraction" )
@@ -587,14 +619,14 @@ Once again, there is an significant enrichment for small angles.
 We can also plot the angle versus the distance to the point:
 
 ```{r}
-step.distances <- sapply( subtracks( TCells.point, 1), distanceToPoint, p = c(1,1,1) )
+step.distances <- sapply( subtracks( TCells2.point, 1), distanceToPoint, p = c(0,0) )
 
 df <- data.frame( dist = step.distances,
                   angles = step.angles )
 ggplot( df, aes( x = dist, y = angles ) ) +
-  geom_point() +
-  geom_hline( yintercept = 90, color = "red" ) +
-  stat_smooth( color = "black", method = "loess" ) +
+  geom_point( size = 0.2, color = "gray") +
+  geom_hline( yintercept = 90, color = "black" ) +
+  stat_smooth( color = "red", method = "loess" ) +
   labs( x = "distance to reference point",
         y = "angle to reference point" ) +
   theme_classic()
@@ -604,18 +636,18 @@ In our artificial dataset, the average angle is below 90 degrees for any distanc
 
 #### 5.2.5 Angles and distances between pairs of cells or individual steps
 
-Analyze angles and distances between pairs of cells:
+Analyze angles and distances between pairs of cells. Because computing all pairs of cells is slow, we'll here take a sample of the tracks to speed things up a little
 
 ```{r}
-df.cells <- analyzeCellPairs( TCells )
+df.cells <- analyzeCellPairs( TCells2 )
 
 # Plot
 ggplot( df.cells, aes( x = dist, y = angle ) ) +
-  geom_point( color = "gray40" ) +
-  stat_smooth( span = 1, color = "black" )+
+  geom_point( color = "gray" ) +
+  stat_smooth( span = 1, color = "red" )+
   labs( x = "distance between cell pairs",
         y = "angle between cell pairs" ) +
-  geom_hline( yintercept = 90, color = "red" ) +
+  geom_hline( yintercept = 90, color = "black" ) +
   theme_classic()
 ```
 
@@ -624,15 +656,15 @@ We expect angles between cell pairs to be on average 90 degrees. A lower average
 We can do something similar on the level of single steps (where we take into account only pairs of steps that occur at the same time point, and we filter for steps that displace at least two micron):
 
 ```{r, warning = FALSE, message = FALSE}
-df.steps <- analyzeStepPairs( TCells, filter.steps = function(x) displacement(x)>2  )
+df.steps <- analyzeStepPairs( TCells2, filter.steps = function(x) displacement(x)>2  )
 
 # Plot
 ggplot( df.steps, aes( x = dist, y = angle ) ) +
-  geom_point( color = "gray40", size = 0.5 ) +
-  stat_smooth( color = "black" )+
+  geom_point( color = "gray", size = 0.5 ) +
+  stat_smooth( color = "red" )+
   labs( x = "distance between step pairs",
         y = "angle between step pairs") +
-  geom_hline( yintercept = 90, color = "red" ) +
+  geom_hline( yintercept = 90, color = "black" ) +
   theme_classic()
 
 ```
