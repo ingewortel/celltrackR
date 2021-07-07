@@ -29,7 +29,7 @@ Compute the angle between two steps in the dataset that occur at the same timepo
 ## Find the angle between the steps of the tracks with ids 1 and 2, at the 3rd
 ## timepoint in the dataset.
 t <- timePoints( TCells )[3]
-angleSteps( TCells, c("1","2"), t )
+angleSteps( TCells, c("1","3"), t )
 }
 \seealso{
 \code{\link{distanceSteps}} to compute the distance between the step starting

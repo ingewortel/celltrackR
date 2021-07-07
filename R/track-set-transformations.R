@@ -33,8 +33,9 @@ normalizeTracks <- function(x){
 #'
 #' @examples
 #' ## Compare 2D and 3D speeds
-#' speed.2D <- mean( sapply( subtracks( projectDimensions( TCells, c("x","z") ), 2 ), speed ) )
-#' speed.3D <- mean( sapply( TCells, speed ) )
+#' load( system.file("extdata", "TCellsRaw.rda", package="celltrackR" ) )
+#' speed.2D <- mean( sapply( subtracks( projectDimensions( TCellsRaw, c("x","z") ), 2 ), speed ) )
+#' speed.3D <- mean( sapply( TCellsRaw, speed ) )
 #'
 #' @export
 projectDimensions <- function(x, dims=c("x","y")) {

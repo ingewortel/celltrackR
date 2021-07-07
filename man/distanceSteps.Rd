@@ -25,10 +25,10 @@ Compute the distance between two steps in the dataset that occur at the same tim
 The distance is the distance between the step starting points.
 }
 \examples{
-## Find the distance between the steps of the tracks with ids 1 and 2, at the 3rd
+## Find the distance between the steps of the tracks with ids 1 and 3, at the 3rd
 ## timepoint in the dataset.
 t <- timePoints( TCells )[3]
-distanceSteps( TCells, c("1","2"), t )
+distanceSteps( TCells, c("1","3"), t )
 }
 \seealso{
 \code{\link{angleSteps}} to compute the angle between the steps,

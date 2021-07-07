@@ -360,8 +360,9 @@ angleToDir <- function (x, dvec = c(1,1,1), from = 1, degrees=TRUE )
 #' ## detect tracking artefacts near the border of the imaging volume.
 #' ## We should be suspicious especially when small angles are more frequent at low distances
 #' ## to the border planes.
-#' steps <- subtracks( TCells, 1 )
-#' minz <- boundingBox( TCells )["min","z"]
+#' load( system.file("extdata", "TCellsRaw.rda", package="celltrackR" ) )
+#' steps <- subtracks( TCellsRaw, 1 )
+#' minz <- boundingBox( TCellsRaw )["min","z"]
 #' ## Compute angles and distances to the lower plane in z-dimension
 #' angles <- sapply( steps, angleToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )
 #' distances <- sapply( steps, distanceToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )
@@ -460,8 +461,9 @@ angleToPlane <- function (x, p1 = c(0,0,0), p2 = c(0,1,0), p3 = c(1,0,0),
 #' ## detect tracking artefacts near the border of the imaging volume.
 #' ## We should be suspicious especially when small angles are more frequent at low distances
 #' ## to the border planes.
-#' steps <- subtracks( TCells, 1 )
-#' minz <- boundingBox( TCells )["min","z"]
+#' load( system.file("extdata", "TCellsRaw.rda", package="celltrackR" ) )
+#' steps <- subtracks( TCellsRaw, 1 )
+#' minz <- boundingBox( TCellsRaw )["min","z"]
 #' ## Compute angles and distances to the lower plane in z-dimension
 #' angles <- sapply( steps, angleToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )
 #' distances <- sapply( steps, distanceToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )

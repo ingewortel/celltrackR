@@ -19,8 +19,8 @@ Compute the minimum distance between two cells in the dataset (minimum over all)
 the timepoints where they were both measured.
 }
 \examples{
-## Find the minimum distance between the tracks with ids 1 and 2
-distanceCells( TCells, c("1","2") )
+## Find the minimum distance between the tracks with ids 1 and 3
+distanceCells( TCells, c("1","3") )
 }
 \seealso{
 \code{\link{angleCells}} to compute the angle between the track displacement vectors,
