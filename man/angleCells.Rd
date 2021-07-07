@@ -20,8 +20,8 @@ A single angle.
 Compute the angle between the displacement vectors of two tracks in the dataset.
 }
 \examples{
-## Find the angle between the tracks with ids 1 and 2
-angleCells( TCells, c("1","2") )
+## Find the angle between the tracks with ids 1 and 3
+angleCells( TCells, c("1","3") )
 }
 \seealso{
 \code{\link{distanceCells}} to compute the minimum distance between the tracks,

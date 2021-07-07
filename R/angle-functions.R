@@ -600,7 +600,7 @@ distanceToPoint <- function (x, p = c(0,0,0), from = 1 )
 #' ## Find the angle between the steps of the tracks with ids 1 and 2, at the 3rd
 #' ## timepoint in the dataset.
 #' t <- timePoints( TCells )[3]
-#' angleSteps( TCells, c("1","2"), t )
+#' angleSteps( TCells, c("1","3"), t )
 #' @export
 angleSteps <- function( X, trackids, t, degrees = TRUE, quietly = FALSE )
 {
@@ -658,10 +658,10 @@ angleSteps <- function( X, trackids, t, degrees = TRUE, quietly = FALSE )
 #' and \code{\link{AngleAnalysis}} for other methods to compute angles and distances.
 #'
 #' @examples
-#' ## Find the distance between the steps of the tracks with ids 1 and 2, at the 3rd
+#' ## Find the distance between the steps of the tracks with ids 1 and 3, at the 3rd
 #' ## timepoint in the dataset.
 #' t <- timePoints( TCells )[3]
-#' distanceSteps( TCells, c("1","2"), t )
+#' distanceSteps( TCells, c("1","3"), t )
 #' @export
 distanceSteps <- function( X, trackids, t, quietly = FALSE )
 {
@@ -910,8 +910,8 @@ cellPairs <- function( X )
 #' and \code{\link{AngleAnalysis}} for other methods to compute angles and distances.
 #'
 #' @examples
-#' ## Find the angle between the tracks with ids 1 and 2
-#' angleCells( TCells, c("1","2") )
+#' ## Find the angle between the tracks with ids 1 and 3
+#' angleCells( TCells, c("1","3") )
 #' @export
 angleCells <- function( X, cellids, degrees = TRUE )
 {
@@ -943,8 +943,8 @@ angleCells <- function( X, cellids, degrees = TRUE )
 #' and \code{\link{AngleAnalysis}} for other methods to compute angles and distances.
 #'
 #' @examples
-#' ## Find the minimum distance between the tracks with ids 1 and 2
-#' distanceCells( TCells, c("1","2") )
+#' ## Find the minimum distance between the tracks with ids 1 and 3
+#' distanceCells( TCells, c("1","3") )
 #' @export
 distanceCells <- function( X, cellids )
 {
