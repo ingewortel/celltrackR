@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>celltrackR</title>
+    	<meta charset="utf-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    	<link rel="stylesheet" 
+    		href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+    		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+    		crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    	<style type="text/css">
+    	
+    	html{
+    		font-family: Roboto, sans-serif;
+    	}
+
+    	body{ 
+    		/*font-family: -apple-system, BlinkMacSystemFont, segoe ui, Roboto, helvetica neue, 
+    			Arial, noto sans, sans-serif, apple color emoji, segoe ui emoji, 
+    			segoe ui symbol, noto color emoji;*/
+    		font-family: Roboto, sans-serif;
+    	}
+    	
+    		
+    	.codediv{
+			max-width: 100%;
+			padding-left: 0;
+			padding-right: 0;
+			background: #333333;
+		    padding: 10px;
+		    border-radius: .2rem;
+		    margin-top: 10px;
+		    margin-bottom: 10px;
+    	}
+    	
+    	.citation{
+    		background:#eaecef;
+    		padding: 10px;
+		    border-radius: .2rem;
+    	}
+    	
+    	.vignette-card{
+    		margin-top:20px;
+    		margin-bottom:20px;
+    	}
+    	
+    	.codediv .mycode{
+		  width:100%!important;
+		  color: white;
+    	}
+    	
+    	.tutorial-img{
+    		max-width:90%;
+    	}
+    	
+    	h1 { margin: 1em 0;
+    	margin-top: 2em; }
+    	h2 { margin: 0.5em 0;
+    	margin-top:0em; }    	
+    	h3 {
+    		margin-top: 2em;
+    		font-size: 120%;
+    		font-weight: "bold";
+    	}
+       
+        </style>
+        
+        
+</head>
+
+<body>
+
+<nav class="navbar navbar-toggleable navbar-expand-lg fixed-top navbar-dark bg-dark"
+	id="navbar-main">
+      <div class="container">
+
+          <a class="navbar-brand" href="index.html">R package: celltrackR</a>
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+
+      <ul class="navbar-nav mr-auto">
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#vignettes"><span>Tutorials</span></a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#cheatsheet"><span>Cheatsheet</span></a>
+        </li>
+
+		<li class="nav-item">
+			<a class="nav-link" href="index.html#cran"><span>CRAN version</span></a>
+		</li>
+		
+		<li class="nav-item">
+			<a class="nav-link" href="index.html#dev"><span>Dev version</span></a>
+		</li>
+
+		<li class="nav-item">
+			<a class="nav-link" href="index.html#cite"><span>Citation</span></a>
+		</li>
+
+
+</ul>
+    </div>
+
+  </div>
+
+</nav>
+
+<div class="container mb-5">
+&nbsp;
+</div>
+
+<div class="container">
+
+
+<h1 class="mt-6">About</h1>      
+      
+<p>
+The package celltrackR is designed to help with describing, visualising, and quantifying tracks of 
+moving objects. Many common measures used in physics and biology are implemented, such as 
+mean square displacement and autocorrelation. The package also provides a flexible function 
+to import tracks from text files.</p>
+
+<p>The celltrackR package has been developed as part of the MotilityLab project. On the 
+project website (<a href="motilitylab.net">motilitylab.net</a>), a simple GUI frontend 
+to many functions in the package is implemented, and public datasets are available to 
+download and analyse. Indeed, the CelltrackR package was formerly called “MotilityLab”, 
+but we changed the name to make this functionality easier to find.</p>
+
+
+
+<section id="vignettes">
+<h1>Tutorials</h1>
+
+<p>See the following tutorials for detailed instructions on how to use the package and the
+included example data sets. These are also available from the package itself: </p>
+
+<div class="codediv">
+<code class="mycode">
+browseVignettes( "celltrackR" )
+</code>
+</div>
+
+<p><br><br>The following tutorials are available:</p>
+
+<div class="row">
+
+	<div class="vignette-card col-12 col-lg-6">
+		<div class="row">
+		<div class="col-3 col-md-2 col-lg-3">
+			<div class="tutorial-img"><img width="100%" src="./img/web-img_Read.png"></img></div>
+		</div>
+		<div class="col-9 col-md-10 col-lg-9">
+			<p class="vignette-title"><a href="./vignettes-out/reading-converting-data.html">1. Reading, Converting, and Filtering Tracking Data</a></p>
+			<p>Learn how to load your own data into R, to subset parts of your data, and to convert
+			between different data structures in R.</p>
+		</div>
+		</div>
+	</div>
+
+	<div class="vignette-card col-12 col-lg-6">
+		<div class="row">
+		<div class="col-3 col-md-2 col-lg-3">
+			<div class="tutorial-img"><img width="100%" src="./img/web-img_QC.png"></img></div>
+		</div>
+		<div class="col-9 col-md-10 col-lg-9">
+			<p class="vignette-title"><a href="./vignettes-out/QC.html">2. Quality Control and Preprocessing</a></p>
+			<p>An overview of quality control and preprocessing methods in the package.</p>
+		</div>
+		</div>
+	</div>
+	
+	<div class="vignette-card col-12 col-lg-6">
+		<div class="row">
+		<div class="col-3 col-md-2 col-lg-3">
+			<div class="tutorial-img"><img width="100%" src="./img/web-img_data-QC.png"></img></div>
+		</div>
+		<div class="col-9 col-md-10 col-lg-9">
+			<p class="vignette-title"><a href="./vignettes-out/data-QC.html">3. Quality Control and Preprocessing of the Datasets in the Package</a></p>
+			<p>QC and preprocessing methods applied to the example datasets of the package. Where tutorial 2 provides a general
+			overview of available methods, this tutorial shows the full workflow of applying them to raw data to obtain the cleaned up data sets
+			included in celltrackR.</p>
+		</div>
+		</div>
+	</div>
+	
+	<div class="vignette-card col-12 col-lg-6">
+		<div class="row">
+		<div class="col-3 col-md-2 col-lg-3">
+			<div class="tutorial-img"><img width="100%" src="./img/web-img_Analysis.png"></img></div>
+		</div>
+		<div class="col-9 col-md-10 col-lg-9">
+			<p class="vignette-title"><a href="./vignettes-out/ana-methods.html">4. Track Analysis Methods</a></p>
+			<p>Learn how to compute several analysis metrics on tracks. This includes simple metrics such as speed, turning angles, and straightness, but also 
+			mean squared displacement (MSD) and autocorrelation plots. The tutorial will also address the different (step-based, cell-based, staggered)
+			methods of calculating these metrics. </p>
+		</div>
+		</div>
+	</div>
+	
+	<div class="vignette-card col-12 col-lg-6">
+		<div class="row">
+		<div class="col-3 col-md-2 col-lg-3">
+			<div class="tutorial-img"><img width="100%" src="./img/web-img_Cluster.png"></img></div>
+		</div>
+		<div class="col-9 col-md-10 col-lg-9">
+			<p class="vignette-title"><a href="./vignettes-out/clustering.html">5. Clustering</a></p>
+			<p>Learn how to apply several clustering and dimensionality reduction methods to a track datasets, and to compare 
+			different datasets using multiple track features.</p>
+		</div>
+		</div>
+	</div>
+	
+	<div class="vignette-card col-12 col-lg-6">
+		<div class="row">
+		<div class="col-3 col-md-2 col-lg-3">
+			<div class="tutorial-img"><img width="100%" src="./img/web-img_Simulation.png"></img></div>
+		</div>
+		<div class="col-9 col-md-10 col-lg-9">
+			<p class="vignette-title"><a href="./vignettes-out/simulation.html">6. Simulating Tracks</a></p>
+			<p>Learn how to simulate tracks using different random walk models, or to bootstrap them from an input data set.</p>
+		</div>
+		</div>
+	</div>
+
+
+
+
+</div>
+</section>
+
+<section id="cheatsheet">
+<h1>Cheat sheet</h1>
+
+<p>The package cheat sheet provides an overview of the available functionalities; it is 
+accessible from R when the package is installed by typing:</p>
+
+<div class="codediv">
+<code class="mycode">
+celltrackR::cheatsheet()
+</code>
+</div>
+
+
+
+<p>Alternatively, you can access it <a href="./img/cheatsheet.pdf">here</a>.</p>
+
+</section>
+
+
+<section id="cran">
+<h1>CRAN version</h1>
+
+<p>CelltrackR is available on <a href="https://cran.rstudio.com/web/packages/celltrackR/index.html">CRAN<a> and can be installed using:
+
+<div class="codediv">
+<code class="mycode">
+install.packages( "celltrackR" )
+</code>
+</div>
+
+<p>(Note the small c in the package name). </p>
+
+
+</section>
+
+
+<section id="dev">
+<h1>Development version</h1>
+
+<p>The latest, development version of the package is available from our <a href="">Github repository<a>
+and can be installed using:</p>
+
+<div class="codediv">
+<code class="mycode">
+devtools::install_github( "ingewortel/celltrackR" )
+</code>
+</div>
+
+<p>If you do not have the devtools package installed, first run:</p>
+
+<div class="codediv">
+<code class="mycode">
+install.packages( "devtools" )
+</code>
+</div>
+
+
+</section>
+
+</section>
+
+
+<section id="cite">
+<h1>Cite</h1>
+
+<p>If you use celltrackR in your research, please consider supporting us by citing the following paper:<p>
+
+
+<div class="citation">
+<p>Inge M N Wortel, Annie Y Liu, Katharina Dannenberg, Jeffrey C Berry, Mark J Miller, Johannes Textor:
+<b>CelltrackR: an R package for fast and flexible analysis of immune cell migration data.</b>
+<i>Immunoinformatics</i>, 2021. doi: <a href="https://doi.org/10.1016/j.immuno.2021.100003">10.1016/j.immuno.2021.100003</a>.</p>
+</div>
+
+
+</section>
+
+
+</div>
+
+<div class="container mb-5">
+&nbsp;
+</div>
+
+
+</body>
+
+</html>
