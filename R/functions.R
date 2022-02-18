@@ -824,6 +824,6 @@ subsample <- function( x, k=2 ){
 #' @export
 timePoints <- function( X )
 {
-  timepoints.per.track <- sapply( X, function(x) unique( x[,1] ) )
-  return( unique( unlist( timepoints.per.track ) ) )
+  timepoints.per.track <- lapply( X, function(x) unique( x[,1] ) )
+  return( sort( unique( unlist( timepoints.per.track ) ) ) )
 }
