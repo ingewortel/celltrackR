@@ -580,19 +580,114 @@ distanceToPoint <- function (x, p = c(0,0,0), from = 1 )
   r
 }
 
+
+
+#' Distance between pairs of tracks at every timepoint
+#'
+#' For every timepoint in the dataset, compute pairwise distances between coordinates.
+#'
+#' @param X a tracks object
+#' @param searchRadius if specified, return only pairs that are within this distance of each other. 
+#' Defaults to \code{Inf}, so if left unspecified, all pairs are returned.
+#' @param times (optional) a vector of timePoints to check pairs at; by default this is just everything.
+#' @param quietly (default FALSE) if TRUE, suppress warnings when there are no tracks with
+#' overlapping timepoints and an empty dataframe is returned. 
+#'
+#' @return a dataframe with the following columns:
+#' \describe{
+#'   \item{cell1}{the id of the track to which the first coordinate belongs}
+#'   \item{cell2}{the id of the track to which the second coordinate belongs}
+#' 	 \item{t}{the time point at which their distance is assessed}
+#' 	 \item{dist}{the distance between the coordinates at this time}
+#' }
+#'
+#' @examples
+#' ## compute find timepoints where two t cells are within 1 micron of each other.
+#' pairsByTime( TCells, searchRadius = 1 )
+#' 
+#' ## indeed, the following two cells nearly touch:
+#' plot( TCells[ c("24","9258") ] )
+#' @export
+pairsByTime <- function( X, searchRadius = Inf, times = timePoints(X), quietly = FALSE )
+{
+  # check X tracks object
+  if( !is.tracks( X ) ) stop( "X must be a tracks object!" )
+  if( length(X) == 0 ){
+  	if( !quietly ) warning( "pairsByTime: tracks object X is empty. Returning an empty dataframe." )
+  	return( data.frame() )
+  }
+  
+  # check times; must be a subset of timePoints(X).
+  if( !all( times %in% timePoints(X) ) ) stop( "times must all occur in X!" )
+
+  # tracks to dataframe, split into a list with one dataframe per 
+  # timepoint. In that dataframe, set the cellid as rownames and
+  # keep only the coordinates.
+  df <- as.data.frame( X )
+  dataByTime <- split( df, df$t )
+  
+  # filter data for the timepoints in 'times' (by default, that's everything)
+  dataByTime <- dataByTime[ as.character( times ) ]
+  
+  coordsByTime <- lapply( dataByTime, function(x){
+    rownames(x) <- x$id
+    keep.cols <- !is.element( colnames(x), c("id"))
+    x <- x[,keep.cols]
+    return(x)
+  })
+  # Per timepoint in the list, compute distance matrix of all the cells present
+  # at that time, and then return pairwise distances in a dataframe.
+  pbt <- lapply( coordsByTime, function(x){
+    
+    # distance from distance matrix
+    # (get coordinates of all points at this time; compute distance matrix)
+    coords <- x[,colnames(x)!="t"]# remove first column containing time.
+    dm <- as.matrix( stats::dist( coords ))
+    
+    # rownames contain cell ids. Get all pairs with combn. This works only if 
+    # there are at least two ids; return an empty dataframe otherwise.
+    
+    if( length( rownames(dm) ) > 1 ){
+    	pairs <- as.data.frame( t(utils::combn( rownames(dm), 2 )) )
+    	colnames(pairs) <- c( "cell1","cell2" )
+    	
+    	# add time info
+		pairs$t <- x[1,"t"]
+		pairs$dist <- apply( pairs, 1, function(y) dm[ y[1], y[2] ] )
+	
+		# filter pairs within distance searchRadius of each other
+		pairs <- pairs[ pairs$dist <= searchRadius, ]
+    } else {
+    	pairs <- data.frame( cell1 = character(0), cell2 = character(0), t = numeric(0), dist = numeric(0) )
+    }    
+    return(pairs)
+  })
+  out <- do.call( rbind, pbt )
+  if( nrow(out) > 0 ){
+  	rownames(out) <- paste0( out[,1], "-", out[,2], "-", out[,3] )
+  } else{
+  	if( !quietly ) warning( "pairsByTime: no tracks share time points; returning an empty dataframe.")
+  }
+  return( out )
+}
+
 #' Angle between Two Steps
 #'
 #' Compute the angle between two steps in the dataset that occur at the same timepoint.
 #'
 #' @param X a tracks object
-#' @param trackids a vector of two indices specifying the tracks to get steps from.
-#' @param t the timepoint at which the steps should start.
+#' @param trackids a vector of two indices specifying the tracks to get steps from, or
+#' a dataframe/matrix of two columns (where every row contains a pair of trackids to compute 
+#' a step angle for)
+#' @param t the timepoint at which the steps should start, or a vector of timepoints if trackids
+#' is a matrix with multiple step pairs to compute angles for.
 #' @param degrees logical; should angle be returned in degrees instead of radians? (defaults to \code{TRUE})
 #' @param quietly logical; should a warning be returned if one or both of the steps are missing
 #' in the data and the function returns NA?
 #'
-#' @return A single angle, or NA if the desired timepoint is missing for one or both
-#' of the tracks.
+#' @return A single angle, or NA if the desired step is missing for one or both
+#' of the tracks. If trackids is a matrix with multiple step pairs to compute angles for,
+#' the output is a numeric vector of angles (or NA values).
 #'
 #' @seealso \code{\link{distanceSteps}} to compute the distance between the step starting
 #' points, \code{\link{timePoints}} to list all timepoints in a dataset,
@@ -603,41 +698,90 @@ distanceToPoint <- function (x, p = c(0,0,0), from = 1 )
 #' ## timepoint in the dataset.
 #' t <- timePoints( TCells )[3]
 #' angleSteps( TCells, c("1","3"), t )
+#' 
+#' ## Do this for multiple pairs and times at once: between cells 1 and 3 at the
+#' ## 3rd timepoint, and between 1 and 4 at the fourth timepoint.
+#' pairs <- data.frame( cell1 = c("1","1"), cell2 = c("3","4"))
+#' times <- timePoints(TCells)[3:4]
+#' angleSteps( TCells, pairs, times )
 #' @export
 angleSteps <- function( X, trackids, t, degrees = TRUE, quietly = FALSE )
 {
+  # ---- Checking/handling input
   if( !is.tracks(X) ){
     stop( "angleSteps: X must be a tracks object." )
   }
-  if( !length(trackids) == 2 ){
-    stop( "angleSteps: an angle is only defined for exactly 2 steps. Please provide exactly 2 trackids.")
+  if( any( !is.element( t, timePoints(X) ) ) ){
+    stop( "angleSteps: the supplied timepoints must correspond to those in the data!")
+  }
+  if( is.data.frame(trackids)) trackids <- as.matrix( trackids )
+  if( is.matrix( trackids ) ){
+    if( ncol(trackids) != 2 ){
+      stop( "angleSteps: an angle is only defined for exactly 2 steps. Please provide exactly 2 trackids, or a matrix with 2 trackid columns per row.")
+    }
+    if( nrow( trackids ) != length(t) ){
+      stop( "angleSteps: if angles are to be computed for a matrix of trackid pairs, then t must be a vector with the same length as the number of pairs.")
+    }
+  } else {
+    if( !length(trackids) == 2 ){
+      stop( "angleSteps: an angle is only defined for exactly 2 steps. Please provide exactly 2 trackids.")
+    }
   }
   if( any( !is.element( trackids, names(X) ) ) ){
     stop( "angleSteps: cannot find all supplied trackids in the data.")
   }
-  X2 <- selectSteps( X, trackids, t )
-  if( any( sapply(X2, is.null ) ) ){
-    if(!quietly){warning( "Warning: cannot find data for both steps. Returning NA.")}
-    return(NA)
+  
+  # if trackids is not a matrix (so we're checking just one angle), 
+  # then just make it a matrix of 1 row.
+  if( !is.matrix(trackids ) )  trackids <- matrix( trackids, ncol = length( trackids ) )
+  
+  # ---- Compute angle(s)
+  # To compute angle(s), first restructure tracks to a dataframe; this will be faster
+  # because it will allow to compute multiple angles at once using matrix-based computations.
+  df <- as.data.frame(X)
+  
+  # Add a column with the index of the timepoint (rather than absolute time);
+  # used below to find 'steps' in the data from coordinates at subsequent timepoints.
+  tsort <- sort( timePoints(X) )
+  tIndices <- stats::setNames( seq_along( tsort ), tsort )
+  df$timeIndex <- tIndices[ as.character( df$t  ) ]
+  
+  # set rownames of the data to a tag containing the cellid and the timepoint; this will
+  # allow us to find coordinates rapidly below.
+  rownames(df) <- paste0( df$id, "-", df$timeIndex )
+  
+  # convert the timepoints of interest to time indices.
+  tindexVec <- tIndices[ as.character(t) ]
+  
+  # Now find all relevant coordinates of the step pairs at the indicated time point.
+  # In trackids, each row is a pair with the two trackids in the columns. For both cells
+  # (columns), first find its coordinates at time t (="start") by using the rownames in df; 
+  # discard t/id columns to keep coordinates only. 
+  coordCols <- !is.element( colnames(df), c("t","id","timeIndex"))
+  start1 <- df[ paste0( trackids[,1], "-", unname( tindexVec ) ), coordCols ]
+  start2 <- df[ paste0( trackids[,2], "-", unname( tindexVec ) ), coordCols ]
+  
+  # also find the coordinates at the next timepoint ( = "end" of the step). Note that this
+  # is simply the point with a time-index incremented by 1:
+  end1 <- df[ paste0( trackids[,1], "-", unname( tindexVec+1 ) ), coordCols ]
+  end2 <- df[ paste0( trackids[,2], "-", unname( tindexVec+1 ) ), coordCols ]
+  
+  # check for which ids all relevant coordinates are actually found
+  keep <- ( rowSums( is.na( start1 )  ) == 0 ) & ( rowSums( is.na( start2 )  ) == 0 ) & ( rowSums( is.na( end1 )  ) == 0 ) & ( rowSums( is.na( end2 )  )== 0 )
+  
+  # subtract start from end to get displacement vector
+  d1 <- as.matrix( end1[keep,] - start1[keep,] )
+  d2 <- as.matrix( end2[keep,] - start2[keep,] )
+  
+  # init angles with NA (the default for if steps not in data), then add angles where possible
+  ang <- rep( NA, nrow( trackids ) ) 
+  if( sum( keep ) > 0 ) ang[keep] <- vecAngle( d1, d2, degrees = degrees )
+  
+  # warn if NAs left
+  if( any( is.na( ang ) ) && !quietly ){
+    warning( "Warning: for some pairs I cannot find data for both steps at the indicated time. Returning NA.")
   }
-  if( length(X2) != 2 ){
-    if(!quietly){warning( "Warning: cannot find data for both steps. Returning NA.")}
-    return(NA)
-  }
-
-  a <- diff( X2[[1]][,-1] )
-  b <- diff( X2[[2]][,-1] )
-
-  # # Normalize a and b by their length
-  # a <- a/sqrt(sum(a^2))
-  # b <- b/sqrt(sum(b^2))
-  #
-  # # Dot product of normalized a and b; this equals cos alpha
-  # rs <- sum(a * b)
-  #
-  # # angle is acos.
-  # ang <- acos(rs)
-  ang <- vecAngle( a, b, degrees = degrees )
+  
   ang
 }
 
@@ -647,13 +791,16 @@ angleSteps <- function( X, trackids, t, degrees = TRUE, quietly = FALSE )
 #' The distance is the distance between the step starting points.
 #'
 #' @param X a tracks object
-#' @param trackids a vector of two indices specifying the tracks to get steps from.
-#' @param t the timepoint at which the steps should start.
+#' @param trackids a vector of two indices specifying the tracks to get steps from, or
+#' a dataframe/matrix of two columns (where every row contains a pair of trackids to compute 
+#' a step angle for)
+#' @param t the timepoint at which the steps should start, or a vector of such timepoints if
+#' multiple step pairs are supplied in \code{trackids}.
 #' @param quietly logical; should a warning be returned if one or both of the steps are missing
 #' in the data and the function returns NA?
 #'
-#' @return A single distance, or NA if the desired timepoint is missing for one or both
-#' of the tracks.
+#' @return A single distance (NA if the desired timepoint is missing for one or both
+#' of the tracks), or a vector of such distances if multiple step pairs are supplied in \code{trackids}.
 #'
 #' @seealso \code{\link{angleSteps}} to compute the angle between the steps,
 #' \code{\link{timePoints}} to list all timepoints in a dataset,
@@ -664,38 +811,84 @@ angleSteps <- function( X, trackids, t, degrees = TRUE, quietly = FALSE )
 #' ## timepoint in the dataset.
 #' t <- timePoints( TCells )[3]
 #' distanceSteps( TCells, c("1","3"), t )
+#' 
+#' ## Do this for multiple pairs and times at once: between cells 1 and 3 at the
+#' ## 3rd timepoint, and between 1 and 4 at the fourth timepoint.
+#' pairs <- data.frame( cell1 = c("1","1"), cell2 = c("3","4"))
+#' times <- timePoints(TCells)[3:4]
+#' distanceSteps( TCells, pairs, times )
 #' @export
 distanceSteps <- function( X, trackids, t, quietly = FALSE )
 {
-
+  
+  # ---- Checking/handling input
   if( !is.tracks(X) ){
     stop( "distanceSteps: X must be a tracks object." )
   }
-  if( !length(trackids) == 2 ){
-    stop( "distanceSteps: only defined for exactly 2 steps. Please provide exactly 2 trackids.")
+  if( any( !is.element( t, timePoints(X) ) ) ){
+    stop( "distanceSteps: the supplied timepoints must correspond to those in the data!")
+  }
+  if( is.data.frame(trackids)) trackids <- as.matrix( trackids )
+  if( is.matrix( trackids ) ){
+    if( ncol(trackids) != 2 ){
+      stop( "distanceSteps: a distance is only defined for exactly 2 steps. Please provide exactly 2 trackids, or a matrix with 2 trackid columns per row.")
+    }
+    if( nrow( trackids ) != length(t) ){
+      stop( "distanceSteps: if distances are to be computed for a matrix of trackid pairs, then t must be a vector with the same length as the number of pairs.")
+    }
+  } else {
+    if( !length(trackids) == 2 ){
+      stop( "distanceSteps: only defined for exactly 2 steps. Please provide exactly 2 trackids.")
+    }
   }
   if( any( !is.element( trackids, names(X) ) ) ){
     stop( "distanceSteps: cannot find all supplied trackids in the data.")
   }
-  X2 <- selectSteps( X, trackids, t )
-  if( any( sapply(X2, is.null ) ) ){
-    if(!quietly){warning( "Warning: cannot find data for both steps. Returning NA.")}
-    return(NA)
+  
+  # if trackids is not a matrix (so we're checking just one angle), 
+  # then just make it a matrix of 1 row.
+  if( !is.matrix(trackids ) )  trackids <- matrix( trackids, ncol = length( trackids ) )
+  
+  # ---- Compute distance(s)
+  # Compute end times of the steps
+  tsort <- sort( timePoints(X) )
+  tIndices <- stats::setNames( seq_along( tsort ), tsort )
+  tIndexVec <- tIndices[as.character(t)]
+  tNext <- tsort[ tIndexVec + 1 ]
+  
+  # check for which pair/time combinations step data are actually present
+  df <- as.data.frame( X )
+  rownames(df) <- paste0( df$id, "-", df$t )
+  coordCols <- !is.element( colnames(df), c("t","id") )
+  start1 <- df[ paste0( trackids[,1], "-", t ), coordCols ]
+  start2 <- df[ paste0( trackids[,2], "-", t ), coordCols ]
+  end1 <- df[ paste0( trackids[,1], "-", tNext ), coordCols ]
+  end2 <- df[ paste0( trackids[,2], "-", tNext ), coordCols ]
+  keep <- ( rowSums( is.na( start1 )  ) == 0 ) & ( rowSums( is.na( start2 )  ) == 0 ) & ( rowSums( is.na( end1 )  ) == 0 ) & ( rowSums( is.na( end2 )  )== 0 )
+  
+  # for the pairs where this is the case, we can get the distance using pairsByTime, using
+  # the starting time of the step. For other pairs, we'll return NA, so init this first.
+  distances <- rep( NA, nrow( trackids ) )
+  if( sum( keep ) > 0 ){
+    tvec <- intersect( unique( c( t, tNext ) ), timePoints( X ) )
+    pbt <- pairsByTime( X, times = tvec )
+    #trackids must be sorted with lowest first
+    trackids <- t( apply( trackids, 1, sort ) ) 
+    distances[keep] <- pbt[ paste0( trackids[keep,1], "-", trackids[keep,2], "-", t[keep] ),"dist" ]
   }
-  if( length(X2) != 2 ){
+  
+  # if trackids are equal their distance is zero.
+  same <- ( trackids[,1] == trackids[,2] )
+  distances[same] <- 0
+  
+  
+  if( any(is.na(distances)) ){
     if(!quietly){warning( "Warning: cannot find data for both steps. Returning NA.")}
-    return(NA)
   }
-
-  # Select the relevant timepoint, and extract coordinates (remove id/time columns)
-  coords <- as.data.frame.tracks( subtracksByTime( X2, t, 0 ) )[,-c(1,2)]
-
-  # Compute the euclidian distance
-  diffm <- diff( as.matrix(coords) )
-  return( sqrt( sum( diffm^2 ) ) )
-
+  return(distances)
+  
+  
 }
-
 
 
 #' Find Pairs of Steps Occurring at the Same Time
@@ -755,7 +948,10 @@ stepPairs <- function( X, filter.steps=NULL )
 #' angles and distances for each pair of steps.
 #'
 #' @param X a tracks object
+#' @param searchRadius if specified, only return analysis for pairs of steps that
+#' start within distance searchRadius from each other
 #' @param filter.steps optional: a function used to filter steps on. See examples.
+#' @param quietly (default FALSE) if TRUE, suppress warnings
 #' @param ... further arguments passed on to \code{angleSteps}
 #'
 #' @return A dataframe with five columns: two for the indices of cellpairs that
@@ -783,27 +979,42 @@ stepPairs <- function( X, filter.steps=NULL )
 #' pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2 )
 #' scatter.smooth( pairs$dist, pairs$angle )
 #' @export
-analyzeStepPairs <- function( X, filter.steps = NULL, ... )
+analyzeStepPairs <- function( X, filter.steps = NULL, searchRadius = Inf, quietly = FALSE, ... )
 {
-
+  
   if( !is.tracks(X) ){
     stop( "analyzeStepPairs: X must be a tracks object!" )
   }
-
-  # Obtain cell paris for each timepoint
+  
+  # Obtain cell pairs for each timepoint; using filter.steps as filter criterion.
   pairs <- stepPairs( X, filter.steps = filter.steps )
-
-  if( nrow(pairs) > 0 ){
-    # Find the distance between the step starting points
-    distances <- unname( apply( pairs, 1, function(x) distanceSteps( X, x[1:2], as.numeric(x[3]), quietly = TRUE ) ) )
-
-    # Find the angles between the steps
-    angles <- unname( apply( pairs, 1, function(x) angleSteps( X, x[1:2], as.numeric(x[3]), quietly = TRUE, ... ) ) )
-
-    # Add to dataframe and return
-    pairs$dist <- distances
-    pairs$angle <- angles
-  }
+  if( nrow(pairs) == 0 ) return(pairs)
+  
+  # initialise dist/angle with NA. Set rownames p1-p2-t for lookup later.
+  pairs$dist <- NA
+  pairs$angle <- NA
+  rownames(pairs) <- paste0( pairs$p1, "-", pairs$p2, "-", pairs$t )
+  
+  # pairs of cells by time coordinate; this also computes a distance. 
+  # these data have rownames id1-id2-t for matching with the pairs dataframe later.
+  pByTime <- pairsByTime( X, searchRadius = searchRadius, quietly = quietly )
+  
+  # add angles for these pairs (which are within the search radius).
+  pByTime$angle <- angleSteps( X, as.matrix(pByTime[,1:2]), pByTime[,3], quietly = TRUE, ... )
+  
+  # Note that pByTime contains all pairs that co-occur at some timepoint, but that
+  # for analyzing steps they need to co-occur at least at two subsequent timepoints.
+  # Thus, pByTime may contain pairs not included in the 'pairs' dataframe generated 
+  # by stepPairs() above. The same holds true if some filter.steps criterion is specified.
+  # But it is also possible that there are pairs in 'pairs' which are not in pByTime,
+  # since pByTime is already focused on pairs within distance searchRadius from each other.
+  # therefore intersect to keep only the pairs that fulfill all these criteria. 
+  pairs <- pairs[ intersect( rownames(pairs), rownames( pByTime ) ), ]
+  
+  # Now that we are sure all pairs in 'pairs' are also in 'pByTime', lookup the computed
+  # angles and distances there and return. 
+  pairs$dist <- pByTime[ rownames(pairs), "dist" ]
+  pairs$angle <- pByTime[ rownames(pairs), "angle" ]
   pairs
 }
 
@@ -812,13 +1023,19 @@ analyzeStepPairs <- function( X, filter.steps = NULL, ... )
 #' Find Distances and Angles for all Pairs of Tracks
 #'
 #' Find all pairs of cells and return the shortest distance between them at any
-#' point, as well as the angle between their overall displacement vectors.
+#' point in time (if they share any time points), as well as the angle between 
+#' their overall displacement vectors.
 #'
 #' @param X a tracks object
+#' @param searchRadius if specified, only return analysis for pairs of cells that
+#' are within distance searchRadius from each other at least at one point in time.
+#' @param quietly (default FALSE) if TRUE, suppress warnings
 #' @param ... further arguments passed on to \code{angleCells}
 #'
 #' @return A dataframe with four columns: two for the indices of cellpairs,
-#' one for the distance between them, and one for their angle.
+#' one for the distance between them, and one for their angle. Note that the 
+#' distance will be NA for pairs of tracks that do not share time points, but
+#' their angle will still be computed.
 #'
 #' @details Analyzing track angles at different distances can be useful to detect
 #' directional bias or local crowding effects; see (Beltman et al, 2009).
@@ -840,30 +1057,54 @@ analyzeStepPairs <- function( X, filter.steps = NULL, ... )
 #' pairs <- analyzeCellPairs( TCells )
 #' scatter.smooth( pairs$dist, pairs$angle )
 #' @export
-analyzeCellPairs <- function( X, ... )
+analyzeCellPairs <- function( X, searchRadius = Inf, quietly = FALSE, ... )
 {
-
+  
   if( !is.tracks(X) ){
     stop( "analyzeCellPairs: X must be a tracks object!" )
   }
-
+  
   # Make all possible pairs of cellids
   pairs <- cellPairs( X )
-
-    if( nrow( pairs ) > 0 ){
-    # Compute angles and distances for all cell pairs in the data
-    cellangles <- apply( pairs, 1, function(x)
-      angleCells( X, x, ... ) )
-
-    celldistances <- apply( pairs, 1, function(x)
-      distanceCells( X, x ) )
-
-    # Make a dataframe
-    pairs$dist <- celldistances
-    pairs$angle <- cellangles
+  if( nrow( pairs ) == 0 ) return(pairs)
+  
+  # init distances and angles with NA.
+  pairs$dist <- NA
+  pairs$angle <- NA
+  
+  # per timepoint, compute distances for all pairs of cells that
+  # are both present at that time point. Output is a df with cell ids, time, and distance.
+  # Note that multiple distances per pair are present if the cells co-occur at multiple
+  # timepoints.
+  allPairs <- pairsByTime( X, searchRadius = searchRadius, quietly = quietly )
+  if( nrow( allPairs ) == 0 ){
+  	return( data.frame( cell1 = character(0), cell2 = character(0), dist = numeric(0), angle = numeric(0) ))
   }
+  
+  # Split by pair to find the min distance between the cells over time; then merge again
+  # into a single dataframe.
+  distByPair <- split( allPairs, paste0( allPairs$cell1, "-", allPairs$cell2 ) )
+  minDistByPair <- lapply( distByPair, function(x) {
+    minD <- min( x$dist )
+    x <- x[1,]
+    x$dist <- minD
+    return(x)
+  })
+  pairMinDist <- do.call( rbind, minDistByPair )
+  
+  # the pairMinDist already has rownames in the form of 'id1-id2' so data can be accessed easily.
+  # do the same with the 'pairs' dataframe of query points generated above:
+  rownames( pairs ) <- paste0( pairs$cell1, "-", pairs$cell2 )
+  
+  # For all the query points, get the distance and angle from the pairMinDist dataframe.
+  # Some query points will not be in this dataframe (if cells do not co-occur at any time);
+  # in that case, dist will remain NA. 
+  pairs[ rownames( pairMinDist ), "dist" ] <- pairMinDist$dist 
+  
+  # add angles and return
+  pairs$angle <- angleCells( X, pairs[,1:2], ...)
   return(pairs)
-
+  
 }
 
 
@@ -900,13 +1141,18 @@ cellPairs <- function( X )
 
 #' Angle between Two Tracks
 #'
-#' Compute the angle between the displacement vectors of two tracks in the dataset.
+#' Compute the angle between the displacement vectors of two tracks in the dataset,
+#' or of several such pairs at once.
+#' Note that in contrast to \code{\link{distanceCells}}, this angle is computed even
+#' when the two tracks do not share any time points.
 #'
 #' @param X a tracks object
-#' @param cellids a vector of two indices specifying the tracks to get steps from.
+#' @param cellids a vector of two indices specifying the tracks to get steps from, or
+#' a dataframe/matrix of two columns (where every row contains a pair of cellids to compute 
+#' an angle for)
 #' @param degrees logical; should angle be returned in degrees instead of radians? (defaults to \code{TRUE})
 #'
-#' @return A single angle.
+#' @return A single angle (if two cellids given), or a vector of angles (if multiple pairs of cellids are supplied).
 #'
 #' @seealso \code{\link{distanceCells}} to compute the minimum distance between the tracks,
 #' and \code{\link{AngleAnalysis}} for other methods to compute angles and distances.
@@ -914,22 +1160,51 @@ cellPairs <- function( X )
 #' @examples
 #' ## Find the angle between the tracks with ids 1 and 3
 #' angleCells( TCells, c("1","3") )
+#' 
+#' ## Find the angles of several cell pairs at once
+#' pairs <- data.frame( cell1 = c("1","1"), cell2 = c( "3","4" ) )
+#' angleCells( TCells, pairs )
 #' @export
-angleCells <- function( X, cellids, degrees = TRUE )
+angleCells <- function (X, cellids, degrees = TRUE ) 
 {
-  if( !is.tracks(X) ){
-    stop( "angleCells: X must be a tracks object!" )
+  #--- check/handle inputs
+  if (!is.tracks(X)) {
+    stop("angleCells: X must be a tracks object!")
   }
-  if( any( !is.element( cellids, names(X) ) ) ){
-    stop( "angleCells: cannot find both cellids in data." )
+  if( is.data.frame(cellids)) cellids <- as.matrix( cellids )
+  unique.ids <- unique( as.vector( cellids ))
+  if (any(!is.element(unique.ids, names(X)))) {
+    stop("angleCells: cannot find all cellids in data.")
   }
-  X <- X[cellids]
-
-  a <- displacementVector( X[[1]] )
-  b <- displacementVector( X[[2]] )
-  return( vecAngle( a, b, degrees = degrees ) )
-
+  if( is.matrix( cellids ) ){
+    if( ncol(cellids) != 2 ){
+      stop( "angleCells: an angle is only defined for exactly 2 cells. Please provide exactly 2 cellids, or a matrix with 2 trackid columns per row.")
+    }
+  } else {
+    if( !length(cellids) == 2 ){
+      stop( "angleCells: an angle is only defined for exactly 2 cells. Please provide exactly 2 cellids.")
+    }
+  }
+  
+  
+  # if cellids is not a matrix (so we're checking just one angle), 
+  # then just make it a matrix of 1 row.
+  if( !is.matrix(cellids ) )  cellids <- matrix( cellids, ncol = length(cellids ) )
+  
+  #--- compute
+  # Get displacement vectors for all the ids in trackids
+  disps <- lapply( unique( as.vector( cellids ) ), function(x) displacementVector( X[[x]] )  )
+  names(disps) <- unique( as.vector( cellids ) )
+  
+  # Get a matrix of displacement vectors for the ids in the first column of trackids, 
+  # and likewise for the second id of each pair
+  disps1 <- do.call( rbind, disps[ cellids[,1] ] )
+  disps2 <- do.call( rbind, disps[ cellids[,2] ] )
+  
+  # compute all angles at once using these matrices.
+  return(vecAngle(disps1, disps2, degrees = degrees))
 }
+
 
 #' Minimum Distance between Two Cells
 #'
@@ -937,9 +1212,13 @@ angleCells <- function( X, cellids, degrees = TRUE )
 #' the timepoints where they were both measured.
 #'
 #' @param X a tracks object
-#' @param cellids a vector of two indices specifying the tracks to compute distance between.
-#'
-#' @return A single distance, or NA if the the tracks do not have overlapping timepoints.
+#' @param cellids a vector of two indices specifying the tracks to compute distance between, or
+#' a dataframe/matrix of two columns (where every row contains a pair of cellids to compute 
+#' a distance for)
+#' @param quietly if TRUE, suppress warnings about returning NA distances.
+#' 
+#' @return A single distance (NA if the the tracks do not have overlapping timepoints), or 
+#' a vector of such distances if multiple pairs are supplied in \code{cellids}.
 #'
 #' @seealso \code{\link{angleCells}} to compute the angle between the track displacement vectors,
 #' and \code{\link{AngleAnalysis}} for other methods to compute angles and distances.
@@ -948,47 +1227,56 @@ angleCells <- function( X, cellids, degrees = TRUE )
 #' ## Find the minimum distance between the tracks with ids 1 and 3
 #' distanceCells( TCells, c("1","3") )
 #' @export
-distanceCells <- function( X, cellids )
+distanceCells <- function( X, cellids, quietly = FALSE )
 {
   if( !is.tracks(X) ){
     stop( "distanceCells: X must be a tracks object!" )
   }
-  if( any( !is.element( cellids, names(X) ) ) ){
+  if( is.data.frame(cellids)) cellids <- as.matrix( cellids )
+  if( any( !is.element( unique( as.vector( cellids ) ) , names(X) ) ) ){
     stop( "distanceCells: cannot find both cellids in data." )
   }
-
-  # Find timepoints occurring in both tracks
-  t1 <- timePoints( X[ cellids[1] ] )
-  t2 <- timePoints( X[ cellids[2] ] )
-  t <- c( t1, t2 )
-  tboth <- t[ duplicated(t) ]
-
-  # If cells have no overlapping timepts, return NA.
-  if( length(tboth) == 0 ){
-    return(NA)
+  if( is.matrix( cellids ) ){
+    if( ncol(cellids) != 2 ){
+      stop( "distanceCells: a distance is only defined for exactly 2 cells. Please provide exactly 2 cellids, or a matrix with 2 trackid columns per row.")
+    }
+  } else {
+    if( !length(cellids) == 2 ){
+      stop( "distanceCells: a distance is only defined for exactly 2 cells. Please provide exactly 2 cellids.")
+    }
   }
+  
+  # if cellids is not a matrix (so we're checking just one angle), 
+  # then just make it a matrix of 1 row.
+  if( !is.matrix(cellids ) )  cellids <- matrix( cellids, ncol = length(cellids ) )
+  
+  # Sort cellids per row
+  cellids <- t( apply( cellids, 1, sort ) )
 
-  # Get the coordinate matrix of both cells for the overlapping timeinterval
-  m1 <- X[[ cellids[1] ]]
-  rownames( m1 ) <- m1[,"t"]
-  m1 <- m1[ as.character(tboth), , drop =FALSE ]
-  m2 <- X[[ cellids[2] ]]
-  rownames( m2 ) <- m2[,"t"]
-  m2 <- m2[ as.character(tboth), , drop = FALSE ]
 
-  # Remove the time column from each matrix
-  m1 <- m1[,-1, drop = FALSE]
-  m2 <- m2[,-1, drop = FALSE]
+  # initalize distance as NA. 
+  pairs <- paste0( cellids[,1],"-", cellids[,2] )
+  distances <- setNames( rep( NA, length(pairs)), pairs )
 
-  # Subtract from each other to get dx,dy,dz at each t
-  mdiff <- m1 - m2
+  # for any pairs that share timepoints, add the distance. 
+  # pairsByTime returns distances for all timepoints where both tracks are present;
+  # use this to extract the min distance for each pair. 
+  pbt <- pairsByTime( X[ unique( as.vector( cellids ) ) ], quietly = TRUE )
+  if( nrow(pbt) > 0 ){
+  	pbt[,1:2] <- t( apply( pbt[,1:2], 1, sort ) ) 
+  	pbtMin <- sapply( split( pbt, paste0( pbt$cell1, "-", pbt$cell2 ) ), function(x) min( x$dist ) )
+  	add.pairs <- pairs[ is.element( pairs, names( pbtMin ))]
+  	distances[add.pairs] <- unname( pbtMin[add.pairs] )
+  }
+  
+  # if cellids are equal, distance is zero
+  distances[ cellids[,1]==cellids[,2]] <- 0
 
-  # compute distance at each timepoint
-  mdiff <- mdiff^2
-  distances <- sqrt( rowSums( mdiff ) )
-  return( min(distances) )
-
+  # Warning if there are NAs
+  if( any(is.na(distances)) ){
+    if(!quietly){warning( "Warning: distance undefined for cells that don't share timepoints; returning NA.")}
+  }
+  return(unname( distances) )
 
 }
-
 
