@@ -9,10 +9,13 @@ distanceCells(X, cellids)
 \arguments{
 \item{X}{a tracks object}
 
-\item{cellids}{a vector of two indices specifying the tracks to compute distance between.}
+\item{cellids}{a vector of two indices specifying the tracks to compute distance between, or
+a dataframe/matrix of two columns (where every row contains a pair of cellids to compute 
+a distance for)}
 }
 \value{
-A single distance, or NA if the the tracks do not have overlapping timepoints.
+A single distance (NA if the the tracks do not have overlapping timepoints), or 
+a vector of such distances if multiple pairs are supplied in \code{cellids}.
 }
 \description{
 Compute the minimum distance between two cells in the dataset (minimum over all)

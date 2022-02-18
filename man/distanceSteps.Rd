@@ -9,16 +9,19 @@ distanceSteps(X, trackids, t, quietly = FALSE)
 \arguments{
 \item{X}{a tracks object}
 
-\item{trackids}{a vector of two indices specifying the tracks to get steps from.}
+\item{trackids}{a vector of two indices specifying the tracks to get steps from, or
+a dataframe/matrix of two columns (where every row contains a pair of trackids to compute 
+a step angle for)}
 
-\item{t}{the timepoint at which the steps should start.}
+\item{t}{the timepoint at which the steps should start, or a vector of such timepoints if
+multiple step pairs are supplied in \code{trackids}.}
 
 \item{quietly}{logical; should a warning be returned if one or both of the steps are missing
 in the data and the function returns NA?}
 }
 \value{
-A single distance, or NA if the desired timepoint is missing for one or both
-of the tracks.
+A single distance (NA if the desired timepoint is missing for one or both
+of the tracks), or a vector of such distances if multiple step pairs are supplied in \code{trackids}.
 }
 \description{
 Compute the distance between two steps in the dataset that occur at the same timepoint.
@@ -29,6 +32,12 @@ The distance is the distance between the step starting points.
 ## timepoint in the dataset.
 t <- timePoints( TCells )[3]
 distanceSteps( TCells, c("1","3"), t )
+
+## Do this for multiple pairs and times at once: between cells 1 and 3 at the
+## 3rd timepoint, and between 1 and 4 at the fourth timepoint.
+pairs <- data.frame( cell1 = c("1","1"), cell2 = c("3","4"))
+times <- timePoints(TCells)[3:4]
+distanceSteps( TCells, pairs, times )
 }
 \seealso{
 \code{\link{angleSteps}} to compute the angle between the steps,

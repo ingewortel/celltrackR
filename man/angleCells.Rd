@@ -9,19 +9,28 @@ angleCells(X, cellids, degrees = TRUE)
 \arguments{
 \item{X}{a tracks object}
 
-\item{cellids}{a vector of two indices specifying the tracks to get steps from.}
+\item{cellids}{a vector of two indices specifying the tracks to get steps from, or
+a dataframe/matrix of two columns (where every row contains a pair of cellids to compute 
+an angle for)}
 
 \item{degrees}{logical; should angle be returned in degrees instead of radians? (defaults to \code{TRUE})}
 }
 \value{
-A single angle.
+A single angle (if two cellids given), or a vector of angles (if multiple pairs of cellids are supplied).
 }
 \description{
-Compute the angle between the displacement vectors of two tracks in the dataset.
+Compute the angle between the displacement vectors of two tracks in the dataset,
+or of several such pairs at once.
+Note that in contrast to \code{\link{distanceCells}}, this angle is computed even
+when the two tracks do not share any time points.
 }
 \examples{
 ## Find the angle between the tracks with ids 1 and 3
 angleCells( TCells, c("1","3") )
+
+## Find the angles of several cell pairs at once
+pairs <- data.frame( cell1 = c("1","1"), cell2 = c( "3","4" ) )
+angleCells( TCells, pairs )
 }
 \seealso{
 \code{\link{distanceCells}} to compute the minimum distance between the tracks,

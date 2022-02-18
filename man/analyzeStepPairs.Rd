@@ -4,12 +4,15 @@
 \alias{analyzeStepPairs}
 \title{Find Distances and Angles for all Pairs of Steps}
 \usage{
-analyzeStepPairs(X, filter.steps = NULL, ...)
+analyzeStepPairs(X, filter.steps = NULL, searchRadius = Inf, ...)
 }
 \arguments{
 \item{X}{a tracks object}
 
 \item{filter.steps}{optional: a function used to filter steps on. See examples.}
+
+\item{searchRadius}{if specified, only return analysis for pairs of steps that
+start within distance searchRadius from each other}
 
 \item{...}{further arguments passed on to \code{angleSteps}}
 }
