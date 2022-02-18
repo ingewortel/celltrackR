@@ -4,7 +4,7 @@
 \alias{pairsByTime}
 \title{Distance between pairs of tracks at every timepoint}
 \usage{
-pairsByTime(X, searchRadius = Inf, times = timePoints(X))
+pairsByTime(X, searchRadius = Inf, times = timePoints(X), quietly = FALSE)
 }
 \arguments{
 \item{X}{a tracks object}
@@ -13,6 +13,9 @@ pairsByTime(X, searchRadius = Inf, times = timePoints(X))
 Defaults to \code{Inf}, so if left unspecified, all pairs are returned.}
 
 \item{times}{(optional) a vector of timePoints to check pairs at; by default this is just everything.}
+
+\item{quietly}{(default FALSE) if TRUE, suppress warnings when there are no tracks with
+overlapping timepoints and an empty dataframe is returned.}
 }
 \value{
 a dataframe with the following columns:

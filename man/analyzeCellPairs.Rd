@@ -4,13 +4,15 @@
 \alias{analyzeCellPairs}
 \title{Find Distances and Angles for all Pairs of Tracks}
 \usage{
-analyzeCellPairs(X, searchRadius = Inf, ...)
+analyzeCellPairs(X, searchRadius = Inf, quietly = FALSE, ...)
 }
 \arguments{
 \item{X}{a tracks object}
 
 \item{searchRadius}{if specified, only return analysis for pairs of cells that
 are within distance searchRadius from each other at least at one point in time.}
+
+\item{quietly}{(default FALSE) if TRUE, suppress warnings}
 
 \item{...}{further arguments passed on to \code{angleCells}}
 }

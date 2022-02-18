@@ -4,7 +4,7 @@
 \alias{distanceCells}
 \title{Minimum Distance between Two Cells}
 \usage{
-distanceCells(X, cellids)
+distanceCells(X, cellids, quietly = FALSE)
 }
 \arguments{
 \item{X}{a tracks object}
@@ -12,6 +12,8 @@ distanceCells(X, cellids)
 \item{cellids}{a vector of two indices specifying the tracks to compute distance between, or
 a dataframe/matrix of two columns (where every row contains a pair of cellids to compute 
 a distance for)}
+
+\item{quietly}{if TRUE, suppress warnings about returning NA distances.}
 }
 \value{
 A single distance (NA if the the tracks do not have overlapping timepoints), or 
