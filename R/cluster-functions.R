@@ -72,7 +72,7 @@ clusterTracks <- function( tracks, measures, scale = TRUE, labels = NULL, method
   # Ensure that these will be reset to their default values before the function
   # exits for any reason.
   oldpar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(oldpar))
+  on.exit(suppressWarnings( graphics::par(oldpar)) )
 
   # Compute clustering based on "method"
   if( method == "hclust" ){
