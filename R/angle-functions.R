@@ -1256,7 +1256,7 @@ distanceCells <- function( X, cellids, quietly = FALSE )
 
   # initalize distance as NA. 
   pairs <- paste0( cellids[,1],"-", cellids[,2] )
-  distances <- setNames( rep( NA, length(pairs)), pairs )
+  distances <- stats::setNames( rep( NA, length(pairs)), pairs )
 
   # for any pairs that share timepoints, add the distance. 
   # pairsByTime returns distances for all timepoints where both tracks are present;
