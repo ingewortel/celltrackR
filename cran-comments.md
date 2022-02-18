@@ -1,4 +1,21 @@
-## Resubmission
+
+## Current submission v1.1.0
+
+
+### Test environments
+* local OS X (x86_64-apple-darwin20.3.0, 64-bit) with R v4.0.5 (2021-03-31)
+
+### R CMD check results
+
+
+### Reverse dependencies
+
+Checked with revdepcheck::revdep_check(); there were no reverse dependencies found.
+
+
+## Previous submission
+
+### Resubmission
 Edit 30-03-2020 (2): Upon request, we have:
 
 * DESCRIPTION : updated the date field.
@@ -22,12 +39,12 @@ This is a resubmission. As requested, we have made the following changes in this
 * vignettes/ : Renamed any variables in the vignettes named T.[something];
 
 
-## Test environments
+### Test environments
 * local OS X install, R 3.6.1
 * ubuntu 18.04.3, R 3.6.2
 * win-builder (devel)
 
-## R CMD check results
+### R CMD check results
 There were no ERRORs or WARNINGs. 
 
 There was 1 NOTE:

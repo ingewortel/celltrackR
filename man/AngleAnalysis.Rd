@@ -59,7 +59,7 @@ computed to the first step in the given track.
 ## Plotting the angle versus the distance to a reference point can be informative to
 ## detect biased movement towards that point. We should be suspicious especially
 ## when small angles are more frequent at lower distances.
-steps <- subtracks( Neutrophils, 1 )
+steps <- subtracks( sample( Neutrophils, 50 ), 1 )
 bb <- boundingBox( Neutrophils )
 angles <- sapply( steps, angleToPoint, p = bb["max",-1] )
 distances <- sapply( steps, distanceToPoint, p = bb["max",-1] )
@@ -76,7 +76,7 @@ hist( sapply( steps, angleToDir, dvec=c(1,-1) ) )
 ## We should be suspicious especially when small angles are more frequent at low distances
 ## to the border planes; as is the case in the z-dimension for the raw data:
 load( system.file("extdata", "TCellsRaw.rda", package="celltrackR" ) )
-steps <- subtracks( TCellsRaw, 1 )
+steps <- subtracks( sample( TCellsRaw, 50 ), 1 )
 minz <- boundingBox( TCellsRaw )["min","z"]
 ## Compute angles and distances to the lower plane in z-dimension
 angles <- sapply( steps, angleToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz), p3 = c(0,1,minz) )
@@ -84,14 +84,14 @@ distances <- sapply( steps, distanceToPlane, p1 = c(0,0,minz), p2 = c(1,0,minz),
 scatter.smooth( distances, angles )
 abline( h = 32.7, col = "red" )
 
-## Plot distance versus angle for all cell pairs
-pairs <- analyzeCellPairs( TCells )
+## Plot distance versus angle for all cell pairs (here in only a sample to speed things up)
+pairs <- analyzeCellPairs( sample( TCells, 50 ) )
 scatter.smooth( pairs$dist, pairs$angle )
 abline( h = 90, col = "red" )
 
 ## Plot distance versus angle for all step pairs, filtering for those that
 ## displace at least 2 microns
-pairs <- analyzeStepPairs( TCells, filter.steps = function(t) displacement(t) > 2 )
+pairs <- analyzeStepPairs( sample( TCells, 50 ), filter.steps = function(t) displacement(t) > 2 )
 scatter.smooth( pairs$dist, pairs$angle )
 abline( h = 90, col = "red" )
 

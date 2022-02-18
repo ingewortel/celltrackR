@@ -35,8 +35,8 @@ Internally, the function uses \code{\link{cellPairs}}, \code{\link{angleCells}},
 and \code{\link{distanceCells}}.
 }
 \examples{
-## Plot distance versus angle for all cell pairs
-pairs <- analyzeCellPairs( TCells )
+## Plot distance versus angle for all cell pairs. Sample T-cell data here for speed.
+pairs <- analyzeCellPairs( sample( TCells, 100 ) )
 scatter.smooth( pairs$dist, pairs$angle )
 }
 \references{

@@ -1,19 +1,21 @@
 Package: celltrackR
 Type: Package
 Title: Motion Trajectory Analysis
-Date: 2020-03-30
-Version: 1.0.0
+Date: 2022-02-18
+Version: 1.1.0
 Authors@R: c(person("Johannes", "Textor", role = c("aut", "cre"),
                      email = "johannes.textor@gmx.de"),
               person("Katharina", "Dannenberg", role = "aut"),
               person("Jeffrey", "Berry", role = "aut" ),
               person("Gerhard", "Burger", role = "aut"),
+              person("Annie","Liu", role= "aut"),
               person("Inge", "Wortel", role = "aut",
                      email = "ingewortel@gmail.com"))
 Author: Johannes Textor [aut, cre],
   Katharina Dannenberg [aut],
   Jeffrey Berry [aut],
   Gerhard Burger [aut],
+  Annie Liu [aut],
   Inge Wortel [aut]
 Maintainer: Johannes Textor <johannes.textor@gmx.de>
 Description: Provides methodology to analyze cells that move in a two- or three-dimensional
