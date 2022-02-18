@@ -501,7 +501,7 @@ test_that("distanceCells returns correct output when multiple distances are requ
   multi <- distanceCells( TCells, cbind(names(TCells)[2:4],names(TCells)[1:3]) )
   expect_true( is.numeric(  multi ) )
   expect_length(  multi, 3 )
-  expect_true(  all( multi >= 0 || is.na(multi) ) )
+  expect_true(  all( multi >= 0, na.rm = TRUE ) )
   shifted10x <- c( makeTracksShifted( c(10,0) ), makeTracksShifted( c(10,0) ) )
   names( shifted10x ) <- as.character( 1:4 )
   expect_true( all( distanceCells( shifted10x, rbind( c( "1","2"), c("3","4"))  ) - 10 < 1e-10 ) )
