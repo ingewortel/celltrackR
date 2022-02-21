@@ -4,13 +4,18 @@
 
 ### Test environments
 * local OS X (x86_64-apple-darwin20.3.0, 64-bit) with R v4.0.5 (2021-03-31)
+* ubuntu 20.04, R v3.6.3
+* win-builder (devel)
 
 ### R CMD check results
 
+Status: OK
+
+(no errors/warnings/notes).
 
 ### Reverse dependencies
 
-Checked with revdepcheck::revdep_check(); there were no reverse dependencies found.
+Not applicable: no dependencies found with revdepcheck::revdep_check().
 
 
 ## Previous submission
