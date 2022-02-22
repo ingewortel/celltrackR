@@ -140,7 +140,7 @@ length( TCells.filtered )
 
 The filtering has removed all tracks of 1-10 steps, leaving 31 out of the 50 sampled tracks in the dataset.
 
-> ! **Note** : Filtering out short tracks can introduce bias in a dataset. See [Beltman et al (2009)](https://www.ncbi.nlm.nih.gov/pubmed/19834485) for details and for step-based analyses as alternative methods to deal with short tracks. See the [vignette on analysis methods](./ana-methods.html) for an explanation of how to use these methods.
+> ! **Note** : Filtering out short tracks can introduce bias in a dataset. See [Beltman et al (2009)](https://pubmed.ncbi.nlm.nih.gov/19834485/) for details and for step-based analyses as alternative methods to deal with short tracks. See the [vignette on analysis methods](./ana-methods.html) for an explanation of how to use these methods.
 
 In the following, we'll use the original, unfiltered data in `TCellsRaw`.
 
@@ -187,7 +187,7 @@ This drift clearly affects the tracks, with a global bias in the $(1,1)$ directi
 
 ### 2.2 Detecting global directionality: hotellingsTest
 
-[Textor et al (2011)](https://www.ncbi.nlm.nih.gov/pubmed/21734152) proposed using Hotelling's T-square test to detect directionality in a dataset. This test computes displacement vectors of all steps in the data, and tests if the mean displacement vector is significantly different from the null vector. 
+[Textor et al (2011)](https://pubmed.ncbi.nlm.nih.gov/21734152/) proposed using Hotelling's T-square test to detect directionality in a dataset. This test computes displacement vectors of all steps in the data, and tests if the mean displacement vector is significantly different from the null vector. 
 
 In using this test, it is important to realise that steps from within a track are not independent: cells usually exhibit some kind of persistent motion at least on a short time scale (that is: the same cell does not tend to go in completely opposite directions at to subsequent timepoints). This means that blindly extracting all steps violates the "independent observations" assumption of Hotelling's test. 
 
@@ -295,7 +295,7 @@ However, this is not always recommended; the z-dimension in many two-photon expe
 
 ### 2.3 Detecting global directionality: angle analysis
 
-[Beltman et al (2009)](https://www.ncbi.nlm.nih.gov/pubmed/19834485) proposed an analysis of angles versus distance between cell pairs to detect global directionality in a dataset. Use the function `analyzeCellPairs` to get a dataframe with for each pair of tracks in the dataset the angle (between their displacement vectors) and the distance (min distance between the tracks at any timepoint). Note that the distance is not defined for pairs of tracks that have no overlap in timepoints -- these will get an NA value.
+[Beltman et al (2009)](https://pubmed.ncbi.nlm.nih.gov/19834485/) proposed an analysis of angles versus distance between cell pairs to detect global directionality in a dataset. Use the function `analyzeCellPairs` to get a dataframe with for each pair of tracks in the dataset the angle (between their displacement vectors) and the distance (min distance between the tracks at any timepoint). Note that the distance is not defined for pairs of tracks that have no overlap in timepoints -- these will get an NA value.
 
 ```{r cellPairs, warning = FALSE, message = FALSE, fig.width=6, fig.heigth = 2.5}
 # compute for both original as drift data
@@ -432,7 +432,7 @@ names(dup.track) <- as.character( new.id )
 TCells.dup <- c( TCellsRaw, dup.track )
 ```
 
-This can again be detected by plotting the angle between cell pairs versus the distance between cell pairs (see also section 2.3 above and [Beltman et al (2009)](https://www.ncbi.nlm.nih.gov/pubmed/19834485)):
+This can again be detected by plotting the angle between cell pairs versus the distance between cell pairs (see also section 2.3 above and [Beltman et al (2009)](https:/pubmed.ncbi.nlm.nih.gov/19834485/)):
 
 ```{r, warning = FALSE, fig.width = 3, fig.height = 2.5 }
 df <- analyzeCellPairs( TCells.dup )
@@ -475,7 +475,7 @@ corrected.dup <- TCells.dup[ names( TCells.dup ) != "9659" ]
 
 ### 3.2 Detecting tracking errors near border or imprecise z-calibration: distances and angles to border planes
 
-A plot of angles and distances to the border planes of the imaging volume can help detect artifacts ([Beltman et al (2009)](https://www.ncbi.nlm.nih.gov/pubmed/19834485) ). We can compute these for each step using the functions `distanceToPlane` and `angleToPlane`.
+A plot of angles and distances to the border planes of the imaging volume can help detect artifacts ([Beltman et al (2009)](https://pubmed.ncbi.nlm.nih.gov/19834485/) ). We can compute these for each step using the functions `distanceToPlane` and `angleToPlane`.
 
 To specify a border plane, we first need three points on that plane. We can either define the imaging volume manually or estimate it using `boundingBox`:
 
@@ -513,7 +513,7 @@ ggplot( df, aes( x = distances,
   theme_classic()
 ```
 
-The mean angle to the border plane should be roughly 32.7 degrees (the red horizontal line). Tracking errors near the border plane would result in a lower average angle near the left and right side of the plots, which is indeed what we see here. This plot also seems to indicate imprecise z-calibration, which results in a systematic deviation from the 32.7 degree angle at any distance to the plane (e.g. at the middle distances in this plot) ([Beltman et al (2009)](https://www.ncbi.nlm.nih.gov/pubmed/19834485) ). 
+The mean angle to the border plane should be roughly 32.7 degrees (the red horizontal line). Tracking errors near the border plane would result in a lower average angle near the left and right side of the plots, which is indeed what we see here. This plot also seems to indicate imprecise z-calibration, which results in a systematic deviation from the 32.7 degree angle at any distance to the plane (e.g. at the middle distances in this plot) ([Beltman et al (2009)](https://pubmed.ncbi.nlm.nih.gov/19834485/) ). 
 
 When we plot the data in the XZ instead of the XY plane, we can see the problem:
 
