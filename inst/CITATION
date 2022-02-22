@@ -12,7 +12,7 @@ citEntry(entry = "Article",
   year         = "2021",
   pages        = "100003",
   volume	   = "1-2",
-  url          = "https://ingewortel.github.io/celltrackR",
+  url          = "https://ingewortel.github.io/celltrackR/",
   textVersion  =
   paste("Inge M.N. Wortel, Annie Y. Liu, Katharina Dannenberg, Jeffrey C. Berry, Mark J. Miller, Johannes Textor (2021).",
         "CelltrackR: an R package for fast and flexible analysis of immune cell migration data.",

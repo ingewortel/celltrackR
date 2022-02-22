@@ -136,7 +136,7 @@ plot( brownian.tracks.bias, main = "biased random walk" )
 
 # 2 The Beauchemin model of lymphocyte migration
 
-Aside from a simple random walk, the package also implements a slightly different model proposed by [Beauchemin et al (2007)](https://www.ncbi.nlm.nih.gov/pubmed/17442932). In contrast to the simple random walk, this model has a tuneable amount of persistence, and the cell pauses briefly between each step as it needs to reorient itself, which takes some time. For these reasons, the Beauchemin model generates tracks that are a bit more realistic than a simple random walk.
+Aside from a simple random walk, the package also implements a slightly different model proposed by [Beauchemin et al (2007)](https://www.ncbi.nlm.nih.gov/pubmed/17442932/). In contrast to the simple random walk, this model has a tuneable amount of persistence, and the cell pauses briefly between each step as it needs to reorient itself, which takes some time. For these reasons, the Beauchemin model generates tracks that are a bit more realistic than a simple random walk.
 
 ```{r beauchemin}
 beauchemin.tracks <- simulateTracks( 10, beaucheminTrack(sim.time=20) )
@@ -398,7 +398,7 @@ Next, let's look at a slightly more complicated model.
 
 ### 5.3 Fitting the Beauchemin model
 
-We now use a similar approach to fit the model proposed by [Beauchemin et al (2007)](https://www.ncbi.nlm.nih.gov/pubmed/17442932), which was designed for T-cell migration in the lymph node. 
+We now use a similar approach to fit the model proposed by [Beauchemin et al (2007)](https://www.ncbi.nlm.nih.gov/pubmed/17442932/), which was designed for T-cell migration in the lymph node. 
 
 The MSD of this model can be derived analytically [(Textor et al (2013), proposition 12)](https://doi.org/10.1186/1471-2105-14-S6-S10) : 
 
@@ -411,7 +411,7 @@ where $M$ is the motility coefficient, which should be the same as our diffusion
 
 $$M = \frac{v_\text{free}^2\cdot t_\text{free}^2}{6(t_\text{free}+t_\text{pause})}$$
 
-We should note here that the Beauchemin has three parameters ($v_\text{free}$, $t_\text{free}$, $t_\text{pause}$), but that these are underdefined based on MSD: multiple parameter combinations can give the exact same MSD (see [Beauchemin et al (2007)](https://www.ncbi.nlm.nih.gov/pubmed/17442932), [Textor et al (2013)](https://doi.org/10.1186/1471-2105-14-S6-S10)). This means we cannot fit all three parameters based on the MSD. Here, we'll set $t_\text{pause}$ to the literature value of 0.5 minute, and fit the other parameters $v_\text{free}$ and $t_\text{free}$ based on the MSD to show how this works: 
+We should note here that the Beauchemin has three parameters ($v_\text{free}$, $t_\text{free}$, $t_\text{pause}$), but that these are underdefined based on MSD: multiple parameter combinations can give the exact same MSD (see [Beauchemin et al (2007)](https://www.ncbi.nlm.nih.gov/pubmed/17442932/), [Textor et al (2013)](https://doi.org/10.1186/1471-2105-14-S6-S10)). This means we cannot fit all three parameters based on the MSD. Here, we'll set $t_\text{pause}$ to the literature value of 0.5 minute, and fit the other parameters $v_\text{free}$ and $t_\text{free}$ based on the MSD to show how this works: 
 
 ```{r fittedBeauchemin}
 # analytical formula
