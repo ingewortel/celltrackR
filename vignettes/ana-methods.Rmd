@@ -157,7 +157,7 @@ ggplot( d, aes( x = cells, y = speed ) ) +
 
 ### 2.2 Step-based analyses
 
-It has been suggested that cell-based analyses introduce biases, and that analyses should be performed on individual "steps" from all tracks combined instead ([Beltman et al (2009)](https://www.ncbi.nlm.nih.gov/pubmed/19834485/)).
+It has been suggested that cell-based analyses introduce biases, and that analyses should be performed on individual "steps" from all tracks combined instead ([Beltman et al (2009)](https://pubmed.ncbi.nlm.nih.gov/19834485/)).
 
 We can extract such steps using the `subtracks()` function (where `i` is the subtrack length, which is 1 for a single step):
 
@@ -237,7 +237,7 @@ ggplot( dangle, aes( x = cells, y = turn.angle ) ) +
 
 ### 2.3 Staggered analyses
 
-Another approach is to compute metrics not only on "steps" (subtracks of length one), but on all possible subtracks in a track. This is called a "staggered" analysis ([Mohktari et al (2013)](https://www.ncbi.nlm.nih.gov/pubmed/24324630/)).
+Another approach is to compute metrics not only on "steps" (subtracks of length one), but on all possible subtracks in a track. This is called a "staggered" analysis ([Mohktari et al (2013)](https://pubmed.ncbi.nlm.nih.gov/24324630/)).
 
 To see how this works on a single track, use `applyStaggered` with `matrix=TRUE`. For example, consider track number 4 (id = "6782") in the `TCells2` data, which has 8 coordinates (7 steps):
 
@@ -387,7 +387,7 @@ The downside of the MSD plot is that it is strongly affected by both speed *and*
 
 ### 4.1 Straightness metrics
 
-The package implements several metrics that provide a measure of track straightness or directionality (see [Mohktari et al (2013)](https://www.ncbi.nlm.nih.gov/pubmed/24324630/) for details): `displacementRatio()`, `outreachRatio`, `straightness()`, and `asphericity()`. These metrics can be applied to the data in the same way as was done for `speed()` in section 2 of this tutorial. See also `?TrackMeasures` for more information.
+The package implements several metrics that provide a measure of track straightness or directionality (see [Mohktari et al (2013)](https://pubmed.ncbi.nlm.nih.gov/24324630/) for details): `displacementRatio()`, `outreachRatio`, `straightness()`, and `asphericity()`. These metrics can be applied to the data in the same way as was done for `speed()` in section 2 of this tutorial. See also `?TrackMeasures` for more information.
 
 ### 4.2 Autocorrelation plots
 
@@ -501,7 +501,7 @@ Aside from directionality *within* a track segment (because of directional persi
 
 ### 5.1 Hotelling's test
 
-An unbiased method for detecting global directionality is Hotelling's T-square test (see [Textor et al (2011)](https://www.ncbi.nlm.nih.gov/pubmed/21734152/)), which tests if the mean step displacement vector is significantly different from the null vector. This method is powerful for detecting global movement biases when the direction is not known in advance. 
+An unbiased method for detecting global directionality is Hotelling's T-square test (see [Textor et al (2011)](https://pubmed.ncbi.nlm.nih.gov/21734152/)), which tests if the mean step displacement vector is significantly different from the null vector. This method is powerful for detecting global movement biases when the direction is not known in advance. 
 
 For example, applying Hotelling's test to the `Neutrophil` data:
 
