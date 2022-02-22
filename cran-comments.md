@@ -1,6 +1,12 @@
 
 ## Current submission v1.1.0
 
+### Resubmission
+
+Edit 22-02-2022: Upon request, we have:
+
+* inst/CITATION : added trailing slash to URL as needed
+* vignettes/*.Rmd, inst/doc/*.html : updated moved URLs as needed
 
 ### Test environments
 * local OS X (x86_64-apple-darwin20.3.0, 64-bit) with R v4.0.5 (2021-03-31)
