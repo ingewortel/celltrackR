@@ -1,0 +1,5 @@
+[{"id":2,"label":"input-file.csv_0","color":"#FFFF00","author":1,"video":1,"date":{"date":"2022-01-01 00:00:00.000000","timezone_type":3,"timezone":"UTC"},
+"points":[[0,2,2,1],[1,3,3,1],[2,4,4,1],[3,5.5,5.5,1]],"cellTypeObject":null,"cellTypeName":"type 1"},
+{"id":3,"label":"input-file.csv_1","color":"#FFFF00","author":1,"video":1,"date":{"date":"2022-01-01 00:00:00.000000","timezone_type":3,"timezone":"UTC"},
+"points":[[0,1,2,1],[1,2,3,1],[2,3,4,1]],"cellTypeObject":null,"cellTypeName":"type 2"}]
+

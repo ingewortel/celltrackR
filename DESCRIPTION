@@ -33,7 +33,7 @@ Description: Provides methodology to analyze cells that move in a two- or three-
 	Textor, Peixoto, Henrickson, Sinn, von Andrian, and Westermann (2011) <doi:10.1073/pnas.1102288108>,
   Textor, Sinn, and de Boer (2013) <doi:10.1186/1471-2105-14-S6-S10>,
   Textor, Henrickson, Mandl, von Andrian, Westermann, de Boer, and Beltman (2014) <doi:10.1371/journal.pcbi.1003752>.
-Depends: R (>= 3.4.0)
+Depends: R (>= 3.5.0)
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
@@ -57,6 +57,7 @@ Suggests:
     ggplot2,
     ggbeeswarm,
     gridExtra,
-    mvtnorm
+    mvtnorm,
+    rjson
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr

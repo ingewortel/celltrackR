@@ -1,3 +1,29 @@
+# Ongoing dev since 1.1.0
+
+Integration with immunemap.org. 
+
+### Potentially breaking changes: 
+
+None.
+
+### Minor changes:
+New functionalities for integration with immunemap.org:
+- (immunemap-integration.R => read.immap.json ): new function, reads data from an 
+	immunemap json file (or an url pointing to such a file). This returns a list with
+	both track object(s) and metadata; see documentation ?read.immap.json. 
+- (immunemap-integration.R) : see above; file contains also several helper functions.
+- tests added for these reading functions as well.
+- (inst/extdata/immunemap.json) : new example file showing the format for immunemap json.
+
+
+### Documentation changes:
+
+None, other than including documentation for new functionalities for integration with
+immunemap.org. 
+
+
+
+
 # celltrackR 1.1.0
 
 Significant speed-up in some of the angle analysis functions.
