@@ -8,7 +8,7 @@ test_that("Importer read.immap.json checks input format correctly", {
 	# Error cases:
 	msg <- "Error in reading json from ImmuneMap: each track in the json should be an object that must at least contains a key 'points'. Please check json format."
 	expect_error( {.read.immap.single( list() )} , msg )
-	expect_error( {.read.immap.single( list( tr ) )}, msg )
+	expect_error( {.read.immap.single( list( im[[1]] ) )}, msg )
 	msg <- "Error in reading json from ImmuneMap: 'points' should contain an array of all numeric arrays of length 4. Your 'points' don't fit this format or are empty - please check."
 	expect_error( {.read.immap.single( list( points = NULL ) )}, msg )
 	expect_error( {.read.immap.single( list( points = numeric(4) ) )}, msg )

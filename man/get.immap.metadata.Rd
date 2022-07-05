@@ -11,12 +11,12 @@ get.immap.metadata(
 )
 }
 \arguments{
-\item{input}{path to the json file downloaded from immunemap; this can also be a url.}
+\item{input}{a parsed json file obtained with \code{\link{parse.immap.json}}}
 
 \item{warn.exclude}{logical: if \code{TRUE} (default), warn when key-value pairs in the json 
 (other than those in exclude.names) are being ignored while parsing immunemap json.}
 
-\item{exclude.names:}{if the json contains keys with these names, they are ignored when reading
+\item{exclude.names}{if the json contains keys with these names, they are ignored when reading
 the metadata.}
 }
 \value{

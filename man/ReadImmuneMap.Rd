@@ -60,6 +60,8 @@ tracks object but a list of tracks objects for each celltype in the data (as
 determined from the metadata in the immunemap json).}
 
 \item{...}{additional parameters to be passed to \code{\link{get.immap.metadata}}.}
+
+\item{input}{the output of \code{parse.immap.json} serves as input for \code{get.immap.tracks}}
 }
 \value{
 \code{read.immap.json}  returns a list with:
@@ -87,7 +89,7 @@ This functionality requires the rjson package to be installed.
 tr <- read.immap.json( file = "https://api.immunemap.org/video/14/tracks", warn.scaling = FALSE )
 
 ## Read tracks from a file and rescale time (.5min/frame) and coordinates (2microns/pixel)
-tr <- read.immap.json( file = "input.json", scale.t = .5, scale.pos = 2 )
+tr <- read.immap.json( file = "inst/extdata/immunemap.json", scale.t = .5, scale.pos = 2 )
 
 }
 \seealso{

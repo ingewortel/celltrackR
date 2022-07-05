@@ -4,6 +4,7 @@
 #' This produces both tracks object(s) and a dataframe with metadata.
 #'
 #' @param file path to the json file downloaded from immunemap; this can also be a url.
+#' @param input the output of \code{parse.immap.json} serves as input for \code{get.immap.tracks}
 #' @param keep.id logical: keep track ids from immunemap? If false, new unique ids are
 #'  generated. Defaults to \code{TRUE}. If there are no ids in the input json, a warning
 #'  will be returned; this can be suppressed by setting keep.id = \code{FALSE}.
@@ -46,7 +47,7 @@
 #' tr <- read.immap.json( file = "https://api.immunemap.org/video/14/tracks", warn.scaling = FALSE )
 #' 
 #' ## Read tracks from a file and rescale time (.5min/frame) and coordinates (2microns/pixel)
-#' tr <- read.immap.json( file = "input.json", scale.t = .5, scale.pos = 2 )
+#' tr <- read.immap.json( file = "inst/extdata/immunemap.json", scale.t = .5, scale.pos = 2 )
 #'
 #' @name ReadImmuneMap
 #'
@@ -235,10 +236,10 @@ get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos =
 #'
 #' Get metadata from tracks obtained from \url{https://immunemap.org} and import into celltrackR. 
 #'
-#' @param input path to the json file downloaded from immunemap; this can also be a url.
+#' @param input a parsed json file obtained with \code{\link{parse.immap.json}}
 #' @param warn.exclude logical: if \code{TRUE} (default), warn when key-value pairs in the json 
 #'  (other than those in exclude.names) are being ignored while parsing immunemap json.
-#' @param exclude.names: if the json contains keys with these names, they are ignored when reading
+#' @param exclude.names if the json contains keys with these names, they are ignored when reading
 #'  the metadata. 
 #'
 #' @return a dataframe with metadata. This function currently only handles metadata with a single
