@@ -46,8 +46,12 @@
 #' ## Read tracks from immunemap online
 #' tr <- read.immap.json( file = "https://api.immunemap.org/video/14/tracks", warn.scaling = FALSE )
 #' 
-#' ## Read tracks from a file and rescale time (.5min/frame) and coordinates (2microns/pixel)
-#' tr <- read.immap.json( file = "inst/extdata/immunemap.json", scale.t = .5, scale.pos = 2 )
+#' ## Read tracks fand rescale time (.5min/frame) and coordinates (2microns/pixel)
+#' fileUrl <- "https://api.immunemap.org/video/14/tracks"
+#' tr <- read.immap.json( file = fileUrl, scale.t = .5, scale.pos = 2 )
+#' 
+#' ## Read tracks from a file 
+#' # tr <- read.immap.json( file = "my-file.json", warn.scaling = FALSE )
 #'
 #' @name ReadImmuneMap
 #'
@@ -253,7 +257,8 @@ get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos =
 #' meta.df <- get.immap.metadata( input )
 #' 
 #' ## Repeat but ignore also the 'color' column:
-#' meta.df <- get.immap.metadata( input, exclude.names = c("points, cellTypeObject","data", "color") )
+#' exclude <-  c("points", "cellTypeObject","date", "color")
+#' meta.df <- get.immap.metadata( input, exclude.names = exclude )
 #'
 #' @export
 get.immap.metadata <- function( input, warn.exclude = TRUE, exclude.names = c("points", "cellTypeObject", "date" ) ){

@@ -34,6 +34,7 @@ input <- parse.immap.json( file = "https://api.immunemap.org/video/14/tracks" )
 meta.df <- get.immap.metadata( input )
 
 ## Repeat but ignore also the 'color' column:
-meta.df <- get.immap.metadata( input, exclude.names = c("points, cellTypeObject","data", "color") )
+exclude <-  c("points", "cellTypeObject","date", "color")
+meta.df <- get.immap.metadata( input, exclude.names = exclude )
 
 }
