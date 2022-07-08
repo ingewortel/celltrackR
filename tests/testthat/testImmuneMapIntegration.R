@@ -60,3 +60,7 @@ test_that("Importer read.immap.json returns correct output", {
 	# check keep.id
 	expect_equal( names( .read.immap.single( list( id = "hi", points = list(numeric(4) ) ), warn.scaling = FALSE ) ), "hi" )
 } )
+
+test_that("Function get.immap.metadata can read dates", {
+	expect_false( any( is.na( read.immap.json( file="immunemap.json", warn.scaling = FALSE, keep.id = FALSE, warn.celltypes = FALSE )$metadata$date ) ) )
+} )

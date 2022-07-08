@@ -291,8 +291,11 @@ get.immap.metadata <- function( input, warn.exclude = TRUE, exclude.names = c("p
 	# Add the date back if it's in there
 	if( nrow( metadata ) == 0 ){
 		metadata <- data.frame( date = NA )
-	} else 	metadata$date <- NA
-	if( is.element( "date", track.json ) ){
+	} else{
+		metadata$date <- NA
+	}
+	
+	if( is.element( "date", names( track.json ) ) ){
 		metadata$date <- paste( track.json$date$date, track.json$date$timezone )
 	}
 	
