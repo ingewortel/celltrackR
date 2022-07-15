@@ -19,15 +19,15 @@ test_that("Importer read.immap.json checks input format correctly", {
 	
 	# Working case: 
 	expect_is( .read.immap.single( minimal.track, warn.scaling = FALSE, keep.id = FALSE ), "tracks" )
-	expect_is( read.immap.json( file="immunemap.json", warn.scaling = FALSE, keep.id = FALSE, warn.celltypes = FALSE )$tracks, "tracks" )
+	expect_is( read.immap.json( url="immunemap.json", warn.scaling = FALSE, keep.id = FALSE, warn.celltypes = FALSE )$tracks, "tracks" )
 
 } )
 
 test_that("Importer read.immap.json warns when scales are not set or when there are no ids to keep", {
 	
-	msg <- "In reading tracks from ImmuneMap: no scaling factors for spatial units replied, returning coordinates in pixels."
+	msg <- "In reading tracks from ImmuneMap: spatial scale of data unnkown, using pixels. Set parameter 'scale.pos' to supply the spatial resolution, or turn off this warning using 'warn.scaling=FALSE'."
 	expect_warning( {.read.immap.single( minimal.track, scale.t = 1, keep.id = FALSE )}, msg )
-	msg <-  "In reading tracks from ImmuneMap: no scaling factors for temporal units replied, returning timepoints in # frames."
+	msg <-  "In reading tracks from ImmuneMap: temporal scale of data unnkown, using frames. Set parameter 'scale.t' to supply the time step between frames, or turn off this warning using 'warn.scaling=FALSE'."
 	expect_warning( {.read.immap.single( minimal.track, scale.pos = 1, keep.id = FALSE )}, msg )
 	msg <-  "In reading tracks from ImmuneMap json: keep.id is set to TRUE but the track contains no id. Returning a track without id. To avoid this message, set keep.id = FALSE."
 	expect_warning( {.read.immap.single( minimal.track, warn.scaling = FALSE )}, msg )
@@ -62,5 +62,5 @@ test_that("Importer read.immap.json returns correct output", {
 } )
 
 test_that("Function get.immap.metadata can read dates", {
-	expect_false( any( is.na( read.immap.json( file="immunemap.json", warn.scaling = FALSE, keep.id = FALSE, warn.celltypes = FALSE )$metadata$date ) ) )
+	expect_false( any( is.na( read.immap.json( url="immunemap.json", warn.scaling = FALSE, keep.id = FALSE, warn.celltypes = FALSE )$metadata$date ) ) )
 } )

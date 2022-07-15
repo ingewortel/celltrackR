@@ -3,7 +3,7 @@
 #' Reads tracks from \url{https://immunemap.org} for import into celltrackR. 
 #' This produces both tracks object(s) and a dataframe with metadata.
 #'
-#' @param file path to the json file downloaded from immunemap; this can also be a url.
+#' @param url of the json file to download from immunemap; this can also be a local file name.
 #' @param input the output of \code{parse.immap.json} serves as input for \code{get.immap.tracks}
 #' @param keep.id logical: keep track ids from immunemap? If false, new unique ids are
 #'  generated. Defaults to \code{TRUE}. If there are no ids in the input json, a warning
@@ -44,22 +44,22 @@
 #'
 #' @examples
 #' ## Read tracks from immunemap online
-#' tr <- read.immap.json( file = "https://api.immunemap.org/video/14/tracks", warn.scaling = FALSE )
+#' tr <- read.immap.json( url = "https://api.immunemap.org/video/14/tracks", warn.scaling = FALSE )
 #' 
 #' ## Read tracks fand rescale time (.5min/frame) and coordinates (2microns/pixel)
-#' fileUrl <- "https://api.immunemap.org/video/14/tracks"
-#' tr <- read.immap.json( file = fileUrl, scale.t = .5, scale.pos = 2 )
+#' tracksUrl <- "https://api.immunemap.org/video/14/tracks"
+#' tr <- read.immap.json( url = tracksUrl, scale.t = .5, scale.pos = 2 )
 #' 
 #' ## Read tracks from a file 
-#' # tr <- read.immap.json( file = "my-file.json", warn.scaling = FALSE )
+#' # tr <- read.immap.json( url = "my-file.json", warn.scaling = FALSE )
 #'
 #' @name ReadImmuneMap
 #'
 #' @export
-read.immap.json <- function( file, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, simplify.2D = TRUE, warn.celltypes = TRUE, split.celltypes = FALSE, ... ){
+read.immap.json <- function( url, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, simplify.2D = TRUE, warn.celltypes = TRUE, split.celltypes = FALSE, ... ){
 
 	# Read json from file or url; error if not json
-	input <- parse.immap.json( file )
+	input <- parse.immap.json( url )
 	
 	# Check format of the input list.
 	.check.immap.json( input )
@@ -105,12 +105,12 @@ read.immap.json <- function( file, keep.id = TRUE, scale.t = NULL, scale.pos = N
 	}
 	elements.check <- sapply( json.input, .check.immap.single, error = FALSE )
 	if( !all( elements.check ) ){
-		stop( "Error in reading json from ImmuneMap: each track in the json should be an object that must at least contains a key 'points'. Please check json format." )
+		stop( "Error reading json from ImmuneMap: each track in the json file should be an object that contains a key 'points'. Please check json format." )
 	}
 	# Check also the points
 	points.check <- sapply( json.input, function(x) .check.immap.points( x$points, error = FALSE ) )
 	if( !all( points.check ) ){
-		stop( "Error in reading json from ImmuneMap: the 'points' key in the json object should contain an array of all numeric arrays of length 4. Some elements do not fulfill this criterion; please check format." )
+		stop( "Error reading json from ImmuneMap: the 'points' key in the json object should contain an array of all numeric arrays of length 4. Some elements do not fulfill this criterion; please check format." )
 	}
 }
 
@@ -160,14 +160,14 @@ read.immap.json <- function( file, keep.id = TRUE, scale.t = NULL, scale.pos = N
 
 #' @rdname ReadImmuneMap
 #' @export
-parse.immap.json <- function( file ){
+parse.immap.json <- function( url ){
 	if( !requireNamespace("rjson", quietly=TRUE ) ){
       stop( "Trying to read tracks from ImmuneMap: please install the 'rjson' package to use this functionality!" )
     }
 
-	input <- tryCatch( rjson::fromJSON( file = file ), 
+	input <- tryCatch( rjson::fromJSON( file = url ), 
 		error = function(cond){ 
-			message(paste("Error reading file:", file))
+			message(paste("Error reading url/file:", url))
 			message("Are you sure this is a json file? Here's the original error message:")
            stop( cond )
 	} )
@@ -208,10 +208,10 @@ get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos =
 	# unless this is turned off.
 	if( warn.scaling ){
 		if( is.null( scale.pos ) ){
-			warning( "In reading tracks from ImmuneMap: no scaling factors for spatial units replied, returning coordinates in pixels." )
+			warning( "In reading tracks from ImmuneMap: spatial scale of data unnkown, using pixels. Set parameter 'scale.pos' to supply the spatial resolution, or turn off this warning using 'warn.scaling=FALSE'." )
 		}
 		if( is.null( scale.t ) ){
-			warning( "In reading tracks from ImmuneMap: no scaling factors for temporal units replied, returning timepoints in # frames." )		
+			warning( "In reading tracks from ImmuneMap: temporal scale of data unnkown, using frames. Set parameter 'scale.t' to supply the time step between frames, or turn off this warning using 'warn.scaling=FALSE'." )
 		}
 	}
 	# if they are supplied, apply the scaling.
@@ -236,7 +236,7 @@ get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos =
 }
 
 
-#' Read tracks ImmuneMap metadata
+#' Get  Track Metadata from ImmuneMap 
 #'
 #' Get metadata from tracks obtained from \url{https://immunemap.org} and import into celltrackR. 
 #'
@@ -253,7 +253,7 @@ get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos =
 #'
 #' @examples
 #' ## Read tracks from immunemap online
-#' input <- parse.immap.json( file = "https://api.immunemap.org/video/14/tracks" )
+#' input <- parse.immap.json( url = "https://api.immunemap.org/video/14/tracks" )
 #' meta.df <- get.immap.metadata( input )
 #' 
 #' ## Repeat but ignore also the 'color' column:

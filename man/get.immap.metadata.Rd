@@ -2,7 +2,7 @@
 % Please edit documentation in R/immunemap-integration.R
 \name{get.immap.metadata}
 \alias{get.immap.metadata}
-\title{Read tracks ImmuneMap metadata}
+\title{Get  Track Metadata from ImmuneMap}
 \usage{
 get.immap.metadata(
   input,
@@ -30,7 +30,7 @@ Get metadata from tracks obtained from \url{https://immunemap.org} and import in
 }
 \examples{
 ## Read tracks from immunemap online
-input <- parse.immap.json( file = "https://api.immunemap.org/video/14/tracks" )
+input <- parse.immap.json( url = "https://api.immunemap.org/video/14/tracks" )
 meta.df <- get.immap.metadata( input )
 
 ## Repeat but ignore also the 'color' column:

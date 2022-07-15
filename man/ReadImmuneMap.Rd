@@ -8,7 +8,7 @@
 \title{Read tracks from ImmuneMap}
 \usage{
 read.immap.json(
-  file,
+  url,
   keep.id = TRUE,
   scale.t = NULL,
   scale.pos = NULL,
@@ -19,7 +19,7 @@ read.immap.json(
   ...
 )
 
-parse.immap.json(file)
+parse.immap.json(url)
 
 get.immap.tracks(
   input,
@@ -31,7 +31,7 @@ get.immap.tracks(
 )
 }
 \arguments{
-\item{file}{path to the json file downloaded from immunemap; this can also be a url.}
+\item{url}{of the json file to download from immunemap; this can also be a local file name.}
 
 \item{keep.id}{logical: keep track ids from immunemap? If false, new unique ids are
 generated. Defaults to \code{TRUE}. If there are no ids in the input json, a warning
@@ -86,14 +86,14 @@ This functionality requires the rjson package to be installed.
 }
 \examples{
 ## Read tracks from immunemap online
-tr <- read.immap.json( file = "https://api.immunemap.org/video/14/tracks", warn.scaling = FALSE )
+tr <- read.immap.json( url = "https://api.immunemap.org/video/14/tracks", warn.scaling = FALSE )
 
 ## Read tracks fand rescale time (.5min/frame) and coordinates (2microns/pixel)
-fileUrl <- "https://api.immunemap.org/video/14/tracks"
-tr <- read.immap.json( file = fileUrl, scale.t = .5, scale.pos = 2 )
+tracksUrl <- "https://api.immunemap.org/video/14/tracks"
+tr <- read.immap.json( url = tracksUrl, scale.t = .5, scale.pos = 2 )
 
 ## Read tracks from a file 
-# tr <- read.immap.json( file = "my-file.json", warn.scaling = FALSE )
+# tr <- read.immap.json( url = "my-file.json", warn.scaling = FALSE )
 
 }
 \seealso{
