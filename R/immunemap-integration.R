@@ -43,12 +43,14 @@
 #' @seealso \code{\link{get.immap.metadata}}.
 #'
 #' @examples
+#' \dontrun{
 #' ## Read tracks from immunemap online
 #' tr <- read.immap.json( url = "https://api.immunemap.org/video/14/tracks", warn.scaling = FALSE )
 #' 
 #' ## Read tracks fand rescale time (.5min/frame) and coordinates (2microns/pixel)
 #' tracksUrl <- "https://api.immunemap.org/video/14/tracks"
 #' tr <- read.immap.json( url = tracksUrl, scale.t = .5, scale.pos = 2 )
+#' }
 #' 
 #' ## Read tracks from a file 
 #' # tr <- read.immap.json( url = "my-file.json", warn.scaling = FALSE )
