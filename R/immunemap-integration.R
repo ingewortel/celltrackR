@@ -70,7 +70,7 @@ read.immap.json <- function( url, keep.id = TRUE, scale.t = NULL, scale.pos = NU
 	.check.immap.json( input, strict )
 	
 	# Now we can read the tracks:
-	tracks <- get.immap.tracks( input, keep.id = keep.id, scale.t = scale.t, scale.pos = scale.pos, warn.scaling = warn.scaling )
+	tracks <- get.immap.tracks( input, keep.id = keep.id, scale.t = scale.t, scale.pos = scale.pos, warn.scaling = warn.scaling, strict = strict )
 	
 	# And the metadata, parsing arguments ... on 
 	meta.df <- get.immap.metadata( input, ... )
