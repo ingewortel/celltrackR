@@ -212,6 +212,11 @@ get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos =
 	# check format of the 'points', return error if problem
 	.check.immap.points( track.json$points, strict )
 	
+	# if not strict, points can be empty; return no track (NULL)
+	if( length( track.json$points) == 0 ){
+		return( NULL )
+	}
+	
 	# Read points
 	tx <- matrix( unlist( track.json$points ), ncol = 4, byrow = TRUE )
 	colnames(tx) <- c("t","x","y","z")
