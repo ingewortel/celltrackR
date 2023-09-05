@@ -24,7 +24,7 @@
 #'  trying to return a single tracks object while the metadata indicates there are 
 #'  multiple celltypes in the data, or when the user is trying to set \code{split.celltypes = TRUE} 
 #'  when there is only one celltype present.
-#' @param strict logical: if \code{TRUE} (default = \code{FALSE}), return throw an error
+#' @param strict logical: if \code{TRUE} (default = \code{TRUE}), return throw an error
 #'  for unexpected json format (e.g. if some tracks are empty). If \code{FALSE}, there will
 #'  only be a warning instead.
 #' @param ... additional parameters to be passed to \code{\link{get.immap.metadata}}.
@@ -61,7 +61,7 @@
 #' @name ReadImmuneMap
 #'
 #' @export
-read.immap.json <- function( url, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, simplify.2D = TRUE, warn.celltypes = TRUE, split.celltypes = FALSE, strict = FALSE, ... ){
+read.immap.json <- function( url, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, simplify.2D = TRUE, warn.celltypes = TRUE, split.celltypes = FALSE, strict = TRUE, ... ){
 
 	# Read json from file or url; error if not json
 	input <- parse.immap.json( url )
@@ -189,10 +189,10 @@ parse.immap.json <- function( url ){
 
 #' @rdname ReadImmuneMap
 #' @export
-get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, simplify.2D = TRUE ){
+get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, simplify.2D = TRUE, strict = TRUE ){
 
 	
-	tracks <- lapply( input, .read.immap.single, keep.id = keep.id, scale.t = scale.t, scale.pos = scale.pos, warn.scaling = warn.scaling )
+	tracks <- lapply( input, .read.immap.single, keep.id = keep.id, scale.t = scale.t, scale.pos = scale.pos, warn.scaling = warn.scaling, strict = strict )
 	tracks <- as.tracks( unlist( tracks, recursive = FALSE ) )
 	
 	# If simplify.2D, remove last coordinate if it is the same everywhere.
@@ -204,13 +204,13 @@ get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos =
 	return(tracks)
 }
 
-.read.immap.single <- function( track.json, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE ){
+.read.immap.single <- function( track.json, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, strict = TRUE ){
 	
 	# check that this is correct format for a track, return error otherwise.
 	.check.immap.single( track.json ) 
 	
 	# check format of the 'points', return error if problem
-	.check.immap.points( track.json$points )
+	.check.immap.points( track.json$points, strict )
 	
 	# Read points
 	tx <- matrix( unlist( track.json$points ), ncol = 4, byrow = TRUE )
