@@ -54,7 +54,7 @@ test_that( "trackFeatureMap produces the right output", {
   # NULL returned if only plots specified, no matter the cluster method
   expect_true( is.null( trackFeatureMap( TCells, c(speed) ) ) )
   expect_true( is.null( trackFeatureMap( TCells, c(speed), method = "MDS" ) ) )
-  expect_true( is.null( trackFeatureMap( TCells, c(speed), method = "UMAP" ) ) )
+  expect_true( is.null( trackFeatureMap( TCells, c(speed,overallAngle), method = "UMAP" ) ) )
   # otherwise output depends on method of choice
   expect_is( trackFeatureMap( TCells, c(speed), method = "PCA", return.mapping = TRUE ),
                 "matrix" )

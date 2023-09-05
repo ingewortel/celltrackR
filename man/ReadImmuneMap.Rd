@@ -16,6 +16,7 @@ read.immap.json(
   simplify.2D = TRUE,
   warn.celltypes = TRUE,
   split.celltypes = FALSE,
+  strict = FALSE,
   ...
 )
 
@@ -58,6 +59,10 @@ when there is only one celltype present.}
 \item{split.celltypes}{logical: if \code{TRUE} (default = \code{FALSE}), return not one
 tracks object but a list of tracks objects for each celltype in the data (as 
 determined from the metadata in the immunemap json).}
+
+\item{strict}{logical: if \code{TRUE} (default = \code{FALSE}), return throw an error
+for unexpected json format (e.g. if some tracks are empty). If \code{FALSE}, there will
+only be a warning instead.}
 
 \item{...}{additional parameters to be passed to \code{\link{get.immap.metadata}}.}
 

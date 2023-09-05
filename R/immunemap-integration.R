@@ -24,6 +24,9 @@
 #'  trying to return a single tracks object while the metadata indicates there are 
 #'  multiple celltypes in the data, or when the user is trying to set \code{split.celltypes = TRUE} 
 #'  when there is only one celltype present.
+#' @param strict logical: if \code{TRUE} (default = \code{FALSE}), return throw an error
+#'  for unexpected json format (e.g. if some tracks are empty). If \code{FALSE}, there will
+#'  only be a warning instead.
 #' @param ... additional parameters to be passed to \code{\link{get.immap.metadata}}.
 #'
 #' @return \code{read.immap.json}  returns a list with:
@@ -58,13 +61,13 @@
 #' @name ReadImmuneMap
 #'
 #' @export
-read.immap.json <- function( url, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, simplify.2D = TRUE, warn.celltypes = TRUE, split.celltypes = FALSE, ... ){
+read.immap.json <- function( url, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, simplify.2D = TRUE, warn.celltypes = TRUE, split.celltypes = FALSE, strict = FALSE, ... ){
 
 	# Read json from file or url; error if not json
 	input <- parse.immap.json( url )
 	
 	# Check format of the input list.
-	.check.immap.json( input )
+	.check.immap.json( input, strict )
 	
 	# Now we can read the tracks:
 	tracks <- get.immap.tracks( input, keep.id = keep.id, scale.t = scale.t, scale.pos = scale.pos, warn.scaling = warn.scaling )
@@ -100,7 +103,7 @@ read.immap.json <- function( url, keep.id = TRUE, scale.t = NULL, scale.pos = NU
 
 }
 
-.check.immap.json <- function( json.input ){
+.check.immap.json <- function( json.input, strict = TRUE ){
 	# Input must be a list, elements must correspond with tracks (check.immap.single)
 	if( !is.list(json.input) ){
 		stop( "Error reading from immunemap. Expecting a list of tracks, please check the format." )
@@ -112,7 +115,15 @@ read.immap.json <- function( url, keep.id = TRUE, scale.t = NULL, scale.pos = NU
 	# Check also the points
 	points.check <- sapply( json.input, function(x) .check.immap.points( x$points, error = FALSE ) )
 	if( !all( points.check ) ){
-		stop( "Error reading json from ImmuneMap: the 'points' key in the json object should contain an array of all numeric arrays of length 4. Some elements do not fulfill this criterion; please check format." )
+		if( strict ){
+			stop( "Error reading json from ImmuneMap: the 'points' key in the json object should contain an array of all numeric arrays of length 4. Some elements do not fulfill this criterion; please check format." )
+		} else {
+			if( !any( points.check ) ){
+					stop( "Error reading json from ImmuneMap: the 'points' key in the json object should contain an array of all numeric arrays of length 4. None of the elements fulfill this criterion; please check format." )
+			} else {
+				warning( "Reading json from ImmuneMap: the 'points' key in the json object should contain an array of all numeric arrays of length 4. Some elements do not fulfill this criterion; please check format." )
+			}
+		}
 	}
 }
 
