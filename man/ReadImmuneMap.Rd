@@ -9,14 +9,15 @@
 \usage{
 read.immap.json(
   url,
+  tracks.url = NULL,
   keep.id = TRUE,
+  scale.auto = TRUE,
   scale.t = NULL,
   scale.pos = NULL,
   warn.scaling = TRUE,
   simplify.2D = TRUE,
   warn.celltypes = TRUE,
   split.celltypes = FALSE,
-  strict = TRUE,
   ...
 )
 
@@ -28,16 +29,27 @@ get.immap.tracks(
   scale.t = NULL,
   scale.pos = NULL,
   warn.scaling = TRUE,
-  simplify.2D = TRUE,
-  strict = TRUE
+  simplify.2D = TRUE
 )
 }
 \arguments{
-\item{url}{of the json file to download from immunemap; this can also be a local file name.}
+\item{url}{of the json file to download from immunemap; this should be the url to the
+video metadata without the "/tracks" suffix. With this method, the metadata will
+be used to automatically scale time to seconds and coordinates to microns if
+\code{scale.auto=TRUE}.}
+
+\item{tracks.url}{optional: alternatively, provide directly the url of the tracks (ending with "/tracks"),
+    or an url of a local json file with tracks. With this method, scales must be set
+manually. If not specified, it is assumed that adding the suffix "/tracks" to the
+supplied \code{url} will provide the track data.}
 
 \item{keep.id}{logical: keep track ids from immunemap? If false, new unique ids are
 generated. Defaults to \code{TRUE}. If there are no ids in the input json, a warning
 will be returned; this can be suppressed by setting keep.id = \code{FALSE}.}
+
+\item{scale.auto}{logical: if \code{TRUE} (the default), scales will be set automatically using
+the metadata found in \code{url}. This works only if the \code{url} is given, not
+if only \code{tracks.url} is supplied.}
 
 \item{scale.t}{optional: multiply timepoints with constant factor to rescale time.
 By default, immunemap returns time in # frames.}
@@ -60,10 +72,6 @@ when there is only one celltype present.}
 \item{split.celltypes}{logical: if \code{TRUE} (default = \code{FALSE}), return not one
 tracks object but a list of tracks objects for each celltype in the data (as 
 determined from the metadata in the immunemap json).}
-
-\item{strict}{logical: if \code{TRUE} (default = \code{TRUE}), return throw an error
-for unexpected json format (e.g. if some tracks are empty). If \code{FALSE}, there will
-only be a warning instead.}
 
 \item{...}{additional parameters to be passed to \code{\link{get.immap.metadata}}.}
 
@@ -92,16 +100,16 @@ This functionality requires the rjson package to be installed.
 }
 \examples{
 \dontrun{
-## Read tracks from immunemap online
-tr <- read.immap.json( url = "https://api.immunemap.org/video/14/tracks", warn.scaling = FALSE )
+## Read tracks from immunemap online, using the video info for automatic scaling
+tr <- read.immap.json( url = "https://api.immunemap.org/video/14" )
 
-## Read tracks fand rescale time (.5min/frame) and coordinates (2microns/pixel)
+## Read tracks and rescale time (.5min/frame) and coordinates (2microns/pixel)
 tracksUrl <- "https://api.immunemap.org/video/14/tracks"
-tr <- read.immap.json( url = tracksUrl, scale.t = .5, scale.pos = 2 )
+tr <- read.immap.json( tracks.url = tracksUrl, scale.auto = FALSE, scale.t = .5, scale.pos = 2 )
 }
 
 ## Read tracks from a file 
-# tr <- read.immap.json( url = "my-file.json", warn.scaling = FALSE )
+# tr <- read.immap.json( tracks.url = "my-file.json", warn.scaling = FALSE )
 
 }
 \seealso{

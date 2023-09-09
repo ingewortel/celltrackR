@@ -3,11 +3,21 @@
 #' Reads tracks from \url{https://immunemap.org} for import into celltrackR. 
 #' This produces both tracks object(s) and a dataframe with metadata.
 #'
-#' @param url of the json file to download from immunemap; this can also be a local file name.
+#' @param url of the json file to download from immunemap; this should be the url to the
+#'		video metadata without the "/tracks" suffix. With this method, the metadata will
+#'		be used to automatically scale time to seconds and coordinates to microns if
+#'		\code{scale.auto=TRUE}.
+#' @param tracks.url optional: alternatively, provide directly the url of the tracks (ending with "/tracks"),
+#' 		or an url of a local json file with tracks. With this method, scales must be set
+#'		manually. If not specified, it is assumed that adding the suffix "/tracks" to the
+#'		supplied \code{url} will provide the track data.
 #' @param input the output of \code{parse.immap.json} serves as input for \code{get.immap.tracks}
 #' @param keep.id logical: keep track ids from immunemap? If false, new unique ids are
 #'  generated. Defaults to \code{TRUE}. If there are no ids in the input json, a warning
 #'  will be returned; this can be suppressed by setting keep.id = \code{FALSE}.
+#' @param scale.auto logical: if \code{TRUE} (the default), scales will be set automatically using
+#'		the metadata found in \code{url}. This works only if the \code{url} is given, not
+#'		if only \code{tracks.url} is supplied.
 #' @param scale.t optional: multiply timepoints with constant factor to rescale time.
 #' 	By default, immunemap returns time in # frames.
 #' @param scale.pos optional: multiply coordinates with constant factor to rescale lengths.
@@ -24,9 +34,6 @@
 #'  trying to return a single tracks object while the metadata indicates there are 
 #'  multiple celltypes in the data, or when the user is trying to set \code{split.celltypes = TRUE} 
 #'  when there is only one celltype present.
-#' @param strict logical: if \code{TRUE} (default = \code{TRUE}), return throw an error
-#'  for unexpected json format (e.g. if some tracks are empty). If \code{FALSE}, there will
-#'  only be a warning instead.
 #' @param ... additional parameters to be passed to \code{\link{get.immap.metadata}}.
 #'
 #' @return \code{read.immap.json}  returns a list with:
@@ -47,30 +54,39 @@
 #'
 #' @examples
 #' \dontrun{
-#' ## Read tracks from immunemap online
-#' tr <- read.immap.json( url = "https://api.immunemap.org/video/14/tracks", warn.scaling = FALSE )
+#' ## Read tracks from immunemap online, using the video info for automatic scaling
+#' tr <- read.immap.json( url = "https://api.immunemap.org/video/14" )
 #' 
-#' ## Read tracks fand rescale time (.5min/frame) and coordinates (2microns/pixel)
+#' ## Read tracks and rescale time (.5min/frame) and coordinates (2microns/pixel)
 #' tracksUrl <- "https://api.immunemap.org/video/14/tracks"
-#' tr <- read.immap.json( url = tracksUrl, scale.t = .5, scale.pos = 2 )
+#' tr <- read.immap.json( tracks.url = tracksUrl, scale.auto = FALSE, scale.t = .5, scale.pos = 2 )
 #' }
 #' 
 #' ## Read tracks from a file 
-#' # tr <- read.immap.json( url = "my-file.json", warn.scaling = FALSE )
+#' # tr <- read.immap.json( tracks.url = "my-file.json", warn.scaling = FALSE )
 #'
 #' @name ReadImmuneMap
 #'
 #' @export
-read.immap.json <- function( url, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, simplify.2D = TRUE, warn.celltypes = TRUE, split.celltypes = FALSE, strict = TRUE, ... ){
+read.immap.json <- function( url, tracks.url = NULL, keep.id = TRUE, scale.auto = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, simplify.2D = TRUE, warn.celltypes = TRUE, split.celltypes = FALSE, ... ){
+
+	if( is.null( tracks.url ) ){ tracks.url <- paste0( url, "/tracks" ) }
 
 	# Read json from file or url; error if not json
-	input <- parse.immap.json( url )
+	input <- parse.immap.json( tracks.url )
 	
 	# Check format of the input list.
-	.check.immap.json( input, strict )
-	
+	.check.immap.json( input )
+
 	# Now we can read the tracks:
-	tracks <- get.immap.tracks( input, keep.id = keep.id, scale.t = scale.t, scale.pos = scale.pos, warn.scaling = warn.scaling, strict = strict )
+	if( scale.auto ){
+		video.info <- parse.immap.json( url )
+		fps <- video.info$size$fps
+		voxel.size <- video.info$size$spacing
+		tracks <- get.immap.tracks( input, keep.id = keep.id, scale.t = (1/fps), scale.pos = voxel.size, simplify.2D = simplify.2D )
+	} else {
+		tracks <- get.immap.tracks( input, keep.id = keep.id, scale.t = scale.t, scale.pos = scale.pos, warn.scaling = warn.scaling, simplify.2D = simplify.2D )
+	}	
 	
 	# And the metadata, parsing arguments ... on 
 	meta.df <- get.immap.metadata( input, ... )
@@ -103,7 +119,7 @@ read.immap.json <- function( url, keep.id = TRUE, scale.t = NULL, scale.pos = NU
 
 }
 
-.check.immap.json <- function( json.input, strict = TRUE ){
+.check.immap.json <- function( json.input ){
 	# Input must be a list, elements must correspond with tracks (check.immap.single)
 	if( !is.list(json.input) ){
 		stop( "Error reading from immunemap. Expecting a list of tracks, please check the format." )
@@ -113,17 +129,16 @@ read.immap.json <- function( url, keep.id = TRUE, scale.t = NULL, scale.pos = NU
 		stop( "Error reading json from ImmuneMap: each track in the json file should be an object that contains a key 'points'. Please check json format." )
 	}
 	# Check also the points
+	points.len <- sapply( json.input, function(x) length(x$points) > 1 )
+	if( !any( points.len  ) ) stop( "Error in reading track data: your tracks all contain either a single coordinate or are empty." )
+	if( !all( points.len ) ) {
+		num.missing <- sum( !points.len )
+		message( paste0( "...skipping ",num.missing," tracks with no coordinates or only a single coordinate" ))
+	}
+	
 	points.check <- sapply( json.input, function(x) .check.immap.points( x$points, error = FALSE ) )
 	if( !all( points.check ) ){
-		if( strict ){
-			stop( "Error reading json from ImmuneMap: the 'points' key in the json object should contain an array of all numeric arrays of length 4. Some elements do not fulfill this criterion; please check format." )
-		} else {
-			if( !any( points.check ) ){
-					stop( "Error reading json from ImmuneMap: the 'points' key in the json object should contain an array of all numeric arrays of length 4. None of the elements fulfill this criterion; please check format." )
-			} else {
-				warning( "Reading json from ImmuneMap: the 'points' key in the json object should contain an array of all numeric arrays of length 4. Some elements do not fulfill this criterion; please check format." )
-			}
-		}
+		stop( "Error reading json from ImmuneMap: the 'points' key in the json object should contain an array of all numeric arrays of length 4. Some elements do not fulfill this criterion; please check format." )
 	}
 }
 
@@ -140,15 +155,15 @@ read.immap.json <- function( url, keep.id = TRUE, scale.t = NULL, scale.pos = NU
 .check.immap.points <- function( pts, error = TRUE ){
 
 	# 'points' should be a list and should contain at least one element.
-	stop.msg <- "Error in reading json from ImmuneMap: 'points' should contain an array of all numeric arrays of length 4. Your 'points' don't fit this format or are empty - please check."
+	stop.msg <- "Error in reading json from ImmuneMap: 'points' should contain an array of all numeric arrays of length 4. Your 'points' don't fit this format - please check."
 	if( !is.list( pts ) ){
 		if( error ) stop( stop.msg )
 		return (FALSE)
 	} 
-	if( length( pts ) == 0 ){
-		if( error ) stop( stop.msg )
-		return( FALSE )
-	}
+	#if( length( pts ) == 0 ){
+	#	if( error ) stop( stop.msg )
+	#	return( FALSE )
+	#}
 
 	# 'points' should be a list of numeric vectors of each length 4.
 	# (if there is no z coordinate, it still contains a 1 on that position.)
@@ -189,10 +204,10 @@ parse.immap.json <- function( url ){
 
 #' @rdname ReadImmuneMap
 #' @export
-get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, simplify.2D = TRUE, strict = TRUE ){
+get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, simplify.2D = TRUE){
 
 	
-	tracks <- lapply( input, .read.immap.single, keep.id = keep.id, scale.t = scale.t, scale.pos = scale.pos, warn.scaling = warn.scaling, strict = strict )
+	tracks <- lapply( input, .read.immap.single, keep.id = keep.id, scale.t = scale.t, scale.pos = scale.pos, warn.scaling = warn.scaling )
 	tracks <- as.tracks( unlist( tracks, recursive = FALSE ) )
 	
 	# If simplify.2D, remove last coordinate if it is the same everywhere.
@@ -204,16 +219,16 @@ get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos =
 	return(tracks)
 }
 
-.read.immap.single <- function( track.json, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE, strict = TRUE ){
+.read.immap.single <- function( track.json, keep.id = TRUE, scale.t = NULL, scale.pos = NULL, warn.scaling = TRUE ){
 	
 	# check that this is correct format for a track, return error otherwise.
 	.check.immap.single( track.json ) 
 	
 	# check format of the 'points', return error if problem
-	.check.immap.points( track.json$points, strict )
+	.check.immap.points( track.json$points )
 	
-	# if not strict, points can be empty; return no track (NULL)
-	if( length( track.json$points) == 0 ){
+	# if points are empty or contain a single coordinate; return no track (NULL)
+	if( length( track.json$points) < 2 ){
 		return( NULL )
 	}
 	
@@ -234,7 +249,7 @@ get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos =
 	}
 	# if they are supplied, apply the scaling.
 	if( !is.null( scale.t ) ) tx[,1] <- tx[,1]*scale.t
-	if( !is.null( scale.pos ) ) tx[,2:4] <- tx[,2:4]*scale.pos
+	if( !is.null( scale.pos ) ) tx[,2:4] <- t( t(tx[,2:4])*scale.pos )
 	
 	# if keep.id = TRUE the track should contain an id.
 	id <- NULL
