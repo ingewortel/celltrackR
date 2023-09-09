@@ -155,7 +155,7 @@ as.tracks.data.frame <- function(x, id.column=1, time.column=2,
     r[,"t"] <- scale.t*r[,"t"]
   }
   if( any( scale.pos != 1 ) ){
-    r[,-c(1,2)] <- scale.pos*r[,-c(1,2)]
+    r[,-c(1,2)] <- t( scale.pos*t( r[,-c(1,2)] ) )
   }
   sort.tracks(as.tracks.list(split.data.frame(as.matrix(r[,-1]), r[,1])))
 }
