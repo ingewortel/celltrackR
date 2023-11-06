@@ -132,6 +132,7 @@
 #'
 #' @docType package
 #' @name celltrackR
+#' @aliases celltrackR-package
 NULL
 
 #' Open the package cheat sheet

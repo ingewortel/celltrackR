@@ -3,6 +3,7 @@
 \docType{package}
 \name{celltrackR}
 \alias{celltrackR}
+\alias{celltrackR-package}
 \title{celltrackR: Quantitative analysis of motion.}
 \description{
 The CelltrackR package is designed for analyzing cell tracks acquired by
