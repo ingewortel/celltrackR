@@ -17,7 +17,7 @@ Author: Johannes Textor [aut, cre],
   Gerhard Burger [aut],
   Annie Liu [aut],
   Inge Wortel [aut]
-Maintainer: Johannes Textor <johannes.textor@gmx.de>
+Maintainer: Inge Wortel <inge.wortel@ru.nl>>
 Description: Provides methodology to analyze cells that move in a two- or three-dimensional
 	space. Available measures include displacement, confinement ratio, autocorrelation,
 	straightness, turning angle, and fractal dimension. Measures can be applied to entire tracks,
