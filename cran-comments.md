@@ -1,5 +1,29 @@
+## Current submission v1.2.0
 
-## Current submission v1.1.0
+
+### Test environments
+* local OS X (x86_64-apple-darwin17.0 (64-bit) with R v4.2.3 (2023-12-15)
+
+
+### R CMD check results
+
+Status: OK
+
+(no errors/warnings/notes).
+
+### Reverse dependencies
+
+## revdepcheck results
+
+We checked 0 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
+
+ * We saw 0 new problems
+ * We failed to check 0 packages
+
+
+
+
+## Previous submission v1.1.0
 
 ### Resubmission
 
@@ -24,7 +48,7 @@ Status: OK
 Not applicable: no dependencies found with revdepcheck::revdep_check().
 
 
-## Previous submission
+## Older submission
 
 ### Resubmission
 Edit 30-03-2020 (2): Upon request, we have:

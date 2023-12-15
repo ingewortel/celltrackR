@@ -1,4 +1,4 @@
-# Ongoing dev since 1.1.0
+# celltrackR 1.2.0
 
 Integration with immunemap.org. 
 
@@ -18,10 +18,10 @@ New functionalities for integration with immunemap.org:
 
 ### Documentation changes:
 
-None, other than including documentation for new functionalities for integration with
-immunemap.org. 
-
-
+Minor changes:
+- including documentation for new functionalities for integration with immunemap.org;
+- Updated package documentation after breaking change in Roxygen upon CRAN request.
+- Package maintainer is now Inge Wortel.
 
 
 # celltrackR 1.1.0
