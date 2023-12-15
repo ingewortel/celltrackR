@@ -3,13 +3,13 @@ Type: Package
 Title: Motion Trajectory Analysis
 Date: 2023-12-15
 Version: 1.2.0
-Authors@R: c(person("Johannes", "Textor", role = c("aut", "cre"),
+Authors@R: c(person("Johannes", "Textor", role = c("aut"),
                      email = "johannes.textor@gmx.de"),
               person("Katharina", "Dannenberg", role = "aut"),
               person("Jeffrey", "Berry", role = "aut" ),
               person("Gerhard", "Burger", role = "aut"),
               person("Annie","Liu", role= "aut"),
-              person("Inge", "Wortel", role = "aut",
+              person("Inge", "Wortel", role = c("aut","cre"),
                      email = "ingewortel@gmail.com"))
 Author: Johannes Textor [aut, cre],
   Katharina Dannenberg [aut],
@@ -17,7 +17,7 @@ Author: Johannes Textor [aut, cre],
   Gerhard Burger [aut],
   Annie Liu [aut],
   Inge Wortel [aut]
-Maintainer: Inge Wortel <inge.wortel@ru.nl>
+Maintainer: Inge Wortel <ingewortel@gmail.com>
 Description: Provides methodology to analyze cells that move in a two- or three-dimensional
 	space. Available measures include displacement, confinement ratio, autocorrelation,
 	straightness, turning angle, and fractal dimension. Measures can be applied to entire tracks,
