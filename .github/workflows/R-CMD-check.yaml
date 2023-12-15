@@ -44,8 +44,8 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - name: Build site
-        run: message( paste0( "Matrix version " , packageVersion( "Matrix" ) ) )
+      - name: Check Matrix and irlba
+        run: message( paste0( "Matrix version " , packageVersion( "Matrix" ) ) ) ; message( paste0( "irlba version " , packageVersion( "irlba" ) ) ); library( celltrackR ); trackFeatureMap( TCells, c(speed,meanTurningAngle), method="UMAP")
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
