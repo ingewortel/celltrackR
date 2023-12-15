@@ -11,12 +11,12 @@ Authors@R: c(person("Johannes", "Textor", role = c("aut"),
               person("Annie","Liu", role= "aut"),
               person("Inge", "Wortel", role = c("aut","cre"),
                      email = "ingewortel@gmail.com"))
-Author: Johannes Textor [aut, cre],
+Author: Johannes Textor [aut],
   Katharina Dannenberg [aut],
   Jeffrey Berry [aut],
   Gerhard Burger [aut],
   Annie Liu [aut],
-  Inge Wortel [aut]
+  Inge Wortel [aut, cre]
 Maintainer: Inge Wortel <ingewortel@gmail.com>
 Description: Provides methodology to analyze cells that move in a two- or three-dimensional
 	space. Available measures include displacement, confinement ratio, autocorrelation,

@@ -10,6 +10,7 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
+matrix_irlba_clash = ( packageVersion( "Matrix" ) > "1.6.1" )
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -159,7 +160,7 @@ Again, we find that the B cells and Neutrophils are separated in this plot, whil
 Uniform manifold approximate and projection (UMAP) is another powerful method to explore structure in high-dimensional datasets. `trackFeatureMap()` supports visualization of tracks in a UMAP. Note that this option requires the `uwot` package. Please install this package first using `install.packages("uwot")`. 
 
 
-```{r umap, eval = FALSE}
+```{r umap, eval = !matrix_irlba_clash }
 trackFeatureMap( all.tracks,
         c(speed,meanTurningAngle,squareDisplacement,
           maxDisplacement,outreachRatio ), method = "UMAP",

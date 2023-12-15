@@ -1,5 +1,13 @@
 set.seed(2345)
 
+# Edit 2023-12-15: currently there is a clash where package irlba used by uwot 
+# clashes when it's dependency 'Matrix' has version > 1.6.1, which causes the
+# function with UMAPs to fail. This is likely to be resolved soon. For now, skip
+# the test if package versions are in the problematic regime.
+matrix_check <- ( packageVersion( "Matrix" ) > "1.6.1" )
+irlba_check <- ( packageVersion( "irlba" ) <= "2.3.5.1" )
+matrix_irlba_clash <- ( matrix_check & irlba_check )
+
 
 # getFeatureMatrix
 all.measures <- c(trackLength, duration, speed, displacement, squareDisplacement, maxDisplacement,
@@ -54,7 +62,7 @@ test_that( "trackFeatureMap produces the right output", {
   # NULL returned if only plots specified, no matter the cluster method
   expect_true( is.null( trackFeatureMap( TCells, c(speed) ) ) )
   expect_true( is.null( trackFeatureMap( TCells, c(speed), method = "MDS" ) ) )
-  expect_true( is.null( trackFeatureMap( TCells, c(speed,overallAngle), method = "UMAP" ) ) )
+ 
   # otherwise output depends on method of choice
   expect_is( trackFeatureMap( TCells, c(speed), method = "PCA", return.mapping = TRUE ),
                 "matrix" )
@@ -70,6 +78,9 @@ test_that( "trackFeatureMap produces the right output", {
                 2 )
   expect_equal( ncol( trackFeatureMap( TCells, c(speed,meanTurningAngle,straightness), method = "MDS", return.mapping = TRUE, k = 3 ) ),
                 3 )
+	
+  skip_if( matrix_irlba_clash, message = "Skipping trackFeatureMap tests with UMAP if dependency clash with 'Matrix' > 1.6.1 and irlba <= 2.3.5.1." )
+  expect_true( is.null( trackFeatureMap( TCells, c(speed,overallAngle), method = "UMAP" ) ) )
   # UMAP returns two columns by default but this can be tuned with n_components
   expect_equal( ncol( trackFeatureMap( TCells, c(speed,meanTurningAngle,straightness), method = "UMAP", return.mapping = TRUE ) ),
                 2 )
