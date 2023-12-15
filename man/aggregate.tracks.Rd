@@ -29,27 +29,27 @@ using \code{\link{wrapTrack}} (but note that this requires an explicit call
 \item{by}{a string that indicates how grouping is performed. Currently, two
 kinds of grouping are supported:
 \itemize{
- \item{"subtracks"}{ Apply \code{measure} to all subtracks according to
-the parameters \code{subtrack.length} and \code{max.overlap}.}
- \item{"prefixes"}{ Apply \code{measure} to all prefixes (i.e., subtracks starting
- from a track's initial position) according to the parameter \code{subtrack.length}.}
+ \item "subtracks"  Apply \code{measure} to all subtracks according to
+the parameters \code{subtrack.length} and \code{max.overlap}.
+ \item "prefixes"   Apply \code{measure} to all prefixes (i.e., subtracks starting
+ from a track's initial position) according to the parameter \code{subtrack.length}.
 }}
 
 \item{FUN}{a summary statistic to be computed on the measures of subtracks with the
 same length. Can be a function or a string.
 If a string is given, it is first matched to the following builtin values:
 \itemize{
- \item{"mean.sd"}{ Outputs the mean and \eqn{mean - sd} as lower and
- \eqn{mean + sd} as upper bound}
- \item{"mean.se"}{ Outputs the mean and \eqn{mean - se} as lower and
- \eqn{mean + se} as upper bound}
- \item{"mean.ci.95"}{ Outputs the mean and upper and lower bound of a
- parametric 95 percent confidence intervall}.
- \item{"mean.ci.99"}{ Outputs the mean and upper and lower bound of a
- parametric 95 percent confidence intervall}.
- \item{"iqr"}{ Outputs the interquartile range, that is, the median, and the
+ \item "mean.sd"  Outputs the mean and \eqn{mean - sd} as lower and
+ \eqn{mean + sd} as upper bound 
+ \item "mean.se" Outputs the mean and \eqn{mean - se} as lower and
+ \eqn{mean + se} as upper bound 
+ \item "mean.ci.95" Outputs the mean and upper and lower bound of a
+ parametric 95 percent confidence interval.
+ \item "mean.ci.99" Outputs the mean and upper and lower bound of a
+ parametric 95 percent confidence intervall.
+ \item "iqr" Outputs the interquartile range, that is, the median, and the
  25-percent-quartile as a lower and and the 75-percent-quartile as an
- upper bound}
+ upper bound
 }
 If the string is not equal to any of these, it is passed on to
 \code{\link{match.fun}}.}

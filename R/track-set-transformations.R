@@ -74,15 +74,14 @@ projectDimensions <- function(x, dims=c("x","y")) {
 #' @param how string specifying what do with tracks that contain gaps. Possible
 #'   values are:
 #' \itemize{
-#'  \item{"drop":}{ the simplest option -- discard all tracks that contain gaps.}
-#'  \item{"split":}{ split tracks around the gaps, e.g. a track for which the step
+#'  \item "drop": the simplest option -- discard all tracks that contain gaps.
+#'  \item "split":  split tracks around the gaps, e.g. a track for which the step
 #'  between the 3rd and 4th positions is too long or too short is split into one
 #'  track corresponding to positions 1 to 3 and another track corresponding to
-#'  position 3 onwards.}
-#'  \item{"interpolate":}{ approximate the track positions using linear
+#'  position 3 onwards.
+#'  \item "interpolate":  approximate the track positions using linear
 #'  interpolation (see \code{\link{interpolateTrack}}). The result is a tracks
 #'  object with constant step durations.
-#'  }
 #' }
 #' @param tol nonnegative number specifying by which fraction each step may deviate
 #'  from the average step duration without being considered a gap. For instance, if
