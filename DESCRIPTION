@@ -52,7 +52,7 @@ Suggests:
     wordspace,
     knitr,
     rmarkdown,
-    Rspectra,
+    RSpectra,
     uwot,
     dendextend,
     ggplot2,
