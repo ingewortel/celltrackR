@@ -80,6 +80,7 @@ test_that( "trackFeatureMap produces the right output", {
                 3 )
 	
   skip_if( matrix_irlba_clash, message = "Skipping trackFeatureMap tests with UMAP if dependency clash with 'Matrix' > 1.6.1 and irlba <= 2.3.5.1." )
+  require( RSpectra )
   expect_true( is.null( trackFeatureMap( TCells, c(speed,overallAngle), method = "UMAP" ) ) )
   # UMAP returns two columns by default but this can be tuned with n_components
   expect_equal( ncol( trackFeatureMap( TCells, c(speed,meanTurningAngle,straightness), method = "UMAP", return.mapping = TRUE ) ),
