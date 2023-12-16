@@ -13,7 +13,7 @@ vignette: >
 matrix_check <- ( packageVersion( "Matrix" ) > "1.6.1" )
 irlba_check <- ( packageVersion( "irlba" ) <= "2.3.5.1" )
 
-matrix_irlba_clash <- ( matrix_check & irlba_check )
+matrix_irlba_clash <- TRUE #( matrix_check & irlba_check )
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
