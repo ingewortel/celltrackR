@@ -44,8 +44,8 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - name: Install irlba from source
-        run: install.packages( "irlba", type = "source" )
+      - name: Custom R
+        run: message( "currently not used" )
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
