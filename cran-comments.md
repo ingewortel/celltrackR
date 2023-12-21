@@ -3,6 +3,9 @@
 
 ### Test environments
 * local OS X (x86_64-apple-darwin17.0 (64-bit) with R v4.2.3 (2023-12-15)
+* windows-latest (release) x86_64-w64-mingw32 (64-bit) with R v4.3.2 (2023-10-31)
+* ubuntu-latest (devel) x86_64-apple-darwin20 (64-bit) with R v4.3.2 (2023-10-31)
+* ubuntu-latest (release) x86_64-pc-linux-gnu (64-bit) with R v4.3.2 (2023-10-31)
 
 
 ### R CMD check results
