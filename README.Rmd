@@ -1,6 +1,6 @@
 ---
 title: CelltrackR README
-author: Johannes Textor
+author: Inge Wortel and Johannes Textor
 output: github_document
 ---
 
@@ -26,6 +26,8 @@ On the project website (motilitylab.net), a simple GUI frontend to many function
 package is implemented, and public datasets are available to download and analyze. 
 Indeed, the CelltrackR package was formerly called "MotilityLab", but we changed the 
 name to make this functionality easier to find.
+
+See also: [https://ingewortel.github.io/celltrackR/](https://ingewortel.github.io/celltrackR/)
 
 # Installation
 

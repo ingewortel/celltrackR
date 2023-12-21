@@ -1,6 +1,6 @@
 CelltrackR README
 ================
-Johannes Textor
+Inge Wortel and Johannes Textor
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -18,6 +18,8 @@ to many functions in the package is implemented, and public datasets are
 available to download and analyze. Indeed, the CelltrackR package was
 formerly called “MotilityLab”, but we changed the name to make this
 functionality easier to find.
+
+See also: <https://ingewortel.github.io/celltrackR/>
 
 # Installation
 

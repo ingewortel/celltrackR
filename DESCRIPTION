@@ -9,12 +9,14 @@ Authors@R: c(person("Johannes", "Textor", role = c("aut"),
               person("Jeffrey", "Berry", role = "aut" ),
               person("Gerhard", "Burger", role = "aut"),
               person("Annie","Liu", role= "aut"),
+              person("Mark","Miller", role= "aut"),
               person("Inge", "Wortel", role = c("aut","cre"),
                      email = "ingewortel@gmail.com"))
 Author: Johannes Textor [aut],
   Katharina Dannenberg [aut],
   Jeffrey Berry [aut],
   Gerhard Burger [aut],
+  Mark Miller [aut],
   Annie Liu [aut],
   Inge Wortel [aut, cre]
 Maintainer: Inge Wortel <ingewortel@gmail.com>
