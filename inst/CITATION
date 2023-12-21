@@ -1,8 +1,8 @@
 citHeader("To cite celltrackR in publications use:")
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
   title        = "{CelltrackR}: an R package for fast and flexible analysis of immune cell migration data",
-  author       = personList(as.person("Inge M. N. Wortel"),
+  author       = c(as.person("Inge M. N. Wortel"),
 			as.person( "Annie Y. Liu"),  
 		   as.person( "Katharina Dannenberg"),
 		   as.person( "Jeffrey C. Berry"),
