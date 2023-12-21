@@ -162,8 +162,12 @@ Again, we find that the B cells and Neutrophils are separated in this plot, whil
 
 Uniform manifold approximate and projection (UMAP) is another powerful method to explore structure in high-dimensional datasets. `trackFeatureMap()` supports visualization of tracks in a UMAP. Note that this option requires the `uwot` package. Please install this package first using `install.packages("uwot")`. 
 
+```{r rspec, echo = FALSE, eval = matrix_irlba_clash}
+library( RSpectra )
+```
 
-```{r umap, eval = !matrix_irlba_clash }
+
+```{r umap}
 trackFeatureMap( all.tracks,
         c(speed,meanTurningAngle,squareDisplacement,
           maxDisplacement,outreachRatio ), method = "UMAP",

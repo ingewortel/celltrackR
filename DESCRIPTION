@@ -18,8 +18,8 @@ Author: Johannes Textor [aut],
   Annie Liu [aut],
   Inge Wortel [aut, cre]
 Maintainer: Inge Wortel <ingewortel@gmail.com>
-Description: Provides methodology to analyze cells that move in a two- or three-dimensional
-	space. Available measures include displacement, confinement ratio, autocorrelation,
+Description: Methods for analyzing (cell) motion in two or three dimensions.
+	Available measures include displacement, confinement ratio, autocorrelation,
 	straightness, turning angle, and fractal dimension. Measures can be applied to entire tracks,
 	steps, or subtracks with varying length. While the methodology has been developed for
 	cell trajectory analysis, it is applicable to anything that moves including animals,
