@@ -1,0 +1,125 @@
+#' Two-Photon Data: B Cells in a Lymph Node
+#'
+#' GFP-labelled B cells were injected retro-orbitally in healthy CD11c-YFP mice, and 
+#' intravitally imaged (using two-photon microscopy) inside a cervical lymph
+#' node. These data illustrate the characteristic "random-walk-like" motion pattern 
+#' of B cells in lymph nodes. For full method details, see references below. 
+#'
+#' @format ## `BCells`
+#' An S3 object of class "tracks"; a list with 74 elements. Each 
+#' element name identifies a cell track. Each element is a matrix
+#' containing the following three columns.
+#' \describe{
+#' 	\item{\code{t}}{the time (in seconds)}
+#' 	\item{\code{x}}{The X coordinate (in micrometers)}
+#'  \item{\code{y}}{The Y coordinate (in micrometers)}
+#' }
+#' @source Data were generated in 2021 in the Mark J. Miller Lab, Department of Medicine, Washington University in St Louis, USA.
+#' @references
+#' Miller MJ and Wei SH and Parker I and Cahalan MD (2002), 
+#' Two-photon imaging of lymphocyte motility and antigen response in intact lymph node.
+#' \emph{Science}, \bold{296}(5574):1869--1873. doi:10.1126/science.1070051
+#' 
+#' Wortel IMN and Liu AY and Dannenberg K and Berry JC and Miller MJ and Textor J (2021),
+#' CelltrackR: an R package for fast and flexible analysis of immune cell migration data.
+#' \emph{ImmunoInformatics}, \bold{1-2}:100003. doi:10.1016/j.immuno.2021.100003
+#' 
+#' @keywords datasets
+#'
+#' @usage data("BCells")
+#' 
+#' @examples
+#'   ## load the tracks
+#'   data(BCells)
+#'
+#'   ## visualize the tracks (calls function plot.tracks)
+#'   plot(BCells)
+#' 
+"BCells"
+
+#' Two-Photon Data: T Cells in a Lymph Node
+#'
+#' RFP-labelled T cells were injected retro-orbitally in healthy CD11c-YFP mice, and 
+#' intravitally imaged (using two-photon microscopy) inside a cervical lymph
+#' node. These data illustrate the characteristic "random-walk-like" motion pattern 
+#' of T cells in lymph nodes. For full method details, see references below. 
+#'
+#' @format ## `TCells`
+#' An S3 object of class "tracks"; a list with 199 elements. Each 
+#' element name identifies a cell track. Each element is a matrix
+#' containing the following three columns.
+#' \describe{
+#' 	\item{\code{t}}{the time (in seconds)}
+#' 	\item{\code{x}}{The X coordinate (in micrometers)}
+#'  \item{\code{y}}{The Y coordinate (in micrometers)}
+#' }
+#' @source Data were generated in 2021 in the Mark J. Miller Lab, Department of Medicine, Washington University in St Louis, USA.
+#' @references
+#' Miller MJ and Wei SH and Parker I and Cahalan MD (2002), 
+#' Two-photon imaging of lymphocyte motility and antigen response in intact lymph node.
+#' \emph{Science}, \bold{296}(5574):1869--1873. doi:10.1126/science.1070051
+#' 
+#' Wortel IMN and Liu AY and Dannenberg K and Berry JC and Miller MJ and Textor J (2021),
+#' CelltrackR: an R package for fast and flexible analysis of immune cell migration data.
+#' \emph{ImmunoInformatics}, \bold{1-2}:100003. doi:10.1016/j.immuno.2021.100003
+#' 
+#' @keywords datasets
+#'
+#' @usage data("TCells")
+#' 
+#' @examples
+#'   ## load the tracks
+#'   data(TCells)
+#'
+#'   ## visualize the tracks (calls function plot.tracks)
+#'   plot(TCells)
+#' 
+"TCells"
+
+#' Two-Photon Data: Neutrophils responding to an infection in the ear
+#'
+#' LysM-GFP mice were infected with S. aureus on their ear, and intravitally
+#' imaged using two-photon microscopy proximal to the infection. 
+#' These cells display a fairly directed kind of motion, as they move towards 
+#' infection foci. For method details, see the references below.
+#'
+#' @format ## `Neutrophils`
+#' An S3 object of class "tracks"; a list with 411 elements. Each 
+#' element name identifies a cell track. Each element is a matrix
+#' containing the following three columns.
+#' \describe{
+#' 	\item{\code{t}}{the time (in seconds)}
+#' 	\item{\code{x}}{The X coordinate (in micrometers)}
+#'  \item{\code{y}}{The Y coordinate (in micrometers)}
+#' }
+#' @source Data were generated in 2021 in the Mark J. Miller Lab, Department of Medicine, Washington University in St Louis, USA.
+#' @references
+#' Lin A and Loughman JA and Zinselmeyer BH and Miller MJ and Caparon MG (2009), 
+#' Streptolysin S inhibits neutrophil recruitment during the early stages of streptococcus pyogenes infection.
+#' \emph{Infect Immun}, \bold{77}(11):5190--5201. doi:10.1128/IAI.00420-09
+#'
+#' Wang B and Zinselmeyer BH and McDole JR and Gieselman PA and Miller MJ (2010), 
+#' Non-invasive imaging of leukocyte homing and migration in vivo.
+#' \emph{J Vis Exp}, \bold{46}:e2062. doi:10.3791/2062
+#'
+#' Graham DB and Zinselmeyer BH and Mascarenhas F and Delgado R and Miller MJ and Swat W (2009), 
+#' Itam signaling by Vav family Rho Guanine nucleotide exchange factors regulates interstitial transit rates of neutrophils in vivo.
+#' \emph{PLOS ONE}, \bold{2}(2):1--5. doi:10.1371/journal.pone.0004652
+#' 
+#' Wortel IMN and Liu AY and Dannenberg K and Berry JC and Miller MJ and Textor J (2021),
+#' CelltrackR: an R package for fast and flexible analysis of immune cell migration data.
+#' \emph{ImmunoInformatics}, \bold{1-2}:100003. doi:10.1016/j.immuno.2021.100003
+#' 
+#' @keywords datasets
+#'
+#' @usage data("Neutrophils")
+#' 
+#' @examples
+#'   ## load the tracks
+#'   data(Neutrophils)
+#'
+#'   ## visualize the tracks (calls function plot.tracks)
+#'   plot(Neutrophils)
+#' 
+"Neutrophils"
+
