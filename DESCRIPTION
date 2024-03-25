@@ -16,10 +16,10 @@ Author: Johannes Textor [aut, cre],
   Katharina Dannenberg [aut],
   Jeffrey Berry [aut],
   Gerhard Burger [aut],
-  Mark Miller [aut],
   Annie Liu [aut],
+  Mark Miller [aut],
   Inge Wortel [aut]
-Maintainer: Inge Wortel <johannes.textor@gmx.de>
+Maintainer: Johannes Textor <johannes.textor@gmx.de>
 Description: Methods for analyzing (cell) motion in two or three dimensions.
 	Available measures include displacement, confinement ratio, autocorrelation,
 	straightness, turning angle, and fractal dimension. Measures can be applied to entire tracks,
