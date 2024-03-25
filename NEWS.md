@@ -21,7 +21,8 @@ New functionalities for integration with immunemap.org:
 Minor changes:
 - including documentation for new functionalities for integration with immunemap.org;
 - Updated package documentation after breaking change in Roxygen upon CRAN request.
-- Package maintainer is now Inge Wortel.
+- Updated the documentation for the included datasets, which had not yet been updated 
+with the new versions of the data included since package v 1.0.0.
 
 
 # celltrackR 1.1.0
