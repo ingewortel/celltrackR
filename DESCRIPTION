@@ -1,25 +1,25 @@
 Package: celltrackR
 Type: Package
 Title: Motion Trajectory Analysis
-Date: 2023-12-15
+Date: 2024-03-25
 Version: 1.2.0
-Authors@R: c(person("Johannes", "Textor", role = c("aut"),
+Authors@R: c(person("Johannes", "Textor", role = c("aut","cre"),
                      email = "johannes.textor@gmx.de"),
               person("Katharina", "Dannenberg", role = "aut"),
               person("Jeffrey", "Berry", role = "aut" ),
               person("Gerhard", "Burger", role = "aut"),
               person("Annie","Liu", role= "aut"),
               person("Mark","Miller", role= "aut"),
-              person("Inge", "Wortel", role = c("aut","cre"),
+              person("Inge", "Wortel", role = c("aut"),
                      email = "ingewortel@gmail.com"))
-Author: Johannes Textor [aut],
+Author: Johannes Textor [aut, cre],
   Katharina Dannenberg [aut],
   Jeffrey Berry [aut],
   Gerhard Burger [aut],
   Mark Miller [aut],
   Annie Liu [aut],
-  Inge Wortel [aut, cre]
-Maintainer: Inge Wortel <ingewortel@gmail.com>
+  Inge Wortel [aut]
+Maintainer: Inge Wortel <johannes.textor@gmx.de>
 Description: Methods for analyzing (cell) motion in two or three dimensions.
 	Available measures include displacement, confinement ratio, autocorrelation,
 	straightness, turning angle, and fractal dimension. Measures can be applied to entire tracks,
