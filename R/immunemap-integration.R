@@ -74,6 +74,7 @@ read.immap.json <- function( url, tracks.url = NULL, keep.id = TRUE, scale.auto 
 
 	# Read json from file or url; error if not json
 	input <- parse.immap.json( tracks.url )
+	if( is.null( input ) ) return(NULL)
 	
 	# Check format of the input list.
 	.check.immap.json( input )
@@ -120,6 +121,11 @@ read.immap.json <- function( url, tracks.url = NULL, keep.id = TRUE, scale.auto 
 }
 
 .check.immap.json <- function( json.input ){
+
+	if( is.null( json.input ) ){
+		return(NULL)
+	}
+
 	# Input must be a list, elements must correspond with tracks (check.immap.single)
 	if( !is.list(json.input) ){
 		stop( "Error reading from immunemap. Expecting a list of tracks, please check the format." )

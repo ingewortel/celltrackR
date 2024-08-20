@@ -17,6 +17,7 @@ test_that("Importer read.immap.json checks input format correctly", {
 	expect_error( {.read.immap.single( list( points = list( "hi" )) )}, msg )
 	expect_error( {.read.immap.single( list( points = list( numeric(3))) )}, msg )
 	
+	skip_if_offline(host = "api.immunemap.org")
 	# Working case: 
 	expect_is( .read.immap.single( minimal.track, warn.scaling = FALSE, keep.id = FALSE ), "tracks" )
 	expect_is( read.immap.json( tracks.url="immunemap.json", scale.auto = FALSE, warn.scaling = FALSE, keep.id = FALSE, warn.celltypes = FALSE )$tracks, "tracks" )
