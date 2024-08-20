@@ -189,10 +189,49 @@ read.immap.json <- function( url, tracks.url = NULL, keep.id = TRUE, scale.auto 
 #' @rdname ReadImmuneMap
 #' @export
 parse.immap.json <- function( url ){
-	if( !requireNamespace("rjson", quietly=TRUE ) ){
-      stop( "Trying to read tracks from ImmuneMap: please install the 'rjson' package to use this functionality!" )
-    }
 
+	rjson.pack <- requireNamespace("rjson", quietly=TRUE )
+	
+	if( !rjson.pack ){
+      stop( "Trying to read tracks from ImmuneMap json format. Please make sure the package 'rjson' is installed to use this functionality." )
+    }
+	
+	curl.pack <- requireNamespace("curl", quietly=TRUE )
+	httr.pack <- requireNamespace("httr", quietly=TRUE)
+
+	if( any( !curl.pack, !httr.pack ) ){
+      stop( "Trying to read tracks from ImmuneMap online. Please make sure the packages 'httr' and 'curl' are installed to use this functionality." )
+    }
+    
+    # check if the url is a web page rather than a local url; if so, extra checks
+    if( grepl( "api.immunemap.org", url ) ){
+        # First check internet connection and status of the page. 
+		# policy "gracefully fail" with message (not error/warning) if page unavailable.
+		if (!curl::has_internet()) {
+			message("Failed to read tracks from immunemap: no internet connection.")
+			return(NULL)
+		}
+	
+		# Informative messages for timeout or http status > 400 
+		resp <- tryCatch(
+		  httr::GET(url = url, httr::timeout(2)),
+		  error = function(e) conditionMessage(e),
+		  warning = function(w) conditionMessage(w)
+		)
+		if (!methods::is( resp, "response" )) {
+			message(resp)
+			return(NULL)
+		}
+	
+		if (httr::http_error(resp)) { 
+			httr::message_for_status(resp)
+			return(NULL)
+		}  	
+
+    }
+    
+  	
+  	# do throw an error when the format is not json.
 	input <- tryCatch( rjson::fromJSON( file = url ), 
 		error = function(cond){ 
 			message(paste("Error reading url/file:", url))
@@ -201,6 +240,9 @@ parse.immap.json <- function( url ){
 	} )
 	return(input)
 }
+
+
+
 
 #' @rdname ReadImmuneMap
 #' @export

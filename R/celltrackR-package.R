@@ -130,10 +130,10 @@
 #'  ## plot clustering
 #'  plot(hclust(dist(asph)))
 #'
-#' @docType package
 #' @name celltrackR
 #' @aliases celltrackR-package
-NULL
+#' @keywords internal
+"_PACKAGE"
 
 #' Open the package cheat sheet
 #'
@@ -175,3 +175,8 @@ cheatsheet <- function( opencmd = NULL )
 
 }
 
+
+
+## usethis namespace: start
+## usethis namespace: end
+NULL

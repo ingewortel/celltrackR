@@ -143,4 +143,5 @@ Johannes Textor, Katharina Dannenberg, Jeffrey Berry, Gerhard Burger, Inge Worte
   Maintainer: Johannes Textor <johannes.textor@gmx.de>
 }
 \keyword{cluster}
+\keyword{internal}
 \keyword{spatial}

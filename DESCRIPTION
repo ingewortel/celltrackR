@@ -1,8 +1,8 @@
 Package: celltrackR
 Type: Package
 Title: Motion Trajectory Analysis
-Date: 2024-03-25
-Version: 1.2.0
+Date: 2024-08-20
+Version: 1.2.1
 Authors@R: c(person("Johannes", "Textor", role = c("aut","cre"),
                      email = "johannes.textor@gmx.de"),
               person("Katharina", "Dannenberg", role = "aut"),
@@ -46,7 +46,8 @@ Imports:
     graphics,
     utils,
     ellipse,
-    pracma
+    pracma,
+    methods
 Suggests:
     scatterplot3d,
     fractaldim,
@@ -61,6 +62,8 @@ Suggests:
     ggbeeswarm,
     gridExtra,
     mvtnorm,
-    rjson
-RoxygenNote: 7.2.3
+    rjson,
+    httr,
+    curl
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
