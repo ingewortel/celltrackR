@@ -65,5 +65,5 @@ Suggests:
     rjson,
     httr,
     curl
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
