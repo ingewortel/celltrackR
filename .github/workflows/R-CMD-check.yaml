@@ -46,7 +46,7 @@ jobs:
           needs: check
 
       - name: Custom R
-        run : devtools::check( manual = TRUE, remote = TRUE )
+        run : install.packages( "devtools" ); devtools::check( manual = TRUE, remote = TRUE )
         #run: message( "currently not used" )
         shell: Rscript {0}
 
