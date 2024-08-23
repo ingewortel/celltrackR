@@ -22,7 +22,8 @@ jobs:
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'oldrel-1'}
+          # remove temporarily because r version not high enough to work with rjson
+          # - {os: ubuntu-latest,   r: 'oldrel-1'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -45,7 +46,8 @@ jobs:
           needs: check
 
       - name: Custom R
-        run: message( "currently not used" )
+        run : install.packages( "devtools" ); devtools::check( manual = TRUE, remote = TRUE )
+        #run: message( "currently not used" )
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
