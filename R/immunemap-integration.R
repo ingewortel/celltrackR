@@ -214,24 +214,23 @@ parse.immap.json <- function( url ){
         # First check internet connection and status of the page. 
 		# policy "gracefully fail" with message (not error/warning) if page unavailable.
 		if (!curl::has_internet()) {
-			message("Failed to read tracks from immunemap: no internet connection.")
+			stop("Failed to read tracks from immunemap: no internet connection.")
 			return(NULL)
 		}
 	
 		# Informative messages for timeout or http status > 400 
 		resp <- tryCatch(
-		  httr::GET(url = url, httr::timeout(2)),
+		  httr::GET(url = url), #, httr::timeout(2)),
 		  error = function(e) conditionMessage(e),
 		  warning = function(w) conditionMessage(w)
 		)
 		if (!methods::is( resp, "response" )) {
-			message(resp)
-			return(NULL)
+			stop(resp)
 		}
 	
 		if (httr::http_error(resp)) { 
 			httr::message_for_status(resp)
-			return(NULL)
+			stop(resp)
 		}  	
 
     }
@@ -333,6 +332,7 @@ get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos =
 #'  the values for each track. 
 #'
 #' @examples
+#' \dontrun{
 #' ## Read tracks from immunemap online
 #' input <- parse.immap.json( url = "https://api.immunemap.org/video/14/tracks" )
 #' meta.df <- get.immap.metadata( input )
@@ -340,7 +340,8 @@ get.immap.tracks <- function( input, keep.id = TRUE, scale.t = NULL, scale.pos =
 #' ## Repeat but ignore also the 'color' column:
 #' exclude <-  c("points", "cellTypeObject","date", "color")
 #' meta.df <- get.immap.metadata( input, exclude.names = exclude )
-#'
+#' }
+#' 
 #' @export
 get.immap.metadata <- function( input, warn.exclude = TRUE, exclude.names = c("points", "cellTypeObject", "date" ) ){
 	

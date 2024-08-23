@@ -1,3 +1,29 @@
+# celltrackR 1.2.1
+
+Improved handling of online resources in tests and examples for immunemap integration
+functions in accordance with CRAN policy.
+
+### Potentially breaking changes: 
+
+None.
+
+### Minor changes:
+- (immunemap-integration.R => parse.immap.json ): now uses jsonlite instead of rjson 
+	because rjson requires R 4.4.1.
+- (immunemap-integration.R => parse.immap.json ): improved handling of cases where the 
+	internet or immunemap website is down.
+- (immunemap-integration.R ): dontrun on examples to avoid errors on CRAN servers due to
+	internet problems.
+- (testImmuneMapIntegration.R) : added a skip_if_offline for same reasons.
+- DESCRIPTION: jsonlite instead of rjson in suggests
+
+
+### Documentation changes:
+
+Minor changes:
+- Updated outdated @docType package to new roxygen recommendation
+
+
 # celltrackR 1.2.0
 
 Integration with immunemap.org. 

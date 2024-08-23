@@ -29,6 +29,7 @@ a dataframe with metadata. This function currently only handles metadata with a 
 Get metadata from tracks obtained from \url{https://immunemap.org} and import into celltrackR.
 }
 \examples{
+\dontrun{
 ## Read tracks from immunemap online
 input <- parse.immap.json( url = "https://api.immunemap.org/video/14/tracks" )
 meta.df <- get.immap.metadata( input )
@@ -36,5 +37,6 @@ meta.df <- get.immap.metadata( input )
 ## Repeat but ignore also the 'color' column:
 exclude <-  c("points", "cellTypeObject","date", "color")
 meta.df <- get.immap.metadata( input, exclude.names = exclude )
+}
 
 }
