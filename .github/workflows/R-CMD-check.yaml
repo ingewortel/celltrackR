@@ -46,7 +46,8 @@ jobs:
           needs: check
 
       - name: Custom R
-        run: message( "currently not used" )
+        run : devtools::check( manual = TRUE, remote = TRUE )
+        #run: message( "currently not used" )
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
