@@ -48,7 +48,7 @@
 #' \code{get.immap.tracks} to extract the tracks, and  \code{\link{get.immap.metadata}}
 #' to read the metadata. 
 #' 
-#' @note This functionality requires the rjson package to be installed.
+#' @note This functionality requires the jsonlite package to be installed.
 #'
 #' @seealso \code{\link{get.immap.metadata}}.
 #'
@@ -196,10 +196,10 @@ read.immap.json <- function( url, tracks.url = NULL, keep.id = TRUE, scale.auto 
 #' @export
 parse.immap.json <- function( url ){
 
-	rjson.pack <- requireNamespace("rjson", quietly=TRUE )
+	jsonlite.pack <- requireNamespace("jsonlite", quietly=TRUE )
 	
-	if( !rjson.pack ){
-      stop( "Trying to read tracks from ImmuneMap json format. Please make sure the package 'rjson' is installed to use this functionality." )
+	if( !jsonlite.pack ){
+      stop( "Trying to read tracks from ImmuneMap json format. Please make sure the package 'jsonlite' is installed to use this functionality." )
     }
 	
 	curl.pack <- requireNamespace("curl", quietly=TRUE )
@@ -238,7 +238,7 @@ parse.immap.json <- function( url ){
     
   	
   	# do throw an error when the format is not json.
-	input <- tryCatch( rjson::fromJSON( file = url ), 
+	input <- tryCatch( jsonlite::fromJSON( url, simplifyDataFrame=FALSE, simplifyMatrix=FALSE ), 
 		error = function(cond){ 
 			message(paste("Error reading url/file:", url))
 			message("Are you sure this is a json file? Here's the original error message:")

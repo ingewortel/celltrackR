@@ -1,5 +1,5 @@
 # example data
-im <- rjson::fromJSON( file = "immunemap.json" )
+im <- jsonlite::fromJSON( "immunemap.json", simplifyDataFrame=FALSE, simplifyMatrix=FALSE )
 minimal.tracks <- list( list( points = list( numeric(4) ) ) )
 minimal.track <- list( points = list( c(1:4), c(1:4) ) )
 

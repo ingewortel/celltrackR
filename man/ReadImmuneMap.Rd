@@ -96,7 +96,7 @@ This produces both tracks object(s) and a dataframe with metadata.
 to read the metadata.
 }
 \note{
-This functionality requires the rjson package to be installed.
+This functionality requires the jsonlite package to be installed.
 }
 \examples{
 \dontrun{
