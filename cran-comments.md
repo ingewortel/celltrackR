@@ -1,4 +1,38 @@
-## Current submission v1.2.0
+## Current submission v1.2.1
+
+### Resubmission after archiving
+
+The package was archived due to a violation of the policy on handling internet resources,
+which we were unable to fix in time before the deadline (2024-08-20). We have now
+adapted the package in line with the policy and are resubmitting it to CRAN. 
+
+
+### Test environments
+* local OS X (aarch64-apple-darwin20 (64-bit) with R v4.4.1 (2024-08-23) 
+* win-builder (devel) (2024-08-23)
+* windows-latest (release) x86_64-w64-mingw32 (64-bit) with R v4.4.1 (2024-08-23)
+* ubuntu-latest (devel) x86_64-pc-linux-gnu (64-bit) with R developmental version (2024-08-23)
+* ubuntu-latest (release) x86_64-pc-linux-gnu (64-bit) with R v4.4.1 (2024-08-23)
+
+
+### R CMD check results
+
+Status: OK
+
+0 errors | 0 warnings | 0 notes
+
+### Reverse dependencies
+
+#### revdepcheck results
+
+We checked 0 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
+
+ * We saw 0 new problems
+ * We failed to check 0 packages
+
+
+
+## Previous submission v1.2.0
 
 
 ### Test environments
