@@ -1,8 +1,7 @@
-## Current submission 1.2.1.9001
+## Current submission v1.2.2
 
 The package was to be removed from CRAN due to a missing forward slash in a URL 
 in a vignette. We added this forward slash. This is the only change that was made.
-
 
 ## Previous submission v1.2.1
 
