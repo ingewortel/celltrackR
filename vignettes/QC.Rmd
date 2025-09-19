@@ -432,7 +432,7 @@ names(dup.track) <- as.character( new.id )
 TCells.dup <- c( TCellsRaw, dup.track )
 ```
 
-This can again be detected by plotting the angle between cell pairs versus the distance between cell pairs (see also section 2.3 above and [Beltman et al (2009)](https:/pubmed.ncbi.nlm.nih.gov/19834485/)):
+This can again be detected by plotting the angle between cell pairs versus the distance between cell pairs (see also section 2.3 above and [Beltman et al (2009)](https://pubmed.ncbi.nlm.nih.gov/19834485/)):
 
 ```{r, warning = FALSE, fig.width = 3, fig.height = 2.5 }
 df <- analyzeCellPairs( TCells.dup )

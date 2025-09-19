@@ -1,8 +1,8 @@
 Package: celltrackR
 Type: Package
 Title: Motion Trajectory Analysis
-Date: 2024-08-23
-Version: 1.2.1.9000
+Date: 2025-09-19
+Version: 1.2.1.9001
 Authors@R: c(person("Johannes", "Textor", role = c("aut","cre"),
                      email = "johannes.textor@gmx.de"),
               person("Katharina", "Dannenberg", role = "aut"),
